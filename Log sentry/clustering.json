@@ -1,0 +1,1020 @@
+{
+  "run_a": {
+    "tag": "anomalies only",
+    "k": 12,
+    "sweep": [
+      {
+        "k": 2,
+        "inertia": 850502.5945807704,
+        "silhouette": 0.4010282397719026
+      },
+      {
+        "k": 3,
+        "inertia": 744543.3361505572,
+        "silhouette": 0.4166825053152249
+      },
+      {
+        "k": 4,
+        "inertia": 663916.5322422604,
+        "silhouette": 0.40880054050853715
+      },
+      {
+        "k": 5,
+        "inertia": 600373.7818033479,
+        "silhouette": 0.4884327489334476
+      },
+      {
+        "k": 6,
+        "inertia": 555246.2519822945,
+        "silhouette": 0.5063038756593962
+      },
+      {
+        "k": 7,
+        "inertia": 526552.3032529594,
+        "silhouette": 0.5101736434174138
+      },
+      {
+        "k": 8,
+        "inertia": 496653.91867196735,
+        "silhouette": 0.5267721398003529
+      },
+      {
+        "k": 9,
+        "inertia": 463625.39104683435,
+        "silhouette": 0.5303415813276043
+      },
+      {
+        "k": 10,
+        "inertia": 442342.3902053261,
+        "silhouette": 0.5191984356981543
+      },
+      {
+        "k": 11,
+        "inertia": 411276.6214607142,
+        "silhouette": 0.5449473094126989
+      },
+      {
+        "k": 12,
+        "inertia": 389921.30112767976,
+        "silhouette": 0.5479461579781656
+      }
+    ],
+    "clusters": [
+      {
+        "cluster": 0,
+        "size": 3241,
+        "share": 0.19248129231500177,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_13",
+            "z": 2.04,
+            "cluster_mean": 2.042,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "seq_mean_logp",
+            "z": -1.84,
+            "cluster_mean": -1.835,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "seq_unseen_rate",
+            "z": 1.77,
+            "cluster_mean": 1.775,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "error_ratio",
+            "z": 1.75,
+            "cluster_mean": 1.755,
+            "overall_mean": 0.0
+          }
+        ],
+        "examples": [
+          -9218908087800925630,
+          -9212210418831881755,
+          -9206195404905607437
+        ]
+      },
+      {
+        "cluster": 1,
+        "size": 3885,
+        "share": 0.2307281149780259,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_30",
+            "z": 1.1,
+            "cluster_mean": 1.099,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "unacked_writes",
+            "z": -1.01,
+            "cluster_mean": -1.011,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_3",
+            "z": 0.77,
+            "cluster_mean": 0.766,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "lifecycle_complete",
+            "z": 0.76,
+            "cluster_mean": 0.764,
+            "overall_mean": 0.0
+          }
+        ],
+        "examples": [
+          -9223089179759331408,
+          -9198187894319819684,
+          -9197931064191189025
+        ]
+      },
+      {
+        "cluster": 2,
+        "size": 25,
+        "share": 0.0014847369046205013,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_16",
+            "z": 20.74,
+            "cluster_mean": 20.738,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_17",
+            "z": 20.74,
+            "cluster_mean": 20.738,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_22",
+            "z": 19.48,
+            "cluster_mean": 19.483,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_19",
+            "z": 18.79,
+            "cluster_mean": 18.788,
+            "overall_mean": 0.0
+          }
+        ],
+        "examples": [
+          -6129683979428294672,
+          -5375146817488963214,
+          -4723951162006187997
+        ]
+      },
+      {
+        "cluster": 3,
+        "size": 2950,
+        "share": 0.17519895474521915,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "seq_min_logp",
+            "z": 1.79,
+            "cluster_mean": 1.794,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "last_event",
+            "z": -1.62,
+            "cluster_mean": -1.623,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_0",
+            "z": -1.54,
+            "cluster_mean": -1.545,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "n_distinct_events",
+            "z": -1.32,
+            "cluster_mean": -1.317,
+            "overall_mean": 0.0
+          }
+        ],
+        "examples": [
+          -9223155031018917603,
+          -9222436454153579126,
+          -9209670686249337720
+        ]
+      },
+      {
+        "cluster": 4,
+        "size": 872,
+        "share": 0.051787623233163084,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "uncommitted_acks",
+            "z": -3.44,
+            "cluster_mean": -3.442,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_6",
+            "z": 3.15,
+            "cluster_mean": 3.15,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_8",
+            "z": 3.15,
+            "cluster_mean": 3.148,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_7",
+            "z": 3.15,
+            "cluster_mean": 3.148,
+            "overall_mean": 0.0
+          }
+        ],
+        "examples": [
+          -9200284066935196216,
+          -9178569792241143301,
+          -9137722442806672784
+        ]
+      },
+      {
+        "cluster": 5,
+        "size": 23,
+        "share": 0.0013659579522508612,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_21",
+            "z": 20.92,
+            "cluster_mean": 20.925,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_11",
+            "z": 19.99,
+            "cluster_mean": 19.988,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_35",
+            "z": 17.46,
+            "cluster_mean": 17.458,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_20",
+            "z": 16.25,
+            "cluster_mean": 16.249,
+            "overall_mean": -0.0
+          }
+        ],
+        "examples": [
+          -9087666954123825617,
+          -6680054068554267213,
+          -6059290274455367169
+        ]
+      },
+      {
+        "cluster": 6,
+        "size": 2518,
+        "share": 0.14954270103337688,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_6",
+            "z": 1.36,
+            "cluster_mean": 1.358,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_7",
+            "z": 1.35,
+            "cluster_mean": 1.347,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_8",
+            "z": 1.35,
+            "cluster_mean": 1.347,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_5",
+            "z": 1.33,
+            "cluster_mean": 1.332,
+            "overall_mean": -0.0
+          }
+        ],
+        "examples": [
+          -9218199794078253530,
+          -9213546006527160481,
+          -9213252085064829469
+        ]
+      },
+      {
+        "cluster": 7,
+        "size": 3,
+        "share": 0.00017816842855446015,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_43",
+            "z": 74.91,
+            "cluster_mean": 74.911,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_39",
+            "z": 46.1,
+            "cluster_mean": 46.098,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_23",
+            "z": 30.57,
+            "cluster_mean": 30.569,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_24",
+            "z": 30.57,
+            "cluster_mean": 30.569,
+            "overall_mean": 0.0
+          }
+        ],
+        "examples": [
+          -6994808880344424033,
+          584730932939516842,
+          7160764053931337311
+        ]
+      },
+      {
+        "cluster": 8,
+        "size": 2819,
+        "share": 0.1674189333650077,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "gap_mean_s",
+            "z": 1.66,
+            "cluster_mean": 1.663,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "gap_std_s",
+            "z": 1.54,
+            "cluster_mean": 1.537,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "duration_s",
+            "z": 1.47,
+            "cluster_mean": 1.466,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "gap_max_s",
+            "z": 1.45,
+            "cluster_mean": 1.453,
+            "overall_mean": 0.0
+          }
+        ],
+        "examples": [
+          -9221523313462138888,
+          -9219305696396907727,
+          -9218981007332915285
+        ]
+      },
+      {
+        "cluster": 9,
+        "size": 8,
+        "share": 0.0004751158094785604,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_28",
+            "z": 43.24,
+            "cluster_mean": 43.242,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_27",
+            "z": 43.24,
+            "cluster_mean": 43.242,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "seq_unseen_transitions",
+            "z": 2.35,
+            "cluster_mean": 2.348,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_10",
+            "z": 2.11,
+            "cluster_mean": 2.106,
+            "overall_mean": 0.0
+          }
+        ],
+        "examples": [
+          -8122638974387556519,
+          -2942077810471468030,
+          -1292779714385604878
+        ]
+      },
+      {
+        "cluster": 10,
+        "size": 2,
+        "share": 0.0001187789523696401,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_34",
+            "z": 58.02,
+            "cluster_mean": 58.022,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_36",
+            "z": 49.04,
+            "cluster_mean": 49.036,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_25",
+            "z": 49.03,
+            "cluster_mean": 49.035,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_23",
+            "z": 36.69,
+            "cluster_mean": 36.69,
+            "overall_mean": 0.0
+          }
+        ],
+        "examples": [
+          -6363674043695218814,
+          7008279672769077211
+        ]
+      },
+      {
+        "cluster": 11,
+        "size": 492,
+        "share": 0.029219622282931464,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_15",
+            "z": 5.74,
+            "cluster_mean": 5.74,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "seq_unseen_transitions",
+            "z": 4.04,
+            "cluster_mean": 4.042,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "seq_unseen_rate",
+            "z": 1.93,
+            "cluster_mean": 1.929,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "seq_min_logp",
+            "z": -1.24,
+            "cluster_mean": -1.238,
+            "overall_mean": -0.0
+          }
+        ],
+        "examples": [
+          -9214626072603923837,
+          -9198733627264590867,
+          -9147462543427262685
+        ]
+      }
+    ]
+  },
+  "run_b": {
+    "tag": "all sessions (composition check)",
+    "k": 11,
+    "sweep": [
+      {
+        "k": 2,
+        "inertia": 4456277.434976799,
+        "silhouette": 0.400079682045031
+      },
+      {
+        "k": 3,
+        "inertia": 3813597.1491068145,
+        "silhouette": 0.400079682045031
+      },
+      {
+        "k": 4,
+        "inertia": 3535619.782315752,
+        "silhouette": 0.4966850855896718
+      },
+      {
+        "k": 5,
+        "inertia": 2972484.250010495,
+        "silhouette": 0.48608338389590383
+      },
+      {
+        "k": 6,
+        "inertia": 2614801.1875060983,
+        "silhouette": 0.5029920146026515
+      },
+      {
+        "k": 7,
+        "inertia": 2438757.7312687207,
+        "silhouette": 0.4462762751036677
+      },
+      {
+        "k": 8,
+        "inertia": 2230955.671568292,
+        "silhouette": 0.5293281827327667
+      },
+      {
+        "k": 9,
+        "inertia": 2058877.7155945404,
+        "silhouette": 0.526120560421357
+      },
+      {
+        "k": 10,
+        "inertia": 1940195.183709769,
+        "silhouette": 0.5391741595137374
+      },
+      {
+        "k": 11,
+        "inertia": 1767060.626401023,
+        "silhouette": 0.5522699353510861
+      },
+      {
+        "k": 12,
+        "inertia": 1656685.3006893136,
+        "silhouette": 0.5326807710471781
+      }
+    ],
+    "clusters": [
+      {
+        "cluster": 0,
+        "size": 14340,
+        "share": 0.17925,
+        "anomaly_share": 0.0020920502092050207,
+        "signature": [
+          {
+            "feature": "has_delete",
+            "z": -2.06,
+            "cluster_mean": -2.062,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_14",
+            "z": -2.05,
+            "cluster_mean": -2.047,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_29",
+            "z": -2.04,
+            "cluster_mean": -2.041,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "last_event",
+            "z": -1.99,
+            "cluster_mean": -1.991,
+            "overall_mean": -0.0
+          }
+        ],
+        "examples": [
+          8398221649231513352,
+          -8408780096777159991,
+          -9004849644640937301
+        ]
+      },
+      {
+        "cluster": 1,
+        "size": 5097,
+        "share": 0.0637125,
+        "anomaly_share": 0.025701392976260545,
+        "signature": [
+          {
+            "feature": "evt_32",
+            "z": 2.61,
+            "cluster_mean": 2.61,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "n_level_warn",
+            "z": 2.61,
+            "cluster_mean": 2.607,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "n_error_events",
+            "z": 2.6,
+            "cluster_mean": 2.6,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "n_threads",
+            "z": 2.57,
+            "cluster_mean": 2.572,
+            "overall_mean": -0.0
+          }
+        ],
+        "examples": [
+          8706262614710946762,
+          1410356647460762403,
+          2154267478982099542
+        ]
+      },
+      {
+        "cluster": 2,
+        "size": 40290,
+        "share": 0.503625,
+        "anomaly_share": 0.010697443534375775,
+        "signature": [
+          {
+            "feature": "evt_29",
+            "z": 0.49,
+            "cluster_mean": 0.487,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "has_delete",
+            "z": 0.48,
+            "cluster_mean": 0.485,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_14",
+            "z": 0.48,
+            "cluster_mean": 0.477,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "duration_s",
+            "z": -0.47,
+            "cluster_mean": -0.47,
+            "overall_mean": 0.0
+          }
+        ],
+        "examples": [
+          3134465140952480868,
+          -8791784475607483755,
+          -6466035457690152734
+        ]
+      },
+      {
+        "cluster": 3,
+        "size": 462,
+        "share": 0.005775,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_13",
+            "z": 13.08,
+            "cluster_mean": 13.078,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "seq_unseen_rate",
+            "z": 11.56,
+            "cluster_mean": 11.555,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "seq_mean_logp",
+            "z": -9.86,
+            "cluster_mean": -9.863,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "lifecycle_complete",
+            "z": -9.54,
+            "cluster_mean": -9.543,
+            "overall_mean": -0.0
+          }
+        ],
+        "examples": [
+          1655560053514668509,
+          -5541295715198490097,
+          5691731050270509816
+        ]
+      },
+      {
+        "cluster": 4,
+        "size": 740,
+        "share": 0.00925,
+        "anomaly_share": 0.6635135135135135,
+        "signature": [
+          {
+            "feature": "evt_6",
+            "z": 9.26,
+            "cluster_mean": 9.258,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_7",
+            "z": 9.23,
+            "cluster_mean": 9.231,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_8",
+            "z": 9.23,
+            "cluster_mean": 9.231,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_5",
+            "z": 9.08,
+            "cluster_mean": 9.078,
+            "overall_mean": -0.0
+          }
+        ],
+        "examples": [
+          8662914238518290176,
+          3786031388798456015,
+          -7203846648684659535
+        ]
+      },
+      {
+        "cluster": 5,
+        "size": 9,
+        "share": 0.0001125,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_21",
+            "z": 80.4,
+            "cluster_mean": 80.397,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_22",
+            "z": 75.48,
+            "cluster_mean": 75.479,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_11",
+            "z": 70.27,
+            "cluster_mean": 70.266,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_20",
+            "z": 69.56,
+            "cluster_mean": 69.56,
+            "overall_mean": -0.0
+          }
+        ],
+        "examples": [
+          5678483308337211471,
+          120486571976949188,
+          2928690555251770634
+        ]
+      },
+      {
+        "cluster": 6,
+        "size": 1,
+        "share": 1.25e-05,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_42",
+            "z": 282.84,
+            "cluster_mean": 282.841,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_36",
+            "z": 252.98,
+            "cluster_mean": 252.98,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_26",
+            "z": 163.3,
+            "cluster_mean": 163.296,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "seq_unseen_transitions",
+            "z": 31.94,
+            "cluster_mean": 31.939,
+            "overall_mean": -0.0
+          }
+        ],
+        "examples": [
+          -7052911997539087826
+        ]
+      },
+      {
+        "cluster": 7,
+        "size": 18649,
+        "share": 0.2331125,
+        "anomaly_share": 0.02160973778754893,
+        "signature": [
+          {
+            "feature": "gap_mean_s",
+            "z": 1.53,
+            "cluster_mean": 1.526,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "duration_s",
+            "z": 1.49,
+            "cluster_mean": 1.492,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "gap_std_s",
+            "z": 1.43,
+            "cluster_mean": 1.431,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "gap_max_s",
+            "z": 1.39,
+            "cluster_mean": 1.388,
+            "overall_mean": 0.0
+          }
+        ],
+        "examples": [
+          -3784789189707312988,
+          7088823890087794483,
+          3417734757896524276
+        ]
+      },
+      {
+        "cluster": 8,
+        "size": 3,
+        "share": 3.75e-05,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_40",
+            "z": 163.3,
+            "cluster_mean": 163.296,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_24",
+            "z": 115.47,
+            "cluster_mean": 115.466,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_23",
+            "z": 113.7,
+            "cluster_mean": 113.703,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_39",
+            "z": 81.64,
+            "cluster_mean": 81.644,
+            "overall_mean": -0.0
+          }
+        ],
+        "examples": [
+          -4723951162006187997,
+          -4250706752040073149,
+          2832388045942608634
+        ]
+      },
+      {
+        "cluster": 9,
+        "size": 406,
+        "share": 0.005075,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "lifecycle_complete",
+            "z": -9.54,
+            "cluster_mean": -9.543,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_3",
+            "z": -9.53,
+            "cluster_mean": -9.53,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_2",
+            "z": -9.49,
+            "cluster_mean": -9.486,
+            "overall_mean": 0.0
+          },
+          {
+            "feature": "evt_0",
+            "z": -8.89,
+            "cluster_mean": -8.889,
+            "overall_mean": -0.0
+          }
+        ],
+        "examples": [
+          7534464379906057281,
+          2668205183285489044,
+          7510799515071823410
+        ]
+      },
+      {
+        "cluster": 10,
+        "size": 3,
+        "share": 3.75e-05,
+        "anomaly_share": 1.0,
+        "signature": [
+          {
+            "feature": "evt_28",
+            "z": 163.3,
+            "cluster_mean": 163.296,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_27",
+            "z": 163.3,
+            "cluster_mean": 163.296,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "seq_unseen_transitions",
+            "z": 12.98,
+            "cluster_mean": 12.979,
+            "overall_mean": -0.0
+          },
+          {
+            "feature": "evt_7",
+            "z": 6.75,
+            "cluster_mean": 6.746,
+            "overall_mean": 0.0
+          }
+        ],
+        "examples": [
+          9122720022222323339,
+          -2942077810471468030,
+          992101295951175683
+        ]
+      }
+    ]
+  },
+  "dbscan": [
+    {
+      "eps": 0.5,
+      "min_samples": 20,
+      "n_clusters": 74,
+      "noise_fraction": 0.1633,
+      "silhouette": 0.789
+    },
+    {
+      "eps": 1.0,
+      "min_samples": 20,
+      "n_clusters": 78,
+      "noise_fraction": 0.1138,
+      "silhouette": 0.744
+    },
+    {
+      "eps": 1.5,
+      "min_samples": 20,
+      "n_clusters": 69,
+      "noise_fraction": 0.0758,
+      "silhouette": 0.649
+    },
+    {
+      "eps": 2.0,
+      "min_samples": 20,
+      "n_clusters": 26,
+      "noise_fraction": 0.0323,
+      "silhouette": 0.544
+    },
+    {
+      "eps": 3.0,
+      "min_samples": 20,
+      "n_clusters": 13,
+      "noise_fraction": 0.0172,
+      "silhouette": 0.583
+    },
+    {
+      "eps": 4.0,
+      "min_samples": 20,
+      "n_clusters": 8,
+      "noise_fraction": 0.0146,
+      "silhouette": 0.414
+    }
+  ]
+}

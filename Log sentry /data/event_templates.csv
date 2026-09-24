@@ -1,0 +1,45 @@
+event_id,template,occurrences
+0,Receiving block <BLK> src: /<IP> dest: /<IP>,1723232
+4,BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLK> size <NUM>,1719741
+2,PacketResponder <NUM> for block <BLK> <*>,1706728
+3,Received block <BLK> of size <NUM> from /<IP>,1706514
+14,Deleting block <BLK> file <PATH><BLK>,1402047
+29,BLOCK* NameSystem.delete: <BLK> is added to invalidSet of <IP>,1396174
+1,BLOCK* NameSystem.allocateBlock: <PATH> <BLK>,575061
+9,<IP> Served block <BLK> to /<IP>,428726
+32,<IP>:Got exception while serving <BLK> to /<IP>:,356207
+10,Verification succeeded for <BLK>,120036
+5,Received block <BLK> src: /<IP> dest: /<IP> of size <NUM>,7097
+7,<IP> Starting thread to transfer block <BLK> to <IP>,7002
+8,BLOCK* ask <IP> to replicate <BLK> to datanode(s) <IP>,7002
+6,<IP>:Transmitted block <BLK> to /<IP>,6937
+30,Unexpected error trying to delete block <BLK>. BlockInfo not found in volumeMap.,5545
+13,writeBlock <BLK> received exception java.io.IOException: Could not read from stream,3226
+15,Receiving empty packet for block <BLK>,1464
+31,BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for <BLK> on <IP> size <NUM> But it does not belong to any file.,1288
+18,BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for <BLK> on <IP> size <NUM>,975
+16,Exception in receiveBlock for block <BLK> java.io.IOException: Connection reset by peer,75
+17,writeBlock <BLK> received exception java.io.IOException: Connection reset by peer,75
+11,writeBlock <BLK> received exception <*>,67
+22,Changing block file offset of block <BLK> from <NUM> to <NUM> meta file offset to <NUM>,65
+21,Exception in receiveBlock for block <BLK> <*>,56
+38,PendingReplicationMonitor timed out block <BLK>,47
+23,<IP>:Exception writing block <BLK> to mirror <IP>,34
+20,PacketResponder <BLK> <NUM> Exception java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=/<IP> remote=/<IP>]. <NUM> millis timeout left.,33
+12,PacketResponder <BLK> <NUM> Exception <*>,29
+19,PacketResponder <BLK> <NUM> Exception java.net.SocketTimeoutException: <NUM> millis timeout while waiting for channel to be ready for read. ch : java.nio.channels.SocketChannel[connected local=/<IP> remote=/<IP>],22
+24,Exception in receiveBlock for block <BLK> java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=/<IP> remote=/<IP>]. <NUM> millis timeout left.,16
+39,writeBlock <BLK> received exception java.io.IOException: <*> <*>,16
+35,writeBlock <BLK> received exception java.net.SocketTimeoutException: <NUM> millis timeout while waiting for channel to be ready for <*> ch : java.nio.channels.SocketChannel[connected local=/<IP> remote=/<IP>],15
+33,PacketResponder <BLK> <NUM> Exception java.io.IOException: <*> <*> <*> <*>,13
+42,Adding an already existing block <BLK>,10
+27,"writeBlock <BLK> received exception java.io.IOException: Block <BLK> is valid, and cannot be written to.",9
+28,<IP>:Failed to transfer <BLK> to <IP> got java.io.IOException: Connection reset by peer,9
+25,writeBlock <BLK> received exception java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=/<IP> remote=/<IP>]. <NUM> millis timeout left.,7
+26,PacketResponder <BLK> <NUM> Exception java.io.IOException: Broken pipe,6
+34,Exception in receiveBlock for block <BLK> java.net.SocketTimeoutException: <NUM> millis timeout while waiting for channel to be ready for write. ch : java.nio.channels.SocketChannel[connected local=/<IP> remote=/<IP>],5
+36,Reopen Block <BLK>,5
+40,PacketResponder <BLK> <NUM> Exception java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[closed]. <NUM> millis timeout left.,5
+37,BLOCK* Removing block <BLK> from neededReplications as it does not belong to any file.,4
+43,Exception in receiveBlock for block <BLK> java.io.IOException: Broken pipe,3
+41,writeBlock <BLK> received exception java.net.NoRouteToHostException: No route to host,1
