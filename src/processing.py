@@ -3,29 +3,27 @@
 Pipeline:  parse each line  ->  group lines into sessions  ->  `features.Session`
 turns every session into the fixed 52-feature row used by the model.
 
-* HDFS sessions are blocks: every `blk_<id>` mentioned in a line is a session.
-* BGL has no session id, so lines are grouped into five-minute windows.
+Raw formats, session definitions and label sources are dataset-specific and live in
+sources.py (HDFS: one session per block; BGL: five-minute windows, labels in the log).
 
 Logs must be in chronological order (setup_data.py sorts the raw downloads).
 """
 import gzip
 from collections import Counter, defaultdict
-from datetime import datetime, timezone
-from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
 
 from features import BLOCK, COLS, IP, Session, bucket, normalise  # noqa: F401 (re-exported)
+from sources import BGL_WINDOW_SECONDS, SOURCES, get_source  # noqa: F401
 
 # Repository root: src/ lives directly under it.
 ROOT = Path(__file__).resolve().parents[1]
 PROCESSED_DIR = ROOT / 'data' / 'processed'
 RAW_DIR = ROOT / 'data' / 'raw'
-BGL_WINDOW_SECONDS = 300
 
 META_COLS = ['session_id', 'source', 't_start', 't_end', 'label']
-ARCHIVES = {'HDFS': 'HDFS_v1', 'BGL': 'BGL'}  # folder names under data/raw/
+ARCHIVES = {name: s.archive for name, s in SOURCES.items()}  # folder names under data/raw/
 
 
 def sorted_log_path(source):
@@ -33,39 +31,13 @@ def sorted_log_path(source):
     return RAW_DIR / ARCHIVES[source] / f'{source}.sorted.log'
 
 
-@lru_cache(maxsize=200000)
-def stamp(date, time):
-    """HDFS 'yymmdd' + 'HHMMSS' -> unix seconds (UTC)."""
-    return int(datetime.strptime(date + time, '%y%m%d%H%M%S').replace(tzinfo=timezone.utc).timestamp())
-
-
 def parse(line, source):
-    """Parse one raw line.
+    """Parse one raw line with the source's adapter (see sources.py).
 
     Returns (session_ids, unix_time, thread, level, message, host_ips, label).
-    `label` is a per-line annotation: always 0 for HDFS (labels come from a
-    separate per-block file) and, for BGL, 1 when the leading alert tag is not '-'.
-    Raises ValueError on malformed lines.
+    Raises ValueError on malformed lines or an unsupported source.
     """
-    if source == 'HDFS':
-        parts = line.strip().split(None, 5)
-        if len(parts) != 6:
-            raise ValueError('Invalid HDFS fields')
-        msg = parts[5]
-        session_ids = list(dict.fromkeys(BLOCK.findall(msg)))
-        hosts = [h.split(':')[0] for h in IP.findall(msg)]
-        return session_ids, stamp(parts[0], parts[1]), parts[2], parts[3], msg, hosts, 0
-    if source != 'BGL':
-        raise ValueError('Unsupported source')
-    parts = line.strip().split(None, 9)
-    if len(parts) == 9:  # empty message
-        parts.append('')
-    if len(parts) != 10:
-        raise ValueError('Invalid BGL fields')
-    t = int(parts[1])
-    # parts[0] is the alert annotation. It becomes the label only and is never
-    # passed to the feature code, so it cannot leak into the model.
-    return [f'window_{t // BGL_WINDOW_SECONDS}'], t, parts[7], parts[8], parts[9], [parts[3]], int(parts[0] != '-')
+    return get_source(source).parse(line)
 
 
 def process(path, source, labels=None, keep=False):
@@ -98,8 +70,10 @@ def process(path, source, labels=None, keep=False):
     if not sessions:
         raise ValueError('No supported sessions found in this file')
 
-    df = pd.DataFrame([s.row(k, source) for k, s in sessions.items()], columns=META_COLS + COLS)
-    if source == 'HDFS':
+    spec = get_source(source)
+    df = pd.DataFrame([s.row(k, source, spec.has_lifecycle) for k, s in sessions.items()],
+                      columns=META_COLS + COLS)
+    if not spec.labels_in_log:  # e.g. HDFS: labels live in a separate per-session file
         df['label'] = attach_hdfs_labels(df, labels)
     audit['sessions'] = len(df)
     events = {k: s.events for k, s in sessions.items()} if keep else {}
@@ -160,3 +134,40 @@ def bucket_inventory(path, source, top=5):
         total = sum(c.values())
         out[f'event_hash_{b:02d}'] = [{'template': t, 'count': n, 'share': n / total} for t, n in c.most_common(top)]
     return out
+
+
+def verify_parser(path, source, head=5, sample=200000):
+    """Show how the parser reads a log: first parsed lines and parse statistics."""
+    import itertools
+    opener = gzip.open if str(path).endswith('.gz') else open
+    ok = bad = 0
+    levels, labels, sessions = Counter(), Counter(), set()
+    with opener(path, 'rt', encoding='utf-8', errors='replace') as f:
+        for i, line in enumerate(itertools.islice(f, sample)):
+            try:
+                ids, t, thread, level, msg, hosts, label = parse(line, source)
+            except (ValueError, OverflowError):
+                bad += 1
+                continue
+            ok += 1
+            levels[level] += 1
+            labels[label] += 1
+            sessions.update(ids)
+            if ok <= head:
+                print(f'line {i + 1}: sessions={ids} time={t} component/thread={thread!r} level={level} '
+                      f'hosts={hosts} line_label={label}\n         message={msg[:90]!r}')
+    spec = get_source(source)
+    print(f'\n{source} ({spec.title}): {ok:,} of {ok + bad:,} lines parsed ({bad:,} malformed)')
+    print(f'sessions seen in this sample: {len(sessions):,}  ({spec.session_definition})')
+    print(f'levels: {dict(levels.most_common())}')
+    print(f'line labels: {dict(labels)}  ({spec.label_policy})')
+
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='Verify the parser on a raw log: shows parsed fields and statistics.')
+    parser.add_argument('--source', choices=list(SOURCES), default='HDFS')
+    parser.add_argument('--log', required=True)
+    parser.add_argument('--head', type=int, default=5, help='how many parsed lines to print')
+    args = parser.parse_args()
+    verify_parser(args.log, args.source, args.head)

@@ -22,6 +22,7 @@ from flask import Flask, Response, jsonify, render_template, request, url_for
 
 from predict import predict
 from processing import ROOT
+from sources import get_source
 from upload_store import build_index, read_events
 
 SOURCES = ['HDFS', 'BGL']
@@ -138,6 +139,7 @@ def index():
     total = flagged = None
     matching, page, pages, prev_url, next_url = 0, 1, 1, None, None
     histogram, clusters = [], []
+    spec = get_source(STATE['source']) if STATE['source'] else None
     ready = [s for s in SOURCES if (ROOT / 'models' / f'{s}_final.joblib').exists()]
     info = load_model_info(STATE['source'] or (ready[0] if ready else None))
 
@@ -179,7 +181,7 @@ def index():
                            total=total, flagged=flagged, rows=rows, audit=STATE['audit'], q=q, only=only,
                            detail=detail, events=events, truncated=truncated, histogram=histogram,
                            clusters=clusters, model=info['model'], comparison=info['comparison'], comparison_split=info['comparison_split'],
-                           profile_note=info['profile_note'])
+                           profile_note=info['profile_note'], spec=spec)
 
 
 @app.errorhandler(413)

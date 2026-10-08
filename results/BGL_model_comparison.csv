@@ -1,0 +1,11 @@
+model,role,period,accuracy,precision,recall,f1,pr_auc,fp,fn,tp,tn,threshold,fit_seconds,predict_seconds,f1_gain_vs_baseline
+Logistic regression,baseline,validation,0.963436,0.440252,0.804598,0.569106,0.470733,89,17,70,2723,0.75,0.04,,
+Random forest,compared,validation,0.988272,0.778947,0.850575,0.813187,0.899427,21,13,74,2791,0.7,0.16,,
+Histogram gradient boosting,final (deployed),validation,0.991031,0.80198,0.931034,0.861702,0.862086,20,6,81,2792,0.7,0.18,,
+Extra trees,additional,validation,0.985512,0.846154,0.632184,0.723684,0.786389,10,32,55,2802,0.85,0.18,,
+XGBoost,additional,validation,0.991376,0.81,0.931034,0.86631,0.922156,19,6,81,2793,0.45,0.18,,
+Logistic regression,baseline,test,0.938255,0.586466,0.693333,0.635438,0.602422,110,69,156,2564,0.75,0.04,0.001,0
+Random forest,compared,test,0.961366,0.83432,0.626667,0.715736,0.875958,28,84,141,2646,0.7,0.2,0.013,0.0802982
+Histogram gradient boosting,final (deployed),test,0.958606,0.857143,0.56,0.677419,0.880368,21,99,126,2653,0.7,0.12,0.002,0.0419815
+Extra trees,additional,test,0.948603,0.827586,0.426667,0.56305,0.794953,20,129,96,2654,0.85,0.23,0.013,-0.072388
+XGBoost,additional,test,0.968265,0.848168,0.72,0.778846,0.896507,29,63,162,2645,0.45,0.12,0.002,0.143408

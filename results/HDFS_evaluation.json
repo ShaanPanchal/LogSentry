@@ -80,7 +80,7 @@
       "fn": 38,
       "tp": 1184,
       "threshold": 0.8,
-      "fit_seconds": 0.55
+      "fit_seconds": 0.72
     },
     {
       "model": "Random forest",
@@ -94,7 +94,7 @@
       "fn": 15,
       "tp": 1207,
       "threshold": 0.9500000000000001,
-      "fit_seconds": 4.84
+      "fit_seconds": 6.07
     },
     {
       "model": "Histogram gradient boosting",
@@ -108,7 +108,7 @@
       "fn": 2,
       "tp": 1220,
       "threshold": 0.9500000000000001,
-      "fit_seconds": 1.44
+      "fit_seconds": 1.56
     },
     {
       "model": "Extra trees",
@@ -122,7 +122,7 @@
       "fn": 6,
       "tp": 1216,
       "threshold": 0.8,
-      "fit_seconds": 3.96
+      "fit_seconds": 6.3
     },
     {
       "model": "XGBoost",
@@ -136,7 +136,7 @@
       "fn": 1,
       "tp": 1221,
       "threshold": 0.25,
-      "fit_seconds": 1.25
+      "fit_seconds": 1.63
     }
   ],
   "temporal_test": [
@@ -152,8 +152,8 @@
       "fn": 161,
       "tp": 1519,
       "threshold": 0.8,
-      "fit_seconds": 0.78,
-      "predict_seconds": 0.015,
+      "fit_seconds": 0.92,
+      "predict_seconds": 0.021,
       "scaling": "required - StandardScaler applied inside the model pipeline",
       "params": {
         "C": 1.0,
@@ -174,8 +174,8 @@
       "fn": 149,
       "tp": 1531,
       "threshold": 0.9500000000000001,
-      "fit_seconds": 5.36,
-      "predict_seconds": 0.075,
+      "fit_seconds": 7.13,
+      "predict_seconds": 0.096,
       "scaling": "not required",
       "params": {
         "n_estimators": 80,
@@ -197,8 +197,8 @@
       "fn": 22,
       "tp": 1658,
       "threshold": 0.9500000000000001,
-      "fit_seconds": 1.65,
-      "predict_seconds": 0.064,
+      "fit_seconds": 1.63,
+      "predict_seconds": 0.074,
       "scaling": "not required",
       "params": {
         "max_iter": 100,
@@ -220,8 +220,8 @@
       "fn": 26,
       "tp": 1654,
       "threshold": 0.8,
-      "fit_seconds": 4.95,
-      "predict_seconds": 0.104,
+      "fit_seconds": 7.13,
+      "predict_seconds": 0.136,
       "scaling": "not required",
       "params": {
         "n_estimators": 100,
@@ -243,8 +243,8 @@
       "fn": 13,
       "tp": 1667,
       "threshold": 0.25,
-      "fit_seconds": 1.41,
-      "predict_seconds": 0.066,
+      "fit_seconds": 1.72,
+      "predict_seconds": 0.073,
       "scaling": "not required",
       "params": {
         "n_estimators": 100,

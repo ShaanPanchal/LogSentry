@@ -63,6 +63,37 @@ class PipelineTests(unittest.TestCase):
                 dashboard.cleanup()
                 predict.ROOT, dashboard.ROOT=oldp,oldd
                 dashboard.STATE.update(df=None,events={},audit={})
+    BGL_LINES = (
+        '- 1117838570 2005.06.03 R02-M1-N0-C:J12-U11 2005-06-03-15.42.50.675872 R02-M1-N0-C:J12-U11 RAS KERNEL INFO instruction cache parity error corrected\n'
+        '- 1117838573 2005.06.03 R02-M1-N0-C:J12-U11 2005-06-03-15.42.53.276129 R02-M1-N0-C:J12-U11 RAS KERNEL INFO instruction cache parity error corrected\n'
+        'KERNDTLB 1117838880 2005.06.03 R04-M0-N1-C:J02-U01 2005-06-03-15.48.00.000001 R04-M0-N1-C:J02-U01 RAS KERNEL FATAL data TLB error interrupt\n'
+        '- 1117839200 2005.06.03 R04-M0-N1-C:J02-U01 2005-06-03-15.53.20.000001 R04-M0-N1-C:J02-U01 RAS APP INFO ciod: generated 128 core files\n')
+
+    def test_bgl_parser_fields_windows_and_labels(self):
+        import sources
+        lines = self.BGL_LINES.splitlines()
+        ids, t, comp, level, msg, hosts, label = sources.parse_bgl(lines[0])
+        self.assertEqual((t, comp, level, hosts, label), (1117838570, 'KERNEL', 'INFO', ['R02-M1-N0-C:J12-U11'], 0))
+        self.assertEqual(msg, 'instruction cache parity error corrected')
+        self.assertEqual(ids, ['window_' + str(1117838570 // 300)])
+        self.assertEqual(sources.parse_bgl(lines[2])[6], 1)                              # alert tag -> label 1
+        self.assertEqual(sources.parse_bgl('KERNDTLB 1 2 3 4 5 RAS KERNEL FATAL')[4], '')  # empty message ok
+        with self.assertRaises(ValueError):sources.parse_bgl('too short')
+        for line in lines:   # fast session lookup used by the drill-down index agrees with the parser
+            self.assertEqual(sources.bgl_session_ids(line), sources.parse_bgl(line)[0])
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / 'bgl.log';p.write_text(self.BGL_LINES + 'garbage line\n')
+            df, audit, _ = processing.process(p, 'BGL', keep=True)
+        self.assertEqual(audit['malformed_lines'], 1);self.assertEqual(audit['event_assignments'], 4)
+        by = df.set_index('session_id')
+        w1, w2 = f'window_{1117838570 // 300}', f'window_{1117838880 // 300}'
+        self.assertEqual(int(by.loc[w1, 'n_events']), 2)                                 # two lines, one window
+        self.assertEqual((by.loc[w1, 'label'], by.loc[w2, 'label']), (0, 1))             # window label = any alert
+        self.assertEqual(by.loc[w1, 'error_ratio'], 0);self.assertEqual(by.loc[w2, 'error_ratio'], 1)  # FATAL level
+        # HDFS-only lifecycle features are "not applicable" (0), never fabricated
+        for c in ('replica_deficit', 'unacked_writes', 'uncommitted_acks', 'lifecycle_complete'):
+            self.assertTrue((df[c] == 0).all(), c)
+
     def test_feature_schema_is_single_source(self):
         # Training table, live features and the model all use features.COLS.
         import features

@@ -1,0 +1,2738 @@
+{
+  "source": "BGL",
+  "algorithm": "KMeans (signed-log + standardised features, labels excluded)",
+  "clustered": "development-period anomalies only",
+  "n_clustered": 829,
+  "selected_k": 7,
+  "sweep": [
+    {
+      "k": 2,
+      "silhouette": 0.24274766445159912,
+      "inertia": 30656.6953125
+    },
+    {
+      "k": 3,
+      "silhouette": 0.16207464039325714,
+      "inertia": 28063.45703125
+    },
+    {
+      "k": 4,
+      "silhouette": 0.17468619346618652,
+      "inertia": 26051.1796875
+    },
+    {
+      "k": 5,
+      "silhouette": 0.1644798070192337,
+      "inertia": 24214.2265625
+    },
+    {
+      "k": 6,
+      "silhouette": 0.17307919263839722,
+      "inertia": 23228.921875
+    },
+    {
+      "k": 7,
+      "silhouette": 0.21363922953605652,
+      "inertia": 22273.6640625
+    },
+    {
+      "k": 8,
+      "silhouette": 0.21318000555038452,
+      "inertia": 21072.09375
+    }
+  ],
+  "clusters": [
+    {
+      "cluster": 0,
+      "sessions": 104,
+      "share": 0.12545235223160434,
+      "composition": {
+        "normal": 0,
+        "anomaly": 104,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 690,
+        "anomaly": 27
+      },
+      "top_features": [
+        {
+          "feature": "gap_mean_s",
+          "cluster_mean": 19.511390686035156,
+          "overall_anomaly_mean": 3.501868486404419,
+          "all_sessions_mean": 14.110458374023438,
+          "z": 1.8651893138885498,
+          "measures": "mean seconds between consecutive events"
+        },
+        {
+          "feature": "gap_std_s",
+          "cluster_mean": 27.555158615112305,
+          "overall_anomaly_mean": 5.934040069580078,
+          "all_sessions_mean": 9.150839805603027,
+          "z": 1.632049560546875,
+          "measures": "variability of the gaps between events"
+        },
+        {
+          "feature": "gap_max_s",
+          "cluster_mean": 93.39423370361328,
+          "overall_anomaly_mean": 32.921592712402344,
+          "all_sessions_mean": 39.79482650756836,
+          "z": 1.214442491531372,
+          "measures": "longest pause between events"
+        },
+        {
+          "feature": "events_per_min",
+          "cluster_mean": 6.467041969299316,
+          "overall_anomaly_mean": 156.8799285888672,
+          "all_sessions_mean": 89.75823211669922,
+          "z": -1.1161751747131348,
+          "measures": "event rate"
+        },
+        {
+          "feature": "n_events",
+          "cluster_mean": 20.134614944458008,
+          "overall_anomaly_mean": 584.6151733398438,
+          "all_sessions_mean": 355.2401123046875,
+          "z": -0.8787802457809448,
+          "measures": "number of log events"
+        }
+      ],
+      "interpretation": "Cluster 0 holds 12.5% of the clustered anomalies. Compared with the overall anomaly population, its members show: gap_mean_s is above the anomaly average (19.5 vs 3.5): long pauses between events (slow progress); gap_std_s is above the anomaly average (27.6 vs 5.93): irregular timing (bursts and stalls); gap_max_s is above the anomaly average (93.4 vs 32.9): at least one long stall mid-session; events_per_min is below the anomaly average (6.47 vs 157): sparse events spread over time; n_events is below the anomaly average (20.1 vs 585): very few events (the session stops early). The sessions nearest its centre are dominated by: \"Lustre mount FAILED : bglio<N> : point <PATH>\" (5.2/session), \"CE sym <N>, at <HEX>, mask <HEX>\" (1.2/session), \"<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>\" (0.8/session). Profile: write chain complete in 0% (anomaly avg 0%) of sessions; mean events 20.1 (anomaly avg 584.6); mean duration 134 (anomaly avg 99) s; share of failure-keyword messages 56.7% (anomaly avg 56.2%); mean hosts 10.6 (anomaly avg 281.4).",
+      "typical_events": [
+        {
+          "template": "Lustre mount FAILED : bglio<N> : point <PATH>",
+          "per_session": 5.2
+        },
+        {
+          "template": "CE sym <N>, at <HEX>, mask <HEX>",
+          "per_session": 1.2
+        },
+        {
+          "template": "<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>",
+          "per_session": 0.8
+        },
+        {
+          "template": "total of <N> ddr error(s) detected and corrected",
+          "per_session": 0.8
+        },
+        {
+          "template": "kernel panic",
+          "per_session": 0.4
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "window_3747162",
+          "n_events": 3,
+          "events": [
+            {
+              "time": 1124148713,
+              "level": "FATAL",
+              "message": "kernel panic"
+            },
+            {
+              "time": 1124148714,
+              "level": "FATAL",
+              "message": "kernel panic"
+            },
+            {
+              "time": 1124148755,
+              "level": "INFO",
+              "message": "shutdown complete"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Lustre mount FAILED : bglio<N> : point <PATH>",
+              "per_session": 5.2
+            },
+            {
+              "template": "CE sym <N>, at <HEX>, mask <HEX>",
+              "per_session": 1.2
+            },
+            {
+              "template": "<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>",
+              "per_session": 0.8
+            },
+            {
+              "template": "total of <N> ddr error(s) detected and corrected",
+              "per_session": 0.8
+            },
+            {
+              "template": "kernel panic",
+              "per_session": 0.4
+            }
+          ]
+        },
+        {
+          "session_id": "window_3749425",
+          "n_events": 3,
+          "events": [
+            {
+              "time": 1124827525,
+              "level": "FATAL",
+              "message": "kernel panic"
+            },
+            {
+              "time": 1124827531,
+              "level": "FATAL",
+              "message": "kernel panic"
+            },
+            {
+              "time": 1124827568,
+              "level": "INFO",
+              "message": "shutdown complete"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "kernel panic",
+              "per_session": 2.0
+            },
+            {
+              "template": "shutdown complete",
+              "per_session": 1.0
+            }
+          ]
+        },
+        {
+          "session_id": "window_3753419",
+          "n_events": 17,
+          "events": [
+            {
+              "time": 1126025866,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 12, bit 7"
+            },
+            {
+              "time": 1126025866,
+              "level": "INFO",
+              "message": "4 ddr errors(s) detected and corrected on rank 0, symbol 2, bit 4"
+            },
+            {
+              "time": 1126025866,
+              "level": "INFO",
+              "message": "CE sym 12, at 0x0cbca9e0, mask 0x01"
+            },
+            {
+              "time": 1126025866,
+              "level": "INFO",
+              "message": "CE sym 2, at 0x06018e00, mask 0x08"
+            },
+            {
+              "time": 1126025866,
+              "level": "INFO",
+              "message": "total of 1 ddr error(s) detected and corrected"
+            },
+            {
+              "time": 1126025866,
+              "level": "INFO",
+              "message": "CE sym 2, at 0x06018e00, mask 0x08"
+            },
+            {
+              "time": 1126025866,
+              "level": "INFO",
+              "message": "CE sym 2, at 0x06018e00, mask 0x08"
+            },
+            {
+              "time": 1126025866,
+              "level": "INFO",
+              "message": "CE sym 2, at 0x06018e00, mask 0x08"
+            },
+            {
+              "time": 1126025866,
+              "level": "INFO",
+              "message": "total of 4 ddr error(s) detected and corrected"
+            },
+            {
+              "time": 1126025988,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio825 : point /p/gb1"
+            },
+            {
+              "time": 1126025989,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio819 : point /p/gb1"
+            },
+            {
+              "time": 1126025989,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio817 : point /p/gb1"
+            },
+            {
+              "time": 1126025989,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio820 : point /p/gb1"
+            },
+            {
+              "time": 1126025989,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio827 : point /p/gb1"
+            },
+            {
+              "time": 1126025989,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio828 : point /p/gb1"
+            },
+            {
+              "time": 1126025989,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio826 : point /p/gb1"
+            },
+            {
+              "time": 1126025989,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio818 : point /p/gb1"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Lustre mount FAILED : bglio<N> : point <PATH>",
+              "per_session": 8.0
+            },
+            {
+              "template": "CE sym <N>, at <HEX>, mask <HEX>",
+              "per_session": 5.0
+            },
+            {
+              "template": "<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>",
+              "per_session": 2.0
+            },
+            {
+              "template": "total of <N> ddr error(s) detected and corrected",
+              "per_session": 2.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cluster": 1,
+      "sessions": 91,
+      "share": 0.1097708082026538,
+      "composition": {
+        "normal": 0,
+        "anomaly": 91,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 2,
+        "anomaly": 0
+      },
+      "top_features": [
+        {
+          "feature": "event_hash_18",
+          "cluster_mean": 1762.1318359375,
+          "overall_anomaly_mean": 205.183349609375,
+          "all_sessions_mean": 20.700387954711914,
+          "z": 2.450716257095337,
+          "measures": "count of events in hash bucket 18: \"data TLB error interrupt\" / \"total of <N> ddr error(s) detected and corrected\" (bucket shared by several event kinds)"
+        },
+        {
+          "feature": "n_events",
+          "cluster_mean": 2150.769287109375,
+          "overall_anomaly_mean": 584.6151733398438,
+          "all_sessions_mean": 355.2401123046875,
+          "z": 1.4374693632125854,
+          "measures": "number of log events"
+        },
+        {
+          "feature": "events_per_min",
+          "cluster_mean": 433.9990539550781,
+          "overall_anomaly_mean": 156.8799285888672,
+          "all_sessions_mean": 89.75823211669922,
+          "z": 1.2010562419891357,
+          "measures": "event rate"
+        },
+        {
+          "feature": "duration_s",
+          "cluster_mean": 273.20880126953125,
+          "overall_anomaly_mean": 99.44873046875,
+          "all_sessions_mean": 79.40008544921875,
+          "z": 1.0628241300582886,
+          "measures": "seconds from first to last event"
+        },
+        {
+          "feature": "event_entropy",
+          "cluster_mean": 0.06712543219327927,
+          "overall_anomaly_mean": 1.4690533876419067,
+          "all_sessions_mean": 0.9276168942451477,
+          "z": -1.0296270847320557,
+          "measures": "diversity of the event-kind distribution"
+        }
+      ],
+      "interpretation": "Cluster 1 holds 11.0% of the clustered anomalies. Compared with the overall anomaly population, its members show: event_hash_18 is above the anomaly average (1.76e+03 vs 205): more events like \"data TLB error interrupt\" / \"total of <N> ddr error(s) detected and corrected\" (bucket shared by several event kinds); n_events is above the anomaly average (2.15e+03 vs 585): more events than a typical anomaly (repeated or retried operations); events_per_min is above the anomaly average (434 vs 157): dense bursts of events; duration_s is above the anomaly average (273 vs 99.4): long-running sessions; event_entropy is below the anomaly average (0.0671 vs 1.47): dominated by one event kind. The sessions nearest its centre are dominated by: \"data TLB error interrupt\" (199.9/session), \"ddr: excessive soft failures, consider replacing the card\" (0.1/session). Profile: write chain complete in 0% (anomaly avg 0%) of sessions; mean events 2150.8 (anomaly avg 584.6); mean duration 273 (anomaly avg 99) s; share of failure-keyword messages 89.5% (anomaly avg 56.2%); mean hosts 400.7 (anomaly avg 281.4).",
+      "typical_events": [
+        {
+          "template": "data TLB error interrupt",
+          "per_session": 199.9
+        },
+        {
+          "template": "ddr: excessive soft failures, consider replacing the card",
+          "per_session": 0.1
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "window_3728456",
+          "n_events": 2093,
+          "events": [
+            {
+              "time": 1118536800,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536800,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536800,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536800,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536800,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536800,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536800,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536801,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536801,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536801,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536801,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536801,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536801,
+              "level": "INFO",
+              "message": "ddr: excessive soft failures, consider replacing the card"
+            },
+            {
+              "time": 1118536801,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536802,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536802,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536802,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536802,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536802,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536802,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536802,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536803,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536803,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536803,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118536803,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "data TLB error interrupt",
+              "per_session": 199.9
+            },
+            {
+              "template": "ddr: excessive soft failures, consider replacing the card",
+              "per_session": 0.1
+            }
+          ]
+        },
+        {
+          "session_id": "window_3728504",
+          "n_events": 1951,
+          "events": [
+            {
+              "time": 1118551200,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551200,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551200,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551200,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551200,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551200,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551201,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551201,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551201,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551201,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551201,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551201,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551201,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551202,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551202,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551202,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551202,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551202,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551202,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551203,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551203,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551203,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551203,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551203,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118551203,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "data TLB error interrupt",
+              "per_session": 200.0
+            }
+          ]
+        },
+        {
+          "session_id": "window_3728509",
+          "n_events": 1951,
+          "events": [
+            {
+              "time": 1118552700,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552700,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552700,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552700,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552700,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552700,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552701,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552701,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552701,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552701,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552701,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552701,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552702,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552702,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552702,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552702,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552702,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552702,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552702,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552703,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552703,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552703,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552703,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552703,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            },
+            {
+              "time": 1118552703,
+              "level": "FATAL",
+              "message": "data TLB error interrupt"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "data TLB error interrupt",
+              "per_session": 200.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cluster": 2,
+      "sessions": 153,
+      "share": 0.18455971049457176,
+      "composition": {
+        "normal": 0,
+        "anomaly": 153,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 1382,
+        "anomaly": 31
+      },
+      "top_features": [
+        {
+          "feature": "duration_s",
+          "cluster_mean": 1.8758169412612915,
+          "overall_anomaly_mean": 99.44873046875,
+          "all_sessions_mean": 79.40008544921875,
+          "z": -1.7063199281692505,
+          "measures": "seconds from first to last event"
+        },
+        {
+          "feature": "n_events",
+          "cluster_mean": 6.725490093231201,
+          "overall_anomaly_mean": 584.6151733398438,
+          "all_sessions_mean": 355.2401123046875,
+          "z": -1.3167846202850342,
+          "measures": "number of log events"
+        },
+        {
+          "feature": "events_per_min",
+          "cluster_mean": 6.370082855224609,
+          "overall_anomaly_mean": 156.8799285888672,
+          "all_sessions_mean": 89.75823211669922,
+          "z": -1.1680622100830078,
+          "measures": "event rate"
+        },
+        {
+          "feature": "gap_max_s",
+          "cluster_mean": 1.2614378929138184,
+          "overall_anomaly_mean": 32.921592712402344,
+          "all_sessions_mean": 39.79482650756836,
+          "z": -0.9390880465507507,
+          "measures": "longest pause between events"
+        },
+        {
+          "feature": "n_hosts",
+          "cluster_mean": 4.99346399307251,
+          "overall_anomaly_mean": 281.43304443359375,
+          "all_sessions_mean": 189.77369689941406,
+          "z": -0.792244017124176,
+          "measures": "distinct hosts/nodes involved"
+        }
+      ],
+      "interpretation": "Cluster 2 holds 18.5% of the clustered anomalies. Compared with the overall anomaly population, its members show: duration_s is below the anomaly average (1.88 vs 99.4): sessions that finish almost instantly; n_events is below the anomaly average (6.73 vs 585): very few events (the session stops early); events_per_min is below the anomaly average (6.37 vs 157): sparse events spread over time; gap_max_s is below the anomaly average (1.26 vs 32.9): no long stalls; n_hosts is below the anomaly average (4.99 vs 281): fewer hosts than usual. The sessions nearest its centre are dominated by: \"Lustre mount FAILED : bglio<N> : point <PATH>\" (0.8/session), \"MailboxMonitor::serviceMailboxes() lib_ido_error: <N> socket closed\" (0.5/session), \"kernel panic\" (0.2/session). Profile: write chain complete in 0% (anomaly avg 0%) of sessions; mean events 6.7 (anomaly avg 584.6); mean duration 2 (anomaly avg 99) s; share of failure-keyword messages 65.2% (anomaly avg 56.2%); mean hosts 5.0 (anomaly avg 281.4).",
+      "typical_events": [
+        {
+          "template": "Lustre mount FAILED : bglio<N> : point <PATH>",
+          "per_session": 0.8
+        },
+        {
+          "template": "MailboxMonitor::serviceMailboxes() lib_ido_error: <N> socket closed",
+          "per_session": 0.5
+        },
+        {
+          "template": "kernel panic",
+          "per_session": 0.2
+        },
+        {
+          "template": "ciod: failed to read message prefix on control stream (CioStream socket to <IP>",
+          "per_session": 0.1
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "window_3752866",
+          "n_events": 4,
+          "events": [
+            {
+              "time": 1125859800,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio819 : point /p/gb1"
+            },
+            {
+              "time": 1125859800,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio820 : point /p/gb1"
+            },
+            {
+              "time": 1125859800,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio817 : point /p/gb1"
+            },
+            {
+              "time": 1125859800,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio818 : point /p/gb1"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Lustre mount FAILED : bglio<N> : point <PATH>",
+              "per_session": 0.8
+            },
+            {
+              "template": "MailboxMonitor::serviceMailboxes() lib_ido_error: <N> socket closed",
+              "per_session": 0.5
+            },
+            {
+              "template": "kernel panic",
+              "per_session": 0.2
+            },
+            {
+              "template": "ciod: failed to read message prefix on control stream (CioStream socket to <IP>",
+              "per_session": 0.1
+            }
+          ]
+        },
+        {
+          "session_id": "window_3752865",
+          "n_events": 4,
+          "events": [
+            {
+              "time": 1125859799,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio827 : point /p/gb1"
+            },
+            {
+              "time": 1125859799,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio828 : point /p/gb1"
+            },
+            {
+              "time": 1125859799,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio825 : point /p/gb1"
+            },
+            {
+              "time": 1125859799,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio826 : point /p/gb1"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Lustre mount FAILED : bglio<N> : point <PATH>",
+              "per_session": 4.0
+            }
+          ]
+        },
+        {
+          "session_id": "window_3749490",
+          "n_events": 1,
+          "events": [
+            {
+              "time": 1124847219,
+              "level": "FATAL",
+              "message": "MailboxMonitor::serviceMailboxes() lib_ido_error: -1019 socket closed"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "MailboxMonitor::serviceMailboxes() lib_ido_error: <N> socket closed",
+              "per_session": 1.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cluster": 3,
+      "sessions": 33,
+      "share": 0.039806996381182146,
+      "composition": {
+        "normal": 0,
+        "anomaly": 33,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 16,
+        "anomaly": 56
+      },
+      "top_features": [
+        {
+          "feature": "event_hash_15",
+          "cluster_mean": 4.181818008422852,
+          "overall_anomaly_mean": 0.3136308789253235,
+          "all_sessions_mean": 2.8044846057891846,
+          "z": 3.0368831157684326,
+          "measures": "count of events in hash bucket 15: \"program interrupt: imprecise exception......<N>\" / \"iar <N> dear <N>c<N>dc\" (bucket shared by several event kinds)"
+        },
+        {
+          "feature": "event_hash_29",
+          "cluster_mean": 104.69696807861328,
+          "overall_anomaly_mean": 5.127864837646484,
+          "all_sessions_mean": 2.4436395168304443,
+          "z": 2.7917733192443848,
+          "measures": "count of events in hash bucket 29: \"machine check enable..............<N>\" / \"iar <N>c dear <N>f<N>c\" (bucket shared by several event kinds)"
+        },
+        {
+          "feature": "event_hash_03",
+          "cluster_mean": 26.090909957885742,
+          "overall_anomaly_mean": 1.7539204359054565,
+          "all_sessions_mean": 5.097714424133301,
+          "z": 2.774707794189453,
+          "measures": "count of events in hash bucket 03: \"Node card is not fully functional\" / \"store operation.............................<N>\" (bucket shared by several event kinds)"
+        },
+        {
+          "feature": "event_hash_27",
+          "cluster_mean": 3.4242424964904785,
+          "overall_anomaly_mean": 0.8588660955429077,
+          "all_sessions_mean": 0.9011642932891846,
+          "z": 2.6845219135284424,
+          "measures": "count of events in hash bucket 27: \"ciod: generated <N> core files for program IMB-MPI<N>KB_perf\" / \"iar <N>c dear <N>f<N>ec\" (bucket shared by several event kinds)"
+        },
+        {
+          "feature": "event_hash_31",
+          "cluster_mean": 8.030303001403809,
+          "overall_anomaly_mean": 0.665862500667572,
+          "all_sessions_mean": 2.3455801010131836,
+          "z": 2.6680617332458496,
+          "measures": "count of events in hash bucket 31: \"data store interrupt caused by icbi.........<N>\" / \"disable store gathering..................<N>\" (bucket shared by several event kinds)"
+        }
+      ],
+      "interpretation": "Cluster 3 holds 4.0% of the clustered anomalies. Compared with the overall anomaly population, its members show: event_hash_15 is above the anomaly average (4.18 vs 0.314): more events like \"program interrupt: imprecise exception......<N>\" / \"iar <N> dear <N>c<N>dc\" (bucket shared by several event kinds); event_hash_29 is above the anomaly average (105 vs 5.13): more events like \"machine check enable..............<N>\" / \"iar <N>c dear <N>f<N>c\" (bucket shared by several event kinds); event_hash_03 is above the anomaly average (26.1 vs 1.75): more events like \"Node card is not fully functional\" / \"store operation.............................<N>\" (bucket shared by several event kinds); event_hash_27 is above the anomaly average (3.42 vs 0.859): more events like \"ciod: generated <N> core files for program IMB-MPI<N>KB_perf\" / \"iar <N>c dear <N>f<N>ec\" (bucket shared by several event kinds); event_hash_31 is above the anomaly average (8.03 vs 0.666): more events like \"data store interrupt caused by icbi.........<N>\" / \"disable store gathering..................<N>\" (bucket shared by several event kinds). The sessions nearest its centre are dominated by: \"CE sym <N>, at <HEX>, mask <HEX>\" (18.9/session), \"<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>\" (7.6/session), \"total of <N> ddr error(s) detected and corrected\" (5.7/session). Profile: write chain complete in 0% (anomaly avg 0%) of sessions; mean events 800.3 (anomaly avg 584.6); mean duration 99 (anomaly avg 99) s; share of failure-keyword messages 33.7% (anomaly avg 56.2%); mean hosts 335.9 (anomaly avg 281.4).",
+      "typical_events": [
+        {
+          "template": "CE sym <N>, at <HEX>, mask <HEX>",
+          "per_session": 18.9
+        },
+        {
+          "template": "<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>",
+          "per_session": 7.6
+        },
+        {
+          "template": "total of <N> ddr error(s) detected and corrected",
+          "per_session": 5.7
+        },
+        {
+          "template": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to <IP>: Link has been severed",
+          "per_session": 3.4
+        },
+        {
+          "template": "<N> tree receiver <N> in re-synch state event(s) (dcr <HEX>) detected",
+          "per_session": 3.1
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "window_3760937",
+          "n_events": 134,
+          "events": [
+            {
+              "time": 1128281225,
+              "level": "FATAL",
+              "message": "floating point unavailable interrupt"
+            },
+            {
+              "time": 1128281225,
+              "level": "FATAL",
+              "message": "floating point unavailable interrupt"
+            },
+            {
+              "time": 1128281225,
+              "level": "FATAL",
+              "message": "instruction address: 0x00003720"
+            },
+            {
+              "time": 1128281225,
+              "level": "FATAL",
+              "message": "instruction address: 0x00003720"
+            },
+            {
+              "time": 1128281225,
+              "level": "FATAL",
+              "message": "exception syndrome register: 0x00800000"
+            },
+            {
+              "time": 1128281225,
+              "level": "FATAL",
+              "message": "exception syndrome register: 0x00800000"
+            },
+            {
+              "time": 1128281226,
+              "level": "FATAL",
+              "message": "machine check: i-fetch......................0"
+            },
+            {
+              "time": 1128281226,
+              "level": "FATAL",
+              "message": "machine check: i-fetch......................0"
+            },
+            {
+              "time": 1128281226,
+              "level": "FATAL",
+              "message": "program interrupt: illegal instruction......0"
+            },
+            {
+              "time": 1128281226,
+              "level": "FATAL",
+              "message": "program interrupt: illegal instruction......0"
+            },
+            {
+              "time": 1128281226,
+              "level": "FATAL",
+              "message": "program interrupt: privileged instruction...0"
+            },
+            {
+              "time": 1128281226,
+              "level": "FATAL",
+              "message": "program interrupt: privileged instruction...0"
+            },
+            {
+              "time": 1128281226,
+              "level": "FATAL",
+              "message": "program interrupt: trap instruction.........0"
+            },
+            {
+              "time": 1128281226,
+              "level": "FATAL",
+              "message": "program interrupt: trap instruction.........0"
+            },
+            {
+              "time": 1128281227,
+              "level": "FATAL",
+              "message": "floating point operation....................0"
+            },
+            {
+              "time": 1128281227,
+              "level": "FATAL",
+              "message": "floating point operation....................0"
+            },
+            {
+              "time": 1128281227,
+              "level": "FATAL",
+              "message": "store operation.............................1"
+            },
+            {
+              "time": 1128281227,
+              "level": "FATAL",
+              "message": "store operation.............................1"
+            },
+            {
+              "time": 1128281227,
+              "level": "FATAL",
+              "message": "data store interrupt caused by dcbf.........0"
+            },
+            {
+              "time": 1128281227,
+              "level": "FATAL",
+              "message": "data store interrupt caused by dcbf.........0"
+            },
+            {
+              "time": 1128281227,
+              "level": "FATAL",
+              "message": "data store interrupt caused by icbi.........0"
+            },
+            {
+              "time": 1128281228,
+              "level": "FATAL",
+              "message": "data store interrupt caused by icbi.........0"
+            },
+            {
+              "time": 1128281228,
+              "level": "FATAL",
+              "message": "auxiliary processor.........................0"
+            },
+            {
+              "time": 1128281228,
+              "level": "FATAL",
+              "message": "auxiliary processor.........................0"
+            },
+            {
+              "time": 1128281228,
+              "level": "FATAL",
+              "message": "program interrupt: unimplemented operation..0"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "CE sym <N>, at <HEX>, mask <HEX>",
+              "per_session": 18.9
+            },
+            {
+              "template": "<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>",
+              "per_session": 7.6
+            },
+            {
+              "template": "total of <N> ddr error(s) detected and corrected",
+              "per_session": 5.7
+            },
+            {
+              "template": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to <IP>: Link has been severed",
+              "per_session": 3.4
+            },
+            {
+              "template": "<N> tree receiver <N> in re-synch state event(s) (dcr <HEX>) detected",
+              "per_session": 3.1
+            }
+          ]
+        },
+        {
+          "session_id": "window_3760632",
+          "n_events": 175,
+          "events": [
+            {
+              "time": 1128189741,
+              "level": "INFO",
+              "message": "1 L3 EDRAM error(s) (dcr 0x0157) detected and corrected"
+            },
+            {
+              "time": 1128189741,
+              "level": "INFO",
+              "message": "1 L3 EDRAM error(s) (dcr 0x0157) detected and corrected"
+            },
+            {
+              "time": 1128189741,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 18, bit 3"
+            },
+            {
+              "time": 1128189741,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 5, bit 5"
+            },
+            {
+              "time": 1128189741,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 34, bit 5"
+            },
+            {
+              "time": 1128189742,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 26, bit 3"
+            },
+            {
+              "time": 1128189742,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 16, bit 5"
+            },
+            {
+              "time": 1128189742,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 30, bit 7"
+            },
+            {
+              "time": 1128189742,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 4, bit 1"
+            },
+            {
+              "time": 1128189742,
+              "level": "INFO",
+              "message": "1 torus receiver z- input pipe error(s) (dcr 0x02f1) detected and corrected"
+            },
+            {
+              "time": 1128189742,
+              "level": "INFO",
+              "message": "9 tree receiver 1 in re-synch state event(s) (dcr 0x0185) detected"
+            },
+            {
+              "time": 1128189742,
+              "level": "INFO",
+              "message": "4 tree receiver 2 in re-synch state event(s) (dcr 0x019a) detected"
+            },
+            {
+              "time": 1128189742,
+              "level": "INFO",
+              "message": "4 tree receiver 2 in re-synch state event(s) (dcr 0x019a) detected"
+            },
+            {
+              "time": 1128189743,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 23, bit 3"
+            },
+            {
+              "time": 1128189743,
+              "level": "INFO",
+              "message": "CE sym 18, at 0x02302f00, mask 0x10"
+            },
+            {
+              "time": 1128189743,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 5, bit 7"
+            },
+            {
+              "time": 1128189743,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 18, bit 0"
+            },
+            {
+              "time": 1128189743,
+              "level": "FATAL",
+              "message": "machine check interrupt (bit=0x06): L3 major internal error"
+            },
+            {
+              "time": 1128189743,
+              "level": "INFO",
+              "message": "9 L3 EDRAM error(s) (dcr 0x0157) detected and corrected"
+            },
+            {
+              "time": 1128189743,
+              "level": "INFO",
+              "message": "4 torus receiver x+ input pipe error(s) (dcr 0x02ec) detected and corrected"
+            },
+            {
+              "time": 1128189744,
+              "level": "INFO",
+              "message": "1 torus receiver z- input pipe error(s) (dcr 0x02f1) detected and corrected"
+            },
+            {
+              "time": 1128189744,
+              "level": "INFO",
+              "message": "CE sym 34, at 0x04189520, mask 0x04"
+            },
+            {
+              "time": 1128189744,
+              "level": "INFO",
+              "message": "CE sym 26, at 0x07a95e80, mask 0x10"
+            },
+            {
+              "time": 1128189744,
+              "level": "INFO",
+              "message": "CE sym 16, at 0x0456cd40, mask 0x04"
+            },
+            {
+              "time": 1128189744,
+              "level": "INFO",
+              "message": "CE sym 30, at 0x006f0e80, mask 0x01"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>",
+              "per_session": 14.0
+            },
+            {
+              "template": "CE sym <N>, at <HEX>, mask <HEX>",
+              "per_session": 14.0
+            },
+            {
+              "template": "total of <N> ddr error(s) detected and corrected",
+              "per_session": 11.0
+            },
+            {
+              "template": "<N> tree receiver <N> in re-synch state event(s) (dcr <HEX>) detected",
+              "per_session": 7.0
+            }
+          ]
+        },
+        {
+          "session_id": "window_3761470",
+          "n_events": 200,
+          "events": [
+            {
+              "time": 1128441057,
+              "level": "INFO",
+              "message": "1 L3 EDRAM error(s) (dcr 0x0157) detected and corrected"
+            },
+            {
+              "time": 1128441057,
+              "level": "INFO",
+              "message": "1 L3 EDRAM error(s) (dcr 0x0157) detected and corrected"
+            },
+            {
+              "time": 1128441057,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 34, bit 1"
+            },
+            {
+              "time": 1128441057,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 11, bit 6"
+            },
+            {
+              "time": 1128441057,
+              "level": "INFO",
+              "message": "2 tree receiver 1 in re-synch state event(s) (dcr 0x0185) detected"
+            },
+            {
+              "time": 1128441057,
+              "level": "INFO",
+              "message": "2 tree receiver 2 in re-synch state event(s) (dcr 0x019a) detected"
+            },
+            {
+              "time": 1128441057,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 13, bit 1"
+            },
+            {
+              "time": 1128441057,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 26, bit 3"
+            },
+            {
+              "time": 1128441058,
+              "level": "INFO",
+              "message": "CE sym 34, at 0x121c5300, mask 0x40"
+            },
+            {
+              "time": 1128441058,
+              "level": "INFO",
+              "message": "CE sym 11, at 0x020b75c0, mask 0x02"
+            },
+            {
+              "time": 1128441058,
+              "level": "INFO",
+              "message": "2 tree receiver 2 in re-synch state event(s) (dcr 0x019a) detected"
+            },
+            {
+              "time": 1128441058,
+              "level": "INFO",
+              "message": "2 ddr errors(s) detected and corrected on rank 0, symbol 13, bit 2"
+            },
+            {
+              "time": 1128441058,
+              "level": "INFO",
+              "message": "CE sym 26, at 0x03231ca0, mask 0x10"
+            },
+            {
+              "time": 1128441058,
+              "level": "INFO",
+              "message": "total of 1 ddr error(s) detected and corrected"
+            },
+            {
+              "time": 1128441058,
+              "level": "INFO",
+              "message": "total of 1 ddr error(s) detected and corrected"
+            },
+            {
+              "time": 1128441058,
+              "level": "INFO",
+              "message": "2 ddr errors(s) detected and corrected on rank 0, symbol 13, bit 3"
+            },
+            {
+              "time": 1128441059,
+              "level": "INFO",
+              "message": "total of 1 ddr error(s) detected and corrected"
+            },
+            {
+              "time": 1128441059,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 13, bit 5"
+            },
+            {
+              "time": 1128441059,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 13, bit 7"
+            },
+            {
+              "time": 1128441059,
+              "level": "INFO",
+              "message": "CE sym 13, at 0x039694e0, mask 0x20"
+            },
+            {
+              "time": 1128441059,
+              "level": "INFO",
+              "message": "CE sym 13, at 0x039694e0, mask 0x20"
+            },
+            {
+              "time": 1128441059,
+              "level": "INFO",
+              "message": "CE sym 13, at 0x039710c0, mask 0x10"
+            },
+            {
+              "time": 1128441059,
+              "level": "INFO",
+              "message": "CE sym 13, at 0x039742a0, mask 0x04"
+            },
+            {
+              "time": 1128441060,
+              "level": "INFO",
+              "message": "CE sym 13, at 0x03975c80, mask 0x01"
+            },
+            {
+              "time": 1128441060,
+              "level": "INFO",
+              "message": "CE sym 13, at 0x03972080, mask 0x10"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to <IP>: Link has been severed",
+              "per_session": 34.0
+            },
+            {
+              "template": "CE sym <N>, at <HEX>, mask <HEX>",
+              "per_session": 10.0
+            },
+            {
+              "template": "<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>",
+              "per_session": 8.0
+            },
+            {
+              "template": "total of <N> ddr error(s) detected and corrected",
+              "per_session": 4.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cluster": 4,
+      "sessions": 27,
+      "share": 0.032569360675512665,
+      "composition": {
+        "normal": 0,
+        "anomaly": 27,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 72,
+        "anomaly": 4
+      },
+      "top_features": [
+        {
+          "feature": "warning_ratio",
+          "cluster_mean": 0.46405139565467834,
+          "overall_anomaly_mean": 0.016126636415719986,
+          "all_sessions_mean": 0.02565895952284336,
+          "z": 4.954899787902832,
+          "measures": "share of WARN-level events"
+        },
+        {
+          "feature": "n_threads",
+          "cluster_mean": 2.8888888359069824,
+          "overall_anomaly_mean": 1.254523515701294,
+          "all_sessions_mean": 1.0789133310317993,
+          "z": 2.773456573486328,
+          "measures": "distinct threads (HDFS) or components (BGL) involved"
+        },
+        {
+          "feature": "gap_mean_s",
+          "cluster_mean": 19.957223892211914,
+          "overall_anomaly_mean": 3.501868486404419,
+          "all_sessions_mean": 14.110458374023438,
+          "z": 2.090799331665039,
+          "measures": "mean seconds between consecutive events"
+        },
+        {
+          "feature": "gap_std_s",
+          "cluster_mean": 24.87776756286621,
+          "overall_anomaly_mean": 5.934040069580078,
+          "all_sessions_mean": 9.150839805603027,
+          "z": 1.7414069175720215,
+          "measures": "variability of the gaps between events"
+        },
+        {
+          "feature": "transition_change_ratio",
+          "cluster_mean": 0.9027188420295715,
+          "overall_anomaly_mean": 0.35302552580833435,
+          "all_sessions_mean": 0.34730100631713867,
+          "z": 1.3650833368301392,
+          "measures": "share of consecutive events that change kind"
+        }
+      ],
+      "interpretation": "Cluster 4 holds 3.3% of the clustered anomalies. Compared with the overall anomaly population, its members show: warning_ratio is above the anomaly average (0.464 vs 0.0161): a high share of warnings; n_threads is above the anomaly average (2.89 vs 1.25): more threads/components involved; gap_mean_s is above the anomaly average (20 vs 3.5): long pauses between events (slow progress); gap_std_s is above the anomaly average (24.9 vs 5.93): irregular timing (bursts and stalls); transition_change_ratio is above the anomaly average (0.903 vs 0.353): frequent switching between event kinds. The sessions nearest its centre are dominated by: \"Ido packet timeout\" (1.1/session), \"MailboxMonitor::serviceMailboxes() lib_ido_error: <N> BGLERR_IDO_PKT_TIMEOUT connection lost to node<PATH> card\" (1.0/session), \"PrepareForService is being done on this part (mLctn(R<N>-M<N>-N<N>), mCardSernum(<N>c<N>b<N>), mLp(FF:F<N>:<N>F:<N>:CD:<N>:<N>:<N>D:<N>:E<N>:<N>:AC), mIp(<IP>), mType(<N>)) by gooding<N>\" (0.1/session). Profile: write chain complete in 0% (anomaly avg 0%) of sessions; mean events 22.4 (anomaly avg 584.6); mean duration 137 (anomaly avg 99) s; share of failure-keyword messages 37.2% (anomaly avg 56.2%); mean hosts 9.7 (anomaly avg 281.4).",
+      "typical_events": [
+        {
+          "template": "Ido packet timeout",
+          "per_session": 1.1
+        },
+        {
+          "template": "MailboxMonitor::serviceMailboxes() lib_ido_error: <N> BGLERR_IDO_PKT_TIMEOUT connection lost to node<PATH> card",
+          "per_session": 1.0
+        },
+        {
+          "template": "PrepareForService is being done on this part (mLctn(R<N>-M<N>-N<N>), mCardSernum(<N>c<N>b<N>), mLp(FF:F<N>:<N>F:<N>:CD:<N>:<N>:<N>D:<N>:E<N>:<N>:AC), mIp(<IP>), mType(<N>)) by gooding<N>",
+          "per_session": 0.1
+        },
+        {
+          "template": "PrepareForService shutting down NodeCard(mLctn(R<N>-M<N>-N<N>), mCardSernum(<N>c<N>b<N>), mLp(FF:F<N>:<N>F:<N>:CD:<N>:<N>:<N>D:<N>:E<N>:<N>:AC), mIp(<IP>), mType(<N>)) as part of Service Action <N>",
+          "per_session": 0.1
+        },
+        {
+          "template": "PrepareForService is being done on this part (mLctn(R<N>-M<N>-N<N>), mCardSernum(<N>c<N>b<N>), mLp(FF:F<N>:<N>F:<N>:BD:BF:<N>:<N>D:<N>:E<N>:<N>:<N>), mIp(<IP>), mType(<N>)) by root",
+          "per_session": 0.1
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "window_3745182",
+          "n_events": 4,
+          "events": [
+            {
+              "time": 1123554722,
+              "level": "WARNING",
+              "message": "PrepareForService is being done on this part (mLctn(R31-M1-N6), mCardSernum(203231503833343000000000594c31304b34333432303230), mLp(FF:F2:9F:16:CD:53:00:0D:60:E9:32:AC), mIp(10.3.0.10), mType(4)) by go"
+            },
+            {
+              "time": 1123554730,
+              "level": "ERROR",
+              "message": "Ido packet timeout"
+            },
+            {
+              "time": 1123554730,
+              "level": "FATAL",
+              "message": "MailboxMonitor::serviceMailboxes() lib_ido_error: -1033 BGLERR_IDO_PKT_TIMEOUT connection lost to node/link/service card"
+            },
+            {
+              "time": 1123554782,
+              "level": "WARNING",
+              "message": "PrepareForService shutting down NodeCard(mLctn(R31-M1-N6), mCardSernum(203231503833343000000000594c31304b34333432303230), mLp(FF:F2:9F:16:CD:53:00:0D:60:E9:32:AC), mIp(10.3.0.10), mType(4)) as part of"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Ido packet timeout",
+              "per_session": 1.1
+            },
+            {
+              "template": "MailboxMonitor::serviceMailboxes() lib_ido_error: <N> BGLERR_IDO_PKT_TIMEOUT connection lost to node<PATH> card",
+              "per_session": 1.0
+            },
+            {
+              "template": "PrepareForService is being done on this part (mLctn(R<N>-M<N>-N<N>), mCardSernum(<N>c<N>b<N>), mLp(FF:F<N>:<N>F:<N>:CD:<N>:<N>:<N>D:<N>:E<N>:<N>:AC), mIp(<IP>), mType(<N>)) by gooding<N>",
+              "per_session": 0.1
+            },
+            {
+              "template": "PrepareForService shutting down NodeCard(mLctn(R<N>-M<N>-N<N>), mCardSernum(<N>c<N>b<N>), mLp(FF:F<N>:<N>F:<N>:CD:<N>:<N>:<N>D:<N>:E<N>:<N>:AC), mIp(<IP>), mType(<N>)) as part of Service Action <N>",
+              "per_session": 0.1
+            },
+            {
+              "template": "PrepareForService is being done on this part (mLctn(R<N>-M<N>-N<N>), mCardSernum(<N>c<N>b<N>), mLp(FF:F<N>:<N>F:<N>:BD:BF:<N>:<N>D:<N>:E<N>:<N>:<N>), mIp(<IP>), mType(<N>)) by root",
+              "per_session": 0.1
+            }
+          ]
+        },
+        {
+          "session_id": "window_3760018",
+          "n_events": 4,
+          "events": [
+            {
+              "time": 1128005447,
+              "level": "ERROR",
+              "message": "Ido packet timeout"
+            },
+            {
+              "time": 1128005447,
+              "level": "FATAL",
+              "message": "MailboxMonitor::serviceMailboxes() lib_ido_error: -1033 BGLERR_IDO_PKT_TIMEOUT connection lost to node/link/service card"
+            },
+            {
+              "time": 1128005448,
+              "level": "WARNING",
+              "message": "PrepareForService is being done on this part (mLctn(R40-M1-N6), mCardSernum(203231503833343000000000594c31304b35303130303231), mLp(FF:F2:9F:16:BD:BF:00:0D:60:E9:42:40), mIp(10.4.0.153), mType(4)) by r"
+            },
+            {
+              "time": 1128005509,
+              "level": "WARNING",
+              "message": "PrepareForService shutting down NodeCard(mLctn(R40-M1-N6), mCardSernum(203231503833343000000000594c31304b35303130303231), mLp(FF:F2:9F:16:BD:BF:00:0D:60:E9:42:40), mIp(10.4.0.153), mType(4)) as part o"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Ido packet timeout",
+              "per_session": 1.0
+            },
+            {
+              "template": "MailboxMonitor::serviceMailboxes() lib_ido_error: <N> BGLERR_IDO_PKT_TIMEOUT connection lost to node<PATH> card",
+              "per_session": 1.0
+            },
+            {
+              "template": "PrepareForService is being done on this part (mLctn(R<N>-M<N>-N<N>), mCardSernum(<N>c<N>b<N>), mLp(FF:F<N>:<N>F:<N>:BD:BF:<N>:<N>D:<N>:E<N>:<N>:<N>), mIp(<IP>), mType(<N>)) by root",
+              "per_session": 1.0
+            },
+            {
+              "template": "PrepareForService shutting down NodeCard(mLctn(R<N>-M<N>-N<N>), mCardSernum(<N>c<N>b<N>), mLp(FF:F<N>:<N>F:<N>:BD:BF:<N>:<N>D:<N>:E<N>:<N>:<N>), mIp(<IP>), mType(<N>)) as part of Service Action <N>",
+              "per_session": 1.0
+            }
+          ]
+        },
+        {
+          "session_id": "window_3754289",
+          "n_events": 4,
+          "events": [
+            {
+              "time": 1126286707,
+              "level": "ERROR",
+              "message": "Ido packet timeout"
+            },
+            {
+              "time": 1126286707,
+              "level": "FATAL",
+              "message": "MailboxMonitor::serviceMailboxes() lib_ido_error: -1033 BGLERR_IDO_PKT_TIMEOUT connection lost to node/link/service card"
+            },
+            {
+              "time": 1126286708,
+              "level": "WARNING",
+              "message": "PrepareForService is being done on this part (mLctn(R03-M1-N6), mCardSernum(203231503833343000000000594c31304b34323836303132), mLp(FF:F2:9F:16:E6:7C:00:0D:60:E9:19:83), mIp(10.0.0.202), mType(4)) by r"
+            },
+            {
+              "time": 1126286766,
+              "level": "WARNING",
+              "message": "PrepareForService shutting down NodeCard(mLctn(R03-M1-N6), mCardSernum(203231503833343000000000594c31304b34323836303132), mLp(FF:F2:9F:16:E6:7C:00:0D:60:E9:19:83), mIp(10.0.0.202), mType(4)) as part o"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Ido packet timeout",
+              "per_session": 1.0
+            },
+            {
+              "template": "MailboxMonitor::serviceMailboxes() lib_ido_error: <N> BGLERR_IDO_PKT_TIMEOUT connection lost to node<PATH> card",
+              "per_session": 1.0
+            },
+            {
+              "template": "PrepareForService is being done on this part (mLctn(R<N>-M<N>-N<N>), mCardSernum(<N>c<N>b<N>), mLp(FF:F<N>:<N>F:<N>:E<N>:<N>C:<N>:<N>D:<N>:E<N>:<N>:<N>), mIp(<IP>), mType(<N>)) by root",
+              "per_session": 1.0
+            },
+            {
+              "template": "PrepareForService shutting down NodeCard(mLctn(R<N>-M<N>-N<N>), mCardSernum(<N>c<N>b<N>), mLp(FF:F<N>:<N>F:<N>:E<N>:<N>C:<N>:<N>D:<N>:E<N>:<N>:<N>), mIp(<IP>), mType(<N>)) as part of Service Action <N>",
+              "per_session": 1.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cluster": 5,
+      "sessions": 241,
+      "share": 0.29071170084439085,
+      "composition": {
+        "normal": 0,
+        "anomaly": 241,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 226,
+        "anomaly": 37
+      },
+      "top_features": [
+        {
+          "feature": "n_event_buckets",
+          "cluster_mean": 20.08298683166504,
+          "overall_anomaly_mean": 9.010856628417969,
+          "all_sessions_mean": 3.8382060527801514,
+          "z": 1.1706650257110596,
+          "measures": "number of distinct event kinds"
+        },
+        {
+          "feature": "event_hash_16",
+          "cluster_mean": 4.261410713195801,
+          "overall_anomaly_mean": 1.7153196334838867,
+          "all_sessions_mean": 1.4414833784103394,
+          "z": 1.0271267890930176,
+          "measures": "count of events in hash bucket 16: \"<N> L<N> EDRAM error(s) (dcr <HEX>) detected and corrected\" / \"ciod: cpu <N> at treeaddr <N> sent unrecognized message <HEX>\" (bucket shared by several event kinds)"
+        },
+        {
+          "feature": "event_entropy",
+          "cluster_mean": 3.002875328063965,
+          "overall_anomaly_mean": 1.4690533876419067,
+          "all_sessions_mean": 0.9276168942451477,
+          "z": 1.003071665763855,
+          "measures": "diversity of the event-kind distribution"
+        },
+        {
+          "feature": "event_hash_11",
+          "cluster_mean": 2.9751036167144775,
+          "overall_anomaly_mean": 6.316043376922607,
+          "all_sessions_mean": 4.397326469421387,
+          "z": 0.9140129089355469,
+          "measures": "count of events in hash bucket 11: \"floating pt ex mode <N> enable......<N>\" / \"total of <N> ddr error(s) detected and corrected over <N> seconds\" (bucket shared by several event kinds)"
+        },
+        {
+          "feature": "event_hash_14",
+          "cluster_mean": 20.576763153076172,
+          "overall_anomaly_mean": 9.36308765411377,
+          "all_sessions_mean": 4.846571922302246,
+          "z": 0.8755936026573181,
+          "measures": "count of events in hash bucket 14: \"<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>\" / \"debug wait enable.................<N>\" (bucket shared by several event kinds)"
+        }
+      ],
+      "interpretation": "Cluster 5 holds 29.1% of the clustered anomalies. Compared with the overall anomaly population, its members show: n_event_buckets is above the anomaly average (20.1 vs 9.01): a wider variety of event kinds; event_hash_16 is above the anomaly average (4.26 vs 1.72): more events like \"<N> L<N> EDRAM error(s) (dcr <HEX>) detected and corrected\" / \"ciod: cpu <N> at treeaddr <N> sent unrecognized message <HEX>\" (bucket shared by several event kinds); event_entropy is above the anomaly average (3 vs 1.47): a more varied mix of events; event_hash_11 is above the anomaly average (2.98 vs 6.32): more events like \"floating pt ex mode <N> enable......<N>\" / \"total of <N> ddr error(s) detected and corrected over <N> seconds\" (bucket shared by several event kinds); event_hash_14 is above the anomaly average (20.6 vs 9.36): more events like \"<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>\" / \"debug wait enable.................<N>\" (bucket shared by several event kinds). The sessions nearest its centre are dominated by: \"CE sym <N>, at <HEX>, mask <HEX>\" (11.1/session), \"<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>\" (7.7/session), \"total of <N> ddr error(s) detected and corrected\" (6.3/session). Profile: write chain complete in 0% (anomaly avg 0%) of sessions; mean events 383.4 (anomaly avg 584.6); mean duration 86 (anomaly avg 99) s; share of failure-keyword messages 33.7% (anomaly avg 56.2%); mean hosts 177.8 (anomaly avg 281.4).",
+      "typical_events": [
+        {
+          "template": "CE sym <N>, at <HEX>, mask <HEX>",
+          "per_session": 11.1
+        },
+        {
+          "template": "<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>",
+          "per_session": 7.7
+        },
+        {
+          "template": "total of <N> ddr error(s) detected and corrected",
+          "per_session": 6.3
+        },
+        {
+          "template": "<N> tree receiver <N> in re-synch state event(s) (dcr <HEX>) detected",
+          "per_session": 2.6
+        },
+        {
+          "template": "floating pt ex mode <N> enable......<N>",
+          "per_session": 1.6
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "window_3757252",
+          "n_events": 46,
+          "events": [
+            {
+              "time": 1127175605,
+              "level": "FATAL",
+              "message": "machine check interrupt"
+            },
+            {
+              "time": 1127175606,
+              "level": "FATAL",
+              "message": "instruction address: 0x0012a1ec"
+            },
+            {
+              "time": 1127175606,
+              "level": "FATAL",
+              "message": "machine check status register: 0x81000000"
+            },
+            {
+              "time": 1127175606,
+              "level": "FATAL",
+              "message": "summary...........................1"
+            },
+            {
+              "time": 1127175607,
+              "level": "FATAL",
+              "message": "instruction plb error.............0"
+            },
+            {
+              "time": 1127175607,
+              "level": "FATAL",
+              "message": "data read plb error...............0"
+            },
+            {
+              "time": 1127175607,
+              "level": "FATAL",
+              "message": "data write plb error..............0"
+            },
+            {
+              "time": 1127175607,
+              "level": "FATAL",
+              "message": "tlb error.........................0"
+            },
+            {
+              "time": 1127175608,
+              "level": "FATAL",
+              "message": "i-cache parity error..............0"
+            },
+            {
+              "time": 1127175608,
+              "level": "FATAL",
+              "message": "d-cache search parity error.......0"
+            },
+            {
+              "time": 1127175608,
+              "level": "FATAL",
+              "message": "d-cache flush parity error........1"
+            },
+            {
+              "time": 1127175608,
+              "level": "FATAL",
+              "message": "imprecise machine check...........0"
+            },
+            {
+              "time": 1127175609,
+              "level": "FATAL",
+              "message": "machine state register: 0x0002f900"
+            },
+            {
+              "time": 1127175609,
+              "level": "FATAL",
+              "message": "wait state enable.................0"
+            },
+            {
+              "time": 1127175609,
+              "level": "FATAL",
+              "message": "critical input interrupt enable...1"
+            },
+            {
+              "time": 1127175609,
+              "level": "FATAL",
+              "message": "external input interrupt enable...1"
+            },
+            {
+              "time": 1127175610,
+              "level": "FATAL",
+              "message": "problem state (0=sup,1=usr).......1"
+            },
+            {
+              "time": 1127175610,
+              "level": "FATAL",
+              "message": "floating point instr. enabled.....1"
+            },
+            {
+              "time": 1127175610,
+              "level": "FATAL",
+              "message": "machine check enable..............1"
+            },
+            {
+              "time": 1127175611,
+              "level": "FATAL",
+              "message": "floating pt ex mode 0 enable......1"
+            },
+            {
+              "time": 1127175611,
+              "level": "FATAL",
+              "message": "debug wait enable.................0"
+            },
+            {
+              "time": 1127175612,
+              "level": "FATAL",
+              "message": "debug interrupt enable............0"
+            },
+            {
+              "time": 1127175612,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 30, bit 7"
+            },
+            {
+              "time": 1127175614,
+              "level": "INFO",
+              "message": "1 L3 EDRAM error(s) (dcr 0x0157) detected and corrected"
+            },
+            {
+              "time": 1127175614,
+              "level": "INFO",
+              "message": "1 L3 EDRAM error(s) (dcr 0x0157) detected and corrected"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "CE sym <N>, at <HEX>, mask <HEX>",
+              "per_session": 11.1
+            },
+            {
+              "template": "<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>",
+              "per_session": 7.7
+            },
+            {
+              "template": "total of <N> ddr error(s) detected and corrected",
+              "per_session": 6.3
+            },
+            {
+              "template": "<N> tree receiver <N> in re-synch state event(s) (dcr <HEX>) detected",
+              "per_session": 2.6
+            },
+            {
+              "template": "floating pt ex mode <N> enable......<N>",
+              "per_session": 1.6
+            }
+          ]
+        },
+        {
+          "session_id": "window_3767578",
+          "n_events": 87,
+          "events": [
+            {
+              "time": 1130273429,
+              "level": "FATAL",
+              "message": "machine check interrupt"
+            },
+            {
+              "time": 1130273430,
+              "level": "FATAL",
+              "message": "instruction address: 0x00017600"
+            },
+            {
+              "time": 1130273430,
+              "level": "FATAL",
+              "message": "machine check status register: 0x81000000"
+            },
+            {
+              "time": 1130273430,
+              "level": "FATAL",
+              "message": "summary...........................1"
+            },
+            {
+              "time": 1130273430,
+              "level": "FATAL",
+              "message": "instruction plb error.............0"
+            },
+            {
+              "time": 1130273431,
+              "level": "FATAL",
+              "message": "data read plb error...............0"
+            },
+            {
+              "time": 1130273431,
+              "level": "FATAL",
+              "message": "data write plb error..............0"
+            },
+            {
+              "time": 1130273431,
+              "level": "FATAL",
+              "message": "tlb error.........................0"
+            },
+            {
+              "time": 1130273432,
+              "level": "FATAL",
+              "message": "i-cache parity error..............0"
+            },
+            {
+              "time": 1130273432,
+              "level": "FATAL",
+              "message": "d-cache search parity error.......0"
+            },
+            {
+              "time": 1130273432,
+              "level": "FATAL",
+              "message": "d-cache flush parity error........1"
+            },
+            {
+              "time": 1130273432,
+              "level": "FATAL",
+              "message": "imprecise machine check...........0"
+            },
+            {
+              "time": 1130273433,
+              "level": "FATAL",
+              "message": "machine state register: 0x00003000"
+            },
+            {
+              "time": 1130273433,
+              "level": "FATAL",
+              "message": "wait state enable.................0"
+            },
+            {
+              "time": 1130273433,
+              "level": "FATAL",
+              "message": "critical input interrupt enable...0"
+            },
+            {
+              "time": 1130273433,
+              "level": "FATAL",
+              "message": "external input interrupt enable...0"
+            },
+            {
+              "time": 1130273434,
+              "level": "FATAL",
+              "message": "problem state (0=sup,1=usr).......0"
+            },
+            {
+              "time": 1130273434,
+              "level": "FATAL",
+              "message": "floating point instr. enabled.....1"
+            },
+            {
+              "time": 1130273434,
+              "level": "FATAL",
+              "message": "machine check enable..............1"
+            },
+            {
+              "time": 1130273435,
+              "level": "FATAL",
+              "message": "floating pt ex mode 0 enable......0"
+            },
+            {
+              "time": 1130273436,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 15, bit 3"
+            },
+            {
+              "time": 1130273436,
+              "level": "INFO",
+              "message": "5 ddr errors(s) detected and corrected on rank 0, symbol 8, bit 5"
+            },
+            {
+              "time": 1130273436,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 34, bit 1"
+            },
+            {
+              "time": 1130273436,
+              "level": "FATAL",
+              "message": "debug wait enable.................0"
+            },
+            {
+              "time": 1130273436,
+              "level": "INFO",
+              "message": "1 ddr errors(s) detected and corrected on rank 0, symbol 33, bit 6"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "CE sym <N>, at <HEX>, mask <HEX>",
+              "per_session": 30.0
+            },
+            {
+              "template": "<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>",
+              "per_session": 14.0
+            },
+            {
+              "template": "total of <N> ddr error(s) detected and corrected",
+              "per_session": 11.0
+            },
+            {
+              "template": "<N> tree receiver <N> in re-synch state event(s) (dcr <HEX>) detected",
+              "per_session": 3.0
+            }
+          ]
+        },
+        {
+          "session_id": "window_3740598",
+          "n_events": 77,
+          "events": [
+            {
+              "time": 1122179492,
+              "level": "FATAL",
+              "message": "machine check interrupt"
+            },
+            {
+              "time": 1122179492,
+              "level": "FATAL",
+              "message": "instruction address: 0x0011ab70"
+            },
+            {
+              "time": 1122179492,
+              "level": "FATAL",
+              "message": "machine check status register: 0x88000000"
+            },
+            {
+              "time": 1122179492,
+              "level": "FATAL",
+              "message": "summary...........................1"
+            },
+            {
+              "time": 1122179493,
+              "level": "FATAL",
+              "message": "instruction plb error.............0"
+            },
+            {
+              "time": 1122179493,
+              "level": "FATAL",
+              "message": "data read plb error...............0"
+            },
+            {
+              "time": 1122179493,
+              "level": "FATAL",
+              "message": "data write plb error..............0"
+            },
+            {
+              "time": 1122179493,
+              "level": "FATAL",
+              "message": "tlb error.........................1"
+            },
+            {
+              "time": 1122179493,
+              "level": "FATAL",
+              "message": "i-cache parity error..............0"
+            },
+            {
+              "time": 1122179493,
+              "level": "FATAL",
+              "message": "d-cache search parity error.......0"
+            },
+            {
+              "time": 1122179494,
+              "level": "FATAL",
+              "message": "d-cache flush parity error........0"
+            },
+            {
+              "time": 1122179494,
+              "level": "FATAL",
+              "message": "imprecise machine check...........0"
+            },
+            {
+              "time": 1122179494,
+              "level": "FATAL",
+              "message": "machine state register: 0x0002f900"
+            },
+            {
+              "time": 1122179494,
+              "level": "FATAL",
+              "message": "wait state enable.................0"
+            },
+            {
+              "time": 1122179494,
+              "level": "FATAL",
+              "message": "critical input interrupt enable...1"
+            },
+            {
+              "time": 1122179494,
+              "level": "FATAL",
+              "message": "external input interrupt enable...1"
+            },
+            {
+              "time": 1122179495,
+              "level": "FATAL",
+              "message": "problem state (0=sup,1=usr).......1"
+            },
+            {
+              "time": 1122179495,
+              "level": "FATAL",
+              "message": "floating point instr. enabled.....1"
+            },
+            {
+              "time": 1122179495,
+              "level": "FATAL",
+              "message": "machine check enable..............1"
+            },
+            {
+              "time": 1122179495,
+              "level": "FATAL",
+              "message": "floating pt ex mode 0 enable......1"
+            },
+            {
+              "time": 1122179495,
+              "level": "FATAL",
+              "message": "debug wait enable.................0"
+            },
+            {
+              "time": 1122179495,
+              "level": "FATAL",
+              "message": "debug interrupt enable............0"
+            },
+            {
+              "time": 1122179495,
+              "level": "FATAL",
+              "message": "floating pt ex mode 1 enable......1"
+            },
+            {
+              "time": 1122179496,
+              "level": "FATAL",
+              "message": "instruction address space.........0"
+            },
+            {
+              "time": 1122179496,
+              "level": "FATAL",
+              "message": "data address space................0"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "CE sym <N>, at <HEX>, mask <HEX>",
+              "per_session": 15.0
+            },
+            {
+              "template": "<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>",
+              "per_session": 7.0
+            },
+            {
+              "template": "total of <N> ddr error(s) detected and corrected",
+              "per_session": 7.0
+            },
+            {
+              "template": "floating pt ex mode <N> enable......<N>",
+              "per_session": 2.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cluster": 6,
+      "sessions": 180,
+      "share": 0.21712907117008443,
+      "composition": {
+        "normal": 0,
+        "anomaly": 180,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 286,
+        "anomaly": 70
+      },
+      "top_features": [
+        {
+          "feature": "n_hosts",
+          "cluster_mean": 782.0722045898438,
+          "overall_anomaly_mean": 281.43304443359375,
+          "all_sessions_mean": 189.77369689941406,
+          "z": 1.2472093105316162,
+          "measures": "distinct hosts/nodes involved"
+        },
+        {
+          "feature": "events_per_min",
+          "cluster_mean": 294.4912414550781,
+          "overall_anomaly_mean": 156.8799285888672,
+          "all_sessions_mean": 89.75823211669922,
+          "z": 0.8439364433288574,
+          "measures": "event rate"
+        },
+        {
+          "feature": "transition_change_ratio",
+          "cluster_mean": 0.039452701807022095,
+          "overall_anomaly_mean": 0.35302552580833435,
+          "all_sessions_mean": 0.34730100631713867,
+          "z": -0.83513343334198,
+          "measures": "share of consecutive events that change kind"
+        },
+        {
+          "feature": "event_entropy",
+          "cluster_mean": 0.26855915784835815,
+          "overall_anomaly_mean": 1.4690533876419067,
+          "all_sessions_mean": 0.9276168942451477,
+          "z": -0.8005936741828918,
+          "measures": "diversity of the event-kind distribution"
+        },
+        {
+          "feature": "n_events",
+          "cluster_mean": 924.3333129882812,
+          "overall_anomaly_mean": 584.6151733398438,
+          "all_sessions_mean": 355.2401123046875,
+          "z": 0.7199652791023254,
+          "measures": "number of log events"
+        }
+      ],
+      "interpretation": "Cluster 6 holds 21.7% of the clustered anomalies. Compared with the overall anomaly population, its members show: n_hosts is above the anomaly average (782 vs 281): more hosts than usual; events_per_min is above the anomaly average (294 vs 157): dense bursts of events; transition_change_ratio is below the anomaly average (0.0395 vs 0.353): the same event kind repeated; event_entropy is below the anomaly average (0.269 vs 1.47): dominated by one event kind; n_events is above the anomaly average (924 vs 585): more events than a typical anomaly (repeated or retried operations). The sessions nearest its centre are dominated by: \"Lustre mount FAILED : bglio<N> : point <PATH>\" (98.8/session), \"ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to <IP>: Link has been severed\" (44.0/session), \"ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to <IP>: Connection reset by peer\" (0.1/session). Profile: write chain complete in 0% (anomaly avg 0%) of sessions; mean events 924.3 (anomaly avg 584.6); mean duration 88 (anomaly avg 99) s; share of failure-keyword messages 68.6% (anomaly avg 56.2%); mean hosts 782.1 (anomaly avg 281.4).",
+      "typical_events": [
+        {
+          "template": "Lustre mount FAILED : bglio<N> : point <PATH>",
+          "per_session": 98.8
+        },
+        {
+          "template": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to <IP>: Link has been severed",
+          "per_session": 44.0
+        },
+        {
+          "template": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to <IP>: Connection reset by peer",
+          "per_session": 0.1
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "window_3749904",
+          "n_events": 113,
+          "events": [
+            {
+              "time": 1124971200,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39516: Link has been severed"
+            },
+            {
+              "time": 1124971200,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39517: Link has been severed"
+            },
+            {
+              "time": 1124971200,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39736: Link has been severed"
+            },
+            {
+              "time": 1124971200,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39737: Link has been severed"
+            },
+            {
+              "time": 1124971200,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39486: Link has been severed"
+            },
+            {
+              "time": 1124971200,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39352: Link has been severed"
+            },
+            {
+              "time": 1124971200,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39353: Link has been severed"
+            },
+            {
+              "time": 1124971200,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39738: Link has been severed"
+            },
+            {
+              "time": 1124971201,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39739: Link has been severed"
+            },
+            {
+              "time": 1124971201,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39714: Link has been severed"
+            },
+            {
+              "time": 1124971201,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39715: Link has been severed"
+            },
+            {
+              "time": 1124971201,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39351: Link has been severed"
+            },
+            {
+              "time": 1124971201,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39544: Link has been severed"
+            },
+            {
+              "time": 1124971201,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39545: Link has been severed"
+            },
+            {
+              "time": 1124971201,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39584: Link has been severed"
+            },
+            {
+              "time": 1124971201,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39585: Link has been severed"
+            },
+            {
+              "time": 1124971201,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39586: Link has been severed"
+            },
+            {
+              "time": 1124971201,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39587: Link has been severed"
+            },
+            {
+              "time": 1124971202,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39712: Link has been severed"
+            },
+            {
+              "time": 1124971202,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39713: Link has been severed"
+            },
+            {
+              "time": 1124971202,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39830: Link has been severed"
+            },
+            {
+              "time": 1124971202,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39831: Link has been severed"
+            },
+            {
+              "time": 1124971202,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39582: Link has been severed"
+            },
+            {
+              "time": 1124971202,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39583: Link has been severed"
+            },
+            {
+              "time": 1124971202,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:39708: Link has been severed"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Lustre mount FAILED : bglio<N> : point <PATH>",
+              "per_session": 98.8
+            },
+            {
+              "template": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to <IP>: Link has been severed",
+              "per_session": 44.0
+            },
+            {
+              "template": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to <IP>: Connection reset by peer",
+              "per_session": 0.1
+            }
+          ]
+        },
+        {
+          "session_id": "window_3755465",
+          "n_events": 50,
+          "events": [
+            {
+              "time": 1126639774,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio143 : point /p/gb1"
+            },
+            {
+              "time": 1126639774,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio144 : point /p/gb1"
+            },
+            {
+              "time": 1126639774,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio141 : point /p/gb1"
+            },
+            {
+              "time": 1126639775,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio142 : point /p/gb1"
+            },
+            {
+              "time": 1126639775,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio135 : point /p/gb1"
+            },
+            {
+              "time": 1126639775,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio136 : point /p/gb1"
+            },
+            {
+              "time": 1126639775,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio133 : point /p/gb1"
+            },
+            {
+              "time": 1126639775,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio134 : point /p/gb1"
+            },
+            {
+              "time": 1126639776,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio2 : point /p/gb1"
+            },
+            {
+              "time": 1126639781,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio385 : point /p/gb1"
+            },
+            {
+              "time": 1126639781,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio386 : point /p/gb1"
+            },
+            {
+              "time": 1126639782,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio655 : point /p/gb1"
+            },
+            {
+              "time": 1126639783,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio656 : point /p/gb1"
+            },
+            {
+              "time": 1126639784,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio387 : point /p/gb1"
+            },
+            {
+              "time": 1126639784,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio388 : point /p/gb1"
+            },
+            {
+              "time": 1126639785,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio899 : point /p/gb1"
+            },
+            {
+              "time": 1126639785,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio907 : point /p/gb1"
+            },
+            {
+              "time": 1126639786,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio908 : point /p/gb1"
+            },
+            {
+              "time": 1126639786,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio905 : point /p/gb1"
+            },
+            {
+              "time": 1126639786,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio906 : point /p/gb1"
+            },
+            {
+              "time": 1126639786,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio647 : point /p/gb1"
+            },
+            {
+              "time": 1126639786,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio648 : point /p/gb1"
+            },
+            {
+              "time": 1126639787,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio653 : point /p/gb1"
+            },
+            {
+              "time": 1126639787,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio654 : point /p/gb1"
+            },
+            {
+              "time": 1126639792,
+              "level": "FATAL",
+              "message": "Lustre mount FAILED : bglio515 : point /p/gb1"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Lustre mount FAILED : bglio<N> : point <PATH>",
+              "per_session": 50.0
+            }
+          ]
+        },
+        {
+          "session_id": "window_3749083",
+          "n_events": 128,
+          "events": [
+            {
+              "time": 1124725185,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:48846: Link has been severed"
+            },
+            {
+              "time": 1124725186,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49245: Link has been severed"
+            },
+            {
+              "time": 1124725186,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49500: Link has been severed"
+            },
+            {
+              "time": 1124725186,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49241: Link has been severed"
+            },
+            {
+              "time": 1124725186,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49501: Link has been severed"
+            },
+            {
+              "time": 1124725186,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49243: Link has been severed"
+            },
+            {
+              "time": 1124725187,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49496: Link has been severed"
+            },
+            {
+              "time": 1124725187,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49639: Link has been severed"
+            },
+            {
+              "time": 1124725187,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49640: Link has been severed"
+            },
+            {
+              "time": 1124725187,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49389: Link has been severed"
+            },
+            {
+              "time": 1124725187,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49390: Link has been severed"
+            },
+            {
+              "time": 1124725187,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49387: Link has been severed"
+            },
+            {
+              "time": 1124725187,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49388: Link has been severed"
+            },
+            {
+              "time": 1124725187,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:48915: Link has been severed"
+            },
+            {
+              "time": 1124725187,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:48916: Link has been severed"
+            },
+            {
+              "time": 1124725187,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:48911: Link has been severed"
+            },
+            {
+              "time": 1124725188,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:48912: Link has been severed"
+            },
+            {
+              "time": 1124725188,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49556: Link has been severed"
+            },
+            {
+              "time": 1124725188,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49127: Link has been severed"
+            },
+            {
+              "time": 1124725188,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49128: Link has been severed"
+            },
+            {
+              "time": 1124725188,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49129: Link has been severed"
+            },
+            {
+              "time": 1124725188,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49130: Link has been severed"
+            },
+            {
+              "time": 1124725188,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49552: Link has been severed"
+            },
+            {
+              "time": 1124725188,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49683: Link has been severed"
+            },
+            {
+              "time": 1124725188,
+              "level": "FATAL",
+              "message": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to 172.16.96.116:49684: Link has been severed"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to <IP>: Link has been severed",
+              "per_session": 128.0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "example_events_available": true
+}

@@ -37,6 +37,8 @@ def predict(path, source, keep=False):
     # bundle['columns'] is the exact feature order the model was trained on.
     scores = bundle['model'].predict_proba(df[bundle['columns']].to_numpy(dtype='float32'))[:, 1]
     flagged = scores >= bundle['threshold']
+    # Sessions whose label is known from the log itself (BGL alert tags); -1 means unlabelled (HDFS uploads).
+    audit = {**audit, 'labelled_sessions': int((df.label >= 0).sum()), 'labelled_anomalous': int((df.label == 1).sum())}
     df = df.drop(columns='label')
     df['score'] = scores
     df['decision'] = np.where(flagged, 'ANOMALY', 'NORMAL')

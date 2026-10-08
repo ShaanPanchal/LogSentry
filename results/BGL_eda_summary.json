@@ -1,0 +1,117 @@
+{
+  "n_sessions": 14494,
+  "n_features": 52,
+  "missing_values_total": 0,
+  "duplicate_session_ids": 0,
+  "class_balance": {
+    "normal": 13440,
+    "anomaly": 1054,
+    "anomaly_rate": 0.07271974610183524,
+    "imbalance_ratio": 12.751423149905124
+  },
+  "constant_columns": [
+    "has_allocate",
+    "has_delete",
+    "replica_deficit",
+    "unacked_writes",
+    "uncommitted_acks",
+    "lifecycle_complete"
+  ],
+  "most_skewed": {
+    "n_events": 10.237910162175956,
+    "n_hosts": 8.781441719010727,
+    "events_per_min": 8.337159128555292,
+    "warning_ratio": 6.257767978248544,
+    "n_threads": 5.058370469844362,
+    "gap_mean_s": 3.828178255022607
+  },
+  "highly_correlated_pairs(|r|>0.9)": [
+    {
+      "a": "n_events",
+      "b": "events_per_min",
+      "r": 0.953
+    }
+  ],
+  "class_means": {
+    "n_events": {
+      "normal": 310.50691964285716,
+      "anomaly": 545.3036053130929
+    },
+    "n_event_buckets": {
+      "normal": 3.4792410714285715,
+      "anomaly": 9.744781783681214
+    },
+    "duration_s": {
+      "normal": 77.20505952380952,
+      "anomaly": 98.71537001897534
+    },
+    "gap_mean_s": {
+      "normal": 13.459464592459561,
+      "anomaly": 3.0964919981119543
+    },
+    "gap_max_s": {
+      "normal": 38.36666666666667,
+      "anomaly": 30.876660341555976
+    },
+    "gap_std_s": {
+      "normal": 8.921122942535863,
+      "anomaly": 5.365336006223909
+    },
+    "events_per_min": {
+      "normal": 78.80870871356622,
+      "anomaly": 151.37148804314043
+    },
+    "n_hosts": {
+      "normal": 164.52299107142858,
+      "anomaly": 273.17931688804555
+    },
+    "n_threads": {
+      "normal": 1.0622023809523808,
+      "anomaly": 1.3927893738140418
+    },
+    "warning_ratio": {
+      "normal": 0.024830708699656995,
+      "anomaly": 0.014471115561100568
+    },
+    "error_ratio": {
+      "normal": 0.05425715009159376,
+      "anomaly": 0.7568770960551519
+    },
+    "keyword_error_ratio": {
+      "normal": 0.4950155805112316,
+      "anomaly": 0.5713266857936053
+    },
+    "has_allocate": {
+      "normal": 0.0,
+      "anomaly": 0.0
+    },
+    "has_delete": {
+      "normal": 0.0,
+      "anomaly": 0.0
+    },
+    "replica_deficit": {
+      "normal": 0.0,
+      "anomaly": 0.0
+    },
+    "unacked_writes": {
+      "normal": 0.0,
+      "anomaly": 0.0
+    },
+    "uncommitted_acks": {
+      "normal": 0.0,
+      "anomaly": 0.0
+    },
+    "lifecycle_complete": {
+      "normal": 0.0,
+      "anomaly": 0.0
+    },
+    "transition_change_ratio": {
+      "normal": 0.37321134071175743,
+      "anomaly": 0.3561139214281878
+    },
+    "event_entropy": {
+      "normal": 0.9169476299954018,
+      "anomaly": 1.5244260079303604
+    }
+  }
+}

@@ -11,7 +11,7 @@ raw log -> parse/clean -> sessions -> 52 features -> classifier -> anomaly score
                                                           |-> clustering of anomalies -> dashboard + drill-down
 ```
 
-* **Data**: Loghub HDFS (11,175,629 log lines -> 575,061 block sessions, 16,838 anomalous). BGL is also supported by the code.
+* **Data**: two Loghub sources, processed and modelled **separately** (never mixed): HDFS (11,175,629 log lines -> 575,061 block sessions, 16,838 anomalous) and Blue Gene/L, BGL (4,747,963 lines -> 14,494 five-minute windows, 1,054 anomalous).
 * **Classification** (core task): normal vs anomalous session. Final model: **HistGradientBoostingClassifier**.
 * **Clustering**: K-means on the anomaly class only, labels excluded, every cluster described from its features and real events.
 * **Evaluation**: purged chronological train/validation/test split, precision/recall/F1/PR-AUC/confusion matrix, error analysis, seed stability.
@@ -55,8 +55,10 @@ is machine-specific.
 |---|---|
 | **Processed dataset used by the final model** | `data/processed/HDFS_sessions.csv.gz` (575,061 rows: `session_id, source, t_start, t_end, label` + the 52 features) |
 | Small real sample log (200 complete sessions, 2,819 lines, for trying prediction / the dashboard) | `data/supporting/sample_HDFS.log` (+ `sample_HDFS_labels.csv`) |
-| What each `event_hash_NN` feature counts | `results/HDFS_event_buckets.json` |
-| Raw Loghub data (186 MB download, not committed) | fetched by `setup_data.py` into `data/raw/` |
+| **Processed BGL dataset** (14,494 five-minute windows, same 52 features) | `data/processed/BGL_sessions.csv.gz` |
+| Small real BGL sample (100 complete windows, 2,595 lines, 25 anomalous) | `data/supporting/sample_BGL.log` (+ `sample_BGL_labels.csv`) |
+| What each `event_hash_NN` feature counts | `results/HDFS_event_buckets.json`, `results/BGL_event_buckets.json` |
+| Raw Loghub data (HDFS_v1.zip 186 MB, BGL.zip 57 MB; not committed) | fetched by `setup_data.py` into `data/raw/` (`BGL.log` ends up at `data/raw/BGL/BGL.log`) |
 
 Source: Loghub (Zhu et al., ISSRE 2023), Zenodo record 8196385, `HDFS_v1.zip` (MD5 verified by the script).
 Loghub datasets are free for research/academic use; cite Zhu, J., He, S., He, P., Liu, J. and Lyu, M.R. (2023)
@@ -82,16 +84,44 @@ training, the CLI and the dashboard. Seven feature groups (justification in the 
 event-type counts (32 hashed buckets), volume/variety, timing, topology, HDFS lifecycle
 completeness ("absence" features), severity, and sequence regularity.
 
+### BGL (second source)
+
+```bash
+python setup_data.py --source BGL --process-only    # download BGL.zip (57 MB), verify MD5, sort, parse, process (~3 min)
+python setup_data.py --source BGL                   # ... and train/cluster/evaluate (results/BGL_*, models/BGL_*)
+```
+
+BGL goes through the **same** `processing.process()` -> `features.Session` -> 52-feature table as HDFS; only the raw-line
+parser, session definition and label source differ, and those live in `src/sources.py` (one adapter per dataset):
+
+| | HDFS | BGL |
+|---|---|---|
+| Raw line | `081109 203518 143 INFO dfs.DataNode: ...` | `- 1117838570 2005.06.03 R02-M1-N0-C:J12-U11 2005-06-03-15.42.50.675872 R02-M1-N0-C:J12-U11 RAS KERNEL INFO ...` |
+| Session | one per block id (`blk_...`) | fixed 5-minute time window (BGL has no session id) |
+| Label | per-block file `anomaly_label.csv` | in the log: first field `-` = normal, anything else = alert; a window is anomalous if any line is an alert |
+| Host / thread | IPs in the message / thread id | node name / component (KERNEL, APP, ...) |
+
+The alert tag is used **only** as the label and never reaches the feature code (unit-tested).
+Six features are HDFS-specific (`has_allocate`, `has_delete`, `replica_deficit`, `unacked_writes`, `uncommitted_acks`,
+`lifecycle_complete`): BGL has no block write chain, so they are fixed at 0 meaning "not applicable" (not fabricated), leaving
+46 active features for BGL (confirmed in `results/BGL_eda_summary.json`, `constant_columns`).
+
+Check the parser on any raw log (prints parsed fields, level/label counts, parse rate):
+
+```bash
+python src/processing.py --source BGL --log data/supporting/sample_BGL.log --head 3
+```
+
 Exploratory analysis of the processed data (class balance, distributions, correlations, figures):
 
 ```bash
-python src/eda.py --source HDFS      # -> results/HDFS_eda_summary.json, figures/HDFS_eda*.png
+python src/eda.py --source HDFS      # -> results/HDFS_eda_summary.json, figures/HDFS_eda*.png  (use --source BGL for BGL)
 ```
 
 ## 4. Training (classification, clustering, error analysis)
 
 ```bash
-python src/train.py --source HDFS    # ~1-2 min
+python src/train.py --source HDFS    # ~1 min   (python src/train.py --source BGL for BGL, ~10 s)
 ```
 
 This one command:
@@ -122,6 +152,7 @@ descriptions are generated from the features and `HDFS_event_buckets.json` only,
 
 ```bash
 python src/predict.py --source HDFS --log data/supporting/sample_HDFS.log --out predictions.csv
+python src/predict.py --source BGL  --log data/supporting/sample_BGL.log  --out predictions_bgl.csv
 ```
 
 Writes one row per session with the 52 features, `score` (anomaly probability), `decision`
@@ -143,7 +174,7 @@ print(df[["session_id", "score", "decision", "cluster"]].sort_values("score", as
 python src/dashboard.py              # http://127.0.0.1:5000
 ```
 
-Upload a log (try `data/supporting/sample_HDFS.log`, source HDFS). The page shows the final model and its
+Pick the log source (HDFS or BGL) and upload a log (try `data/supporting/sample_HDFS.log` or `sample_BGL.log`). An "Analysis details" panel shows the source, model used, session definition, sessions analysed, sessions the model flagged, sessions labelled anomalous in the log itself (BGL only), events assigned and the parsing statistics (raw lines, malformed lines, lines without a session). The page shows the final model and its
 test metrics, sessions analysed / flagged, the anomaly-score distribution, the anomaly clusters present in the
 upload with their descriptions, and a searchable/sortable session table. **Inspect** opens a session: its score,
 decision, cluster and the real raw events read back from the uploaded file. Results can be exported as CSV.
@@ -170,6 +201,22 @@ Hard subset - anomalies whose messages contain no error words (n=858): recall 0.
 All numbers are generated by the code and stored in `results/`; the 22 missed anomalies and
 the single false positive of the final model are analysed in `results/HDFS_error_analysis.json`.
 
+### BGL (temporal test period: the latest 20% of windows, 2,899 windows of which 225 anomalous)
+
+| Model | Accuracy | Precision | Recall | F1 | PR-AUC | FP | FN |
+|---|---|---|---|---|---|---|---|
+| Logistic regression | 0.9383 | 0.5865 | 0.6933 | 0.6354 | 0.6024 | 110 | 69 |
+| Random forest | 0.9614 | 0.8343 | 0.6267 | 0.7157 | 0.8760 | 28 | 84 |
+| **Histogram gradient boosting (final)** | **0.9586** | **0.8571** | **0.5600** | **0.6774** | **0.8804** | 21 | 99 |
+| Extra trees | 0.9486 | 0.8276 | 0.4267 | 0.5630 | 0.7950 | 20 | 129 |
+| XGBoost | 0.9683 | 0.8482 | 0.7200 | 0.7788 | 0.8965 | 29 | 63 |
+
+BGL is a much harder problem than HDFS under the same temporal protocol (F1 0.56-0.78 vs about 0.99). The final model is chosen by the
+same validation rule as for HDFS (HGB), and XGBoost is best on the test period here. Note the anomaly share differs sharply between
+the validation (3.0%) and test (7.8%) periods, so thresholds tuned on validation transfer imperfectly. BGL clusters
+(829 anomalies, k=7) are weak (silhouette 0.21); see `results/BGL_cluster_report.md`. Results for the two sources are never mixed:
+every file is prefixed `HDFS_` or `BGL_`.
+
 Clustering (11,494 development-period anomalies, k=6 by silhouette among k>=3; k=2..8 sweep reported): the
 clusters are truncated 2-event sessions, long/stalled sessions that still complete, failed writes
 ("Could not read from stream"), over-replicated sessions with many hosts, and two tiny clusters of rare exception
@@ -182,7 +229,8 @@ assignment, interpretation and real example sessions are in `results/HDFS_cluste
 README.md  environment.yml  requirements.txt  setup_data.py
 src/
   features.py     feature schema + Session accumulator (single source of truth)
-  processing.py   raw log parsing, session grouping, process() -> feature table
+  sources.py      per-dataset adapters (HDFS, BGL): line parser, session definition, label source, download metadata
+  processing.py   source-independent session grouping, process() -> feature table, parser verification
   train.py        split, classifier comparison, final model; orchestrates the steps below
   clustering.py   K-means within the anomaly class + automatic cluster interpretation
   comparison.py   five-model comparison record + shared-test-set verification
@@ -203,7 +251,8 @@ kept only as historical reference and nothing here depends on it.
 
 ## 9. Limitations
 
-* BGL: the adapter, feature code and unit test exist (`python setup_data.py --source BGL`), but only HDFS has been run end to end for the submitted models/results.
-* HDFS lifecycle features are HDFS-specific (zero for BGL).
+* BGL sessions are fixed five-minute windows (a common but arbitrary choice); a different window size changes the dataset (`sources.BGL_WINDOW_SECONDS`, then rebuild).
+* HDFS lifecycle features are not applicable to BGL (fixed 0), so BGL models use 46 informative features.
+* The processed CSVs store features to 8 significant digits, so a live re-computation can differ from a stored score by a tiny amount for borderline sessions (checked: identical once the same rounding is applied).
 * Hash-bucket event features can merge several event kinds into one bucket (see `results/HDFS_event_buckets.json`).
 * The dashboard keeps one analysed upload at a time and is meant for local use.

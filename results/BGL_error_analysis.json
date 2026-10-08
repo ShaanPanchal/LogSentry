@@ -1,0 +1,814 @@
+{
+  "source": "BGL",
+  "test_sessions": 2899,
+  "confusion": {
+    "tn": 2653,
+    "fp": 21,
+    "fn": 99,
+    "tp": 126
+  },
+  "hard_subset": {
+    "definition": "test anomalies whose messages contain no error/exception/timeout words",
+    "n": 4,
+    "recall": 0.5,
+    "recall_on_keyword_anomalies": 0.5610859728506787
+  },
+  "false_positives": {
+    "count": 21,
+    "vs_true_negatives": [
+      {
+        "feature": "error_ratio",
+        "group_mean": 0.9195210337638855,
+        "reference_mean": 0.03680865094065666,
+        "z": 3.194849967956543,
+        "measures": "share of ERROR-level events"
+      },
+      {
+        "feature": "event_hash_22",
+        "group_mean": 16.428571701049805,
+        "reference_mean": 0.4474180042743683,
+        "z": 1.7809381484985352,
+        "measures": "count of events in hash bucket 22: \"disable apu instruction broadcast........<N>\" / \"ciod: Error creating node map from file <PATH>: Bad address\" (bucket shared by several event kinds)"
+      },
+      {
+        "feature": "event_hash_13",
+        "group_mean": 18.5238094329834,
+        "reference_mean": 0.662269115447998,
+        "z": 1.0995954275131226,
+        "measures": "count of events in hash bucket 13: \"machine check: i-fetch......................<N>\" / \"auxiliary processor.........................<N>\" (bucket shared by several event kinds)"
+      },
+      {
+        "feature": "event_hash_25",
+        "group_mean": 28.619047164916992,
+        "reference_mean": 1.5816056728363037,
+        "z": 0.5896303057670593,
+        "measures": "count of events in hash bucket 25: \"rts: kernel terminated for reason <N>\" / \"Can not get assembly information for node card\" (bucket shared by several event kinds)"
+      },
+      {
+        "feature": "event_entropy",
+        "group_mean": 0.4471655488014221,
+        "reference_mean": 1.0465573072433472,
+        "z": -0.5574756264686584,
+        "measures": "diversity of the event-kind distribution"
+      }
+    ],
+    "what_they_share": "False positives (n=21) differ from correctly-cleared normal sessions mainly in: error_ratio higher (0.92 vs 0.0368); event_hash_22 [count of events in hash bucket 22: \"disable apu instruction broadcast........<N>\" / \"ciod: Error creating node] higher (16.4 vs 0.447); event_hash_13 [count of events in hash bucket 13: \"machine check: i-fetch......................<N>\" / \"auxiliary processor...] higher (18.5 vs 0.662).",
+    "examples": [
+      {
+        "session_id": "window_3772447",
+        "probability": 0.972426615119396,
+        "features": {
+          "n_events": 128.0,
+          "duration_s": 16.0,
+          "gap_max_s": 2.0,
+          "n_hosts": 64.0,
+          "keyword_error_ratio": 0.5,
+          "lifecycle_complete": 0.0,
+          "replica_deficit": 0.0,
+          "unacked_writes": 0.0
+        },
+        "events": [
+          {
+            "time": 1131734211,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131734211,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131734212,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131734212,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131734213,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131734213,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131734214,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131734214,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131734215,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131734215,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131734215,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131734215,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131734215,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131734215,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131734215,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          }
+        ]
+      },
+      {
+        "session_id": "window_3772453",
+        "probability": 0.9723205723558296,
+        "features": {
+          "n_events": 132.0,
+          "duration_s": 27.0,
+          "gap_max_s": 4.0,
+          "n_hosts": 64.0,
+          "keyword_error_ratio": 0.5151515007019043,
+          "lifecycle_complete": 0.0,
+          "replica_deficit": 0.0,
+          "unacked_writes": 0.0
+        },
+        "events": [
+          {
+            "time": 1131736064,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131736064,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131736067,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131736067,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131736071,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131736071,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131736072,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131736072,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131736072,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131736072,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131736072,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131736072,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131736074,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131736074,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131736075,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          }
+        ]
+      },
+      {
+        "session_id": "window_3772435",
+        "probability": 0.9712149272939392,
+        "features": {
+          "n_events": 128.0,
+          "duration_s": 18.0,
+          "gap_max_s": 2.0,
+          "n_hosts": 64.0,
+          "keyword_error_ratio": 0.5,
+          "lifecycle_complete": 0.0,
+          "replica_deficit": 0.0,
+          "unacked_writes": 0.0
+        },
+        "events": [
+          {
+            "time": 1131730530,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131730530,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131730532,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131730532,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131730533,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131730533,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131730535,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131730535,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131730536,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131730537,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131730537,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131730537,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131730537,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          },
+          {
+            "time": 1131730537,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          },
+          {
+            "time": 1131730539,
+            "level": "FAILURE",
+            "message": "Link PGOOD error latched on link card"
+          }
+        ]
+      },
+      {
+        "session_id": "window_3774432",
+        "probability": 0.9698526342751846,
+        "features": {
+          "n_events": 1.0,
+          "duration_s": 0.0,
+          "gap_max_s": 0.0,
+          "n_hosts": 1.0,
+          "keyword_error_ratio": 1.0,
+          "lifecycle_complete": 0.0,
+          "replica_deficit": 0.0,
+          "unacked_writes": 0.0
+        },
+        "events": [
+          {
+            "time": 1132329775,
+            "level": "FAILURE",
+            "message": "Hardware monitor caught java.net.SocketException: Broken pipe and is stopping"
+          }
+        ]
+      },
+      {
+        "session_id": "window_3774433",
+        "probability": 0.9698526342751846,
+        "features": {
+          "n_events": 1.0,
+          "duration_s": 0.0,
+          "gap_max_s": 0.0,
+          "n_hosts": 1.0,
+          "keyword_error_ratio": 1.0,
+          "lifecycle_complete": 0.0,
+          "replica_deficit": 0.0,
+          "unacked_writes": 0.0
+        },
+        "events": [
+          {
+            "time": 1132329955,
+            "level": "FAILURE",
+            "message": "Hardware monitor caught java.net.SocketException: Broken pipe and is stopping"
+          }
+        ]
+      }
+    ]
+  },
+  "false_negatives": {
+    "count": 99,
+    "vs_true_positives": [
+      {
+        "feature": "n_event_buckets",
+        "group_mean": 6.060606002807617,
+        "reference_mean": 17.46825408935547,
+        "z": -2.0220561027526855,
+        "measures": "number of distinct event kinds"
+      },
+      {
+        "feature": "event_hash_03",
+        "group_mean": 44.73737335205078,
+        "reference_mean": 1.6507936716079712,
+        "z": 1.4882246255874634,
+        "measures": "count of events in hash bucket 03: \"Node card is not fully functional\" / \"store operation.............................<N>\" (bucket shared by several event kinds)"
+      },
+      {
+        "feature": "event_entropy",
+        "group_mean": 0.9427981972694397,
+        "reference_mean": 2.3457376956939697,
+        "z": -1.3048334121704102,
+        "measures": "diversity of the event-kind distribution"
+      },
+      {
+        "feature": "n_threads",
+        "group_mean": 2.1818182468414307,
+        "reference_mean": 1.682539701461792,
+        "z": 1.1418018341064453,
+        "measures": "distinct threads (HDFS) or components (BGL) involved"
+      },
+      {
+        "feature": "event_hash_07",
+        "group_mean": 213.21212768554688,
+        "reference_mean": 86.24603271484375,
+        "z": 1.1328907012939453,
+        "measures": "count of events in hash bucket 07: \"CE sym <N>, at <HEX>, mask <HEX>\" / \"ciod: Error reading message prefix on CioStream socket to <IP>, Link has been severed\" (bucket shared by several event kinds)"
+      }
+    ],
+    "vs_normal_sessions": [
+      {
+        "feature": "n_threads",
+        "group_mean": 2.1818182468414307,
+        "reference_mean": 1.048247218132019,
+        "z": 2.592367649078369,
+        "measures": "distinct threads (HDFS) or components (BGL) involved"
+      },
+      {
+        "feature": "error_ratio",
+        "group_mean": 0.7182690501213074,
+        "reference_mean": 0.03680865094065666,
+        "z": 2.4664478302001953,
+        "measures": "share of ERROR-level events"
+      },
+      {
+        "feature": "event_hash_07",
+        "group_mean": 213.21212768554688,
+        "reference_mean": 13.105541229248047,
+        "z": 1.785507321357727,
+        "measures": "count of events in hash bucket 07: \"CE sym <N>, at <HEX>, mask <HEX>\" / \"ciod: Error reading message prefix on CioStream socket to <IP>, Link has been severed\" (bucket shared by several event kinds)"
+      },
+      {
+        "feature": "event_hash_03",
+        "group_mean": 44.73737335205078,
+        "reference_mean": 0.8563889861106873,
+        "z": 1.5156636238098145,
+        "measures": "count of events in hash bucket 03: \"Node card is not fully functional\" / \"store operation.............................<N>\" (bucket shared by several event kinds)"
+      },
+      {
+        "feature": "transition_change_ratio",
+        "group_mean": 0.24125953018665314,
+        "reference_mean": 0.48087385296821594,
+        "z": -0.5619077682495117,
+        "measures": "share of consecutive events that change kind"
+      }
+    ],
+    "what_they_share": "Missed anomalies (n=99) differ from detected anomalies mainly in: n_event_buckets lower (6.06 vs 17.5); event_hash_03 [count of events in hash bucket 03: \"Node card is not fully functional\" / \"store operation.....................] higher (44.7 vs 1.65); event_entropy lower (0.943 vs 2.35). They also differ from normal sessions mainly in: n_threads higher (2.18 vs 1.05); error_ratio higher (0.718 vs 0.0368); event_hash_07 [count of events in hash bucket 07: \"CE sym <N>, at <HEX>, mask <HEX>\" / \"ciod: Error reading message prefix on] higher (213 vs 13.1).",
+    "examples": [
+      {
+        "session_id": "window_3774116",
+        "probability": 0.0052003586241725,
+        "features": {
+          "n_events": 34.0,
+          "duration_s": 98.0,
+          "gap_max_s": 63.0,
+          "n_hosts": 2.0,
+          "keyword_error_ratio": 0.05882352963089943,
+          "lifecycle_complete": 0.0,
+          "replica_deficit": 0.0,
+          "unacked_writes": 0.0
+        },
+        "events": [
+          {
+            "time": 1132234880,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N12. A service action may be required."
+          },
+          {
+            "time": 1132234880,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N14. A service action may be required."
+          },
+          {
+            "time": 1132234880,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N15. A service action may be required."
+          },
+          {
+            "time": 1132234880,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N13. A service action may be required."
+          },
+          {
+            "time": 1132234880,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N8. A service action may be required."
+          },
+          {
+            "time": 1132234880,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N10. A service action may be required."
+          },
+          {
+            "time": 1132234881,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N11. A service action may be required."
+          },
+          {
+            "time": 1132234881,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N9. A service action may be required."
+          },
+          {
+            "time": 1132234881,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N4. A service action may be required."
+          },
+          {
+            "time": 1132234881,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N6. A service action may be required."
+          },
+          {
+            "time": 1132234881,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N7. A service action may be required."
+          },
+          {
+            "time": 1132234881,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N5. A service action may be required."
+          },
+          {
+            "time": 1132234881,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N0. A service action may be required."
+          },
+          {
+            "time": 1132234882,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N2. A service action may be required."
+          },
+          {
+            "time": 1132234882,
+            "level": "FATAL",
+            "message": "Power Good signal deactivated: R73-M1-N3. A service action may be required."
+          }
+        ]
+      },
+      {
+        "session_id": "window_3787968",
+        "probability": 0.0057710628840005,
+        "features": {
+          "n_events": 8.0,
+          "duration_s": 0.0,
+          "gap_max_s": 0.0,
+          "n_hosts": 8.0,
+          "keyword_error_ratio": 1.0,
+          "lifecycle_complete": 0.0,
+          "replica_deficit": 0.0,
+          "unacked_writes": 0.0
+        },
+        "events": [
+          {
+            "time": 1136390405,
+            "level": "FATAL",
+            "message": "idoproxy communication failure: socket closed"
+          },
+          {
+            "time": 1136390405,
+            "level": "FATAL",
+            "message": "idoproxy communication failure: socket closed"
+          },
+          {
+            "time": 1136390405,
+            "level": "FATAL",
+            "message": "idoproxy communication failure: socket closed"
+          },
+          {
+            "time": 1136390405,
+            "level": "FATAL",
+            "message": "idoproxy communication failure: socket closed"
+          },
+          {
+            "time": 1136390405,
+            "level": "FATAL",
+            "message": "idoproxy communication failure: socket closed"
+          },
+          {
+            "time": 1136390405,
+            "level": "FATAL",
+            "message": "idoproxy communication failure: socket closed"
+          },
+          {
+            "time": 1136390405,
+            "level": "FATAL",
+            "message": "idoproxy communication failure: socket closed"
+          },
+          {
+            "time": 1136390405,
+            "level": "FATAL",
+            "message": "idoproxy communication failure: socket closed"
+          }
+        ]
+      },
+      {
+        "session_id": "window_3775971",
+        "probability": 0.0122978805761263,
+        "features": {
+          "n_events": 17.0,
+          "duration_s": 68.0,
+          "gap_max_s": 64.0,
+          "n_hosts": 8.0,
+          "keyword_error_ratio": 0.47058823704719543,
+          "lifecycle_complete": 0.0,
+          "replica_deficit": 0.0,
+          "unacked_writes": 0.0
+        },
+        "events": [
+          {
+            "time": 1132791443,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132791443,
+            "level": "INFO",
+            "message": "ciod: In packet from node 80.0 (R62-M0-NF-C:J15-U01), message still ready for node 48 (softheader=00300050 00020000 00000003 00000000)"
+          },
+          {
+            "time": 1132791446,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132791446,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132791446,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132791446,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132791446,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132791446,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132791446,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132791510,
+            "level": "FATAL",
+            "message": "ciod: Error reading message prefix on CioStream socket to 172.16.96.116:57603, Link has been severed"
+          },
+          {
+            "time": 1132791510,
+            "level": "FATAL",
+            "message": "ciod: Error reading message prefix on CioStream socket to 172.16.96.116:57602, Link has been severed"
+          },
+          {
+            "time": 1132791510,
+            "level": "FATAL",
+            "message": "ciod: Error reading message prefix on CioStream socket to 172.16.96.116:57601, Link has been severed"
+          },
+          {
+            "time": 1132791510,
+            "level": "FATAL",
+            "message": "ciod: Error reading message prefix on CioStream socket to 172.16.96.116:57600, Link has been severed"
+          },
+          {
+            "time": 1132791511,
+            "level": "FATAL",
+            "message": "ciod: Error reading message prefix on CioStream socket to 172.16.96.116:57597, Link has been severed"
+          },
+          {
+            "time": 1132791511,
+            "level": "FATAL",
+            "message": "ciod: Error reading message prefix on CioStream socket to 172.16.96.116:57596, Link has been severed"
+          }
+        ]
+      },
+      {
+        "session_id": "window_3775966",
+        "probability": 0.0141501757053329,
+        "features": {
+          "n_events": 64.0,
+          "duration_s": 201.0,
+          "gap_max_s": 129.0,
+          "n_hosts": 33.0,
+          "keyword_error_ratio": 0.5,
+          "lifecycle_complete": 0.0,
+          "replica_deficit": 0.0,
+          "unacked_writes": 0.0
+        },
+        "events": [
+          {
+            "time": 1132789890,
+            "level": "INFO",
+            "message": "ciod: In packet from node 1933.0 (R66-M0-N8-C:J12-U11), message code 2 is not 3 or 4294967295 (softheader=000d078d 00030000 00000001 00000000)"
+          },
+          {
+            "time": 1132789896,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789896,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789896,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789896,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789896,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789896,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789896,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789896,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789897,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789897,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789897,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789897,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789897,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          },
+          {
+            "time": 1132789897,
+            "level": "INFO",
+            "message": "ciod: pollControlDescriptors: Detected the debugger died."
+          }
+        ]
+      },
+      {
+        "session_id": "window_3772449",
+        "probability": 0.0230819721594493,
+        "features": {
+          "n_events": 3.0,
+          "duration_s": 188.0,
+          "gap_max_s": 101.0,
+          "n_hosts": 1.0,
+          "keyword_error_ratio": 0.0,
+          "lifecycle_complete": 0.0,
+          "replica_deficit": 0.0,
+          "unacked_writes": 0.0
+        },
+        "events": [
+          {
+            "time": 1131734805,
+            "level": "SEVERE",
+            "message": "LinkCard power module U58 is not accessible"
+          },
+          {
+            "time": 1131734906,
+            "level": "FAILURE",
+            "message": "No power module U58 found found on link card"
+          },
+          {
+            "time": 1131734993,
+            "level": "FAILURE",
+            "message": "Temperature Over Limit on link card"
+          }
+        ]
+      }
+    ]
+  }
+}

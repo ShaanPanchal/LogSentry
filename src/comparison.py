@@ -39,17 +39,18 @@ KEY_PARAMS = {
     'XGBoost': ['n_estimators', 'max_depth', 'learning_rate', 'tree_method'],
 }
 
-# Written profiles. Statements about the data refer to the exploratory analysis (results/HDFS_eda_summary.json):
-# ~3% anomalies, binary flags next to counts and durations spanning five orders of magnitude, strongly
-# correlated timing features. Observed performance is in the results tables, not asserted here.
+# Written profiles, source-neutral on purpose (they are reused for HDFS and BGL): they rely only on properties both
+# session tables share - an imbalanced anomaly class, binary flags next to counts and durations on very different
+# scales, and correlated timing features (see results/<SOURCE>_eda_summary.json). Observed performance is in the
+# results tables, not asserted here.
 PROFILES = {
     'Logistic regression': {
         'type': 'Linear model (L2-regularised logistic regression)',
         'learning_approach': 'Learns one weight per feature; the anomaly probability is a sigmoid of a weighted sum, '
                              'fitted by convex optimisation. It is the only model that is linear in its inputs.',
         'scaling': 'required',
-        'suitability': 'Fast, interpretable baseline; class weighting offsets the ~3% anomaly rate. It cannot express '
-                       'feature interactions or thresholds (e.g. "write chain incomplete AND long gap") unless they are '
+        'suitability': 'Fast, interpretable baseline; class weighting offsets the anomaly class imbalance. It cannot express '
+                       'feature interactions or thresholds (e.g. "no completion event AND a long gap") unless they are '
                        'hand-crafted, and durations/counts are used on their raw, heavily skewed scale.'},
     'Random forest': {
         'type': 'Bagged ensemble of deep decision trees',
@@ -63,7 +64,7 @@ PROFILES = {
         'learning_approach': 'Shallow trees are added one after another, each fitted to the errors of the ensemble so '
                              'far; features are pre-binned into histograms so training is fast on 575k sessions.',
         'scaling': 'not required',
-        'suitability': 'Boosting concentrates on hard, borderline sessions, which matters when anomalies are rare; '
+        'suitability': 'Boosting concentrates on hard, borderline sessions, which matters when the anomaly class is the minority; '
                        'binning copes with the skewed feature scales. Not class-weighted: the threshold is tuned instead.'},
     'XGBoost': {
         'type': 'Gradient-boosted decision trees (XGBoost library)',
@@ -173,7 +174,7 @@ def write_markdown(source, result):
         params = ', '.join(f'{k}={v}' for k, v in p['key_params'].items())
         lines += [f'## {name}', '', f"* **Type:** {p['type']}", f"* **Learning approach:** {p['learning_approach']}",
                   f"* **Feature scaling:** {p['scaling']}", f"* **Key configuration:** {params}",
-                  f"* **Suitability for the {p['n_features']} HDFS session features:** {p['suitability']}", '']
+                  f"* **Suitability for the {p['n_features']} {source} session features:** {p['suitability']}", '']
     (ROOT / 'results' / f'{source}_model_comparison.md').write_text('\n'.join(lines))
 
 

@@ -28,36 +28,23 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / 'src'))
 
-from processing import ARCHIVES, PROCESSED_DIR, RAW_DIR, bucket_inventory, process, sorted_log_path  # noqa: E402
+from processing import PROCESSED_DIR, RAW_DIR, bucket_inventory, process, sorted_log_path  # noqa: E402
+from sources import SOURCES, get_source  # noqa: E402
 
 ZENODO = 'https://zenodo.org/records/8196385/files/{archive}.zip'
-# source -> (MD5 of the archive, files to extract)
-SOURCES = {
-    'HDFS': ('76a24b4d9a6164d543fb275f89773260', ['HDFS.log', 'preprocessed/anomaly_label.csv']),
-    'BGL': ('4452953c470f2d95fcb32d5f6e733f7a', ['BGL.log']),
-}
 CHUNK_LINES = 100000
 DOWNLOAD_ATTEMPTS = 4
 
 
-def sort_key(line, source):
-    """Chronological key: HDFS 'yymmdd'+'HHMMSS', BGL unix seconds."""
-    parts = line.split(None, 2)
-    try:
-        return int(parts[0] + parts[1]) if source == 'HDFS' else int(parts[1])
-    except (ValueError, IndexError):
-        return -1
-
-
 def sort_file(path, out, source):
     """External merge sort: sort chunks in memory, then k-way merge them."""
-    key = lambda line: sort_key(line, source)  # noqa: E731
+    key = get_source(source).sort_key  # chronological key for this source's line format
     with tempfile.TemporaryDirectory(dir=path.parent) as temp:
         chunk_files, chunk = [], []
 
         def flush():
             chunk_path = Path(temp) / str(len(chunk_files))
-            chunk_path.write_text(''.join(sorted(chunk, key=key)))
+            chunk_path.write_text(''.join(sorted(chunk, key=key)), encoding='utf-8')
             chunk_files.append(chunk_path)
             chunk.clear()
 
@@ -68,9 +55,9 @@ def sort_file(path, out, source):
                     flush()
         if chunk:
             flush()
-        streams = [p.open() for p in chunk_files]
+        streams = [p.open(encoding='utf-8') for p in chunk_files]
         try:
-            with out.open('w') as f:
+            with out.open('w', encoding='utf-8') as f:
                 f.writelines(heapq.merge(*streams, key=key))
         finally:
             for s in streams:
@@ -103,8 +90,8 @@ def download_and_verify(archive, digest):
 
 def prepare_raw(source):
     """Download, verify, extract and chronologically sort the raw log. Returns the labels path (HDFS)."""
-    archive = ARCHIVES[source]
-    digest, files = SOURCES[source]
+    spec = get_source(source)
+    archive, digest, files = spec.archive, spec.md5, spec.files
     dest = RAW_DIR / archive
     dest.mkdir(parents=True, exist_ok=True)
     zip_path = download_and_verify(archive, digest)
@@ -113,7 +100,7 @@ def prepare_raw(source):
             z.extract(name, dest)
     print('Sorting records chronologically...', flush=True)
     sort_file(dest / files[0], sorted_log_path(source), source)
-    return dest / files[1] if source == 'HDFS' else None
+    return dest / files[1] if len(files) > 1 else None  # separate label file (HDFS only)
 
 
 def build_processed_dataset(source):

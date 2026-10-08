@@ -69,7 +69,7 @@
           "cluster_mean": 0.0,
           "overall_anomaly_mean": 2.091874122619629,
           "all_sessions_mean": 2.6818625926971436,
-          "z": -1.5647650957107544,
+          "z": -1.5647653341293335,
           "measures": "count of events in hash bucket 19: \"Deleting block <BLOCK> file <PATH>\" / \"writeBlock <BLOCK> received exception java.io.IOException: Could not read from stream\""
         },
         {
@@ -77,7 +77,7 @@
           "cluster_mean": 1.0,
           "overall_anomaly_mean": 2.5716025829315186,
           "all_sessions_mean": 2.986393690109253,
-          "z": -1.5645778179168701,
+          "z": -1.5645779371261597,
           "measures": "count of events in hash bucket 15: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\""
         },
         {
@@ -216,7 +216,7 @@
           "cluster_mean": 1.0,
           "overall_anomaly_mean": 0.5500261187553406,
           "all_sessions_mean": 0.9840354323387146,
-          "z": 0.9044837951660156,
+          "z": 0.9044839143753052,
           "measures": "full allocate/receive/ack/store chain present"
         },
         {
@@ -232,7 +232,7 @@
           "cluster_mean": 2.9546549320220947,
           "overall_anomaly_mean": 1.65303635597229,
           "all_sessions_mean": 2.6652684211730957,
-          "z": 0.8721290230751038,
+          "z": 0.872128963470459,
           "measures": "count of events in hash bucket 27: \"BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>\""
         },
         {
@@ -713,7 +713,7 @@
           "cluster_mean": 3.7459471225738525,
           "overall_anomaly_mean": 1.5475834608078003,
           "all_sessions_mean": 1.099828839302063,
-          "z": 1.2683806419372559,
+          "z": 1.2683805227279663,
           "measures": "event rate"
         },
         {
@@ -721,7 +721,7 @@
           "cluster_mean": 1.9869694709777832,
           "overall_anomaly_mean": 0.9122150540351868,
           "all_sessions_mean": 0.033957161009311676,
-          "z": 1.1737593412399292,
+          "z": 1.1737594604492188,
           "measures": "\"receiving\" events minus acknowledgements"
         },
         {
@@ -729,7 +729,7 @@
           "cluster_mean": 0.00037230082671158016,
           "overall_anomaly_mean": 0.5500261187553406,
           "all_sessions_mean": 0.9840354323387146,
-          "z": -1.1048492193222046,
+          "z": -1.1048493385314941,
           "measures": "full allocate/receive/ack/store chain present"
         },
         {
@@ -737,7 +737,7 @@
           "cluster_mean": 0.0,
           "overall_anomaly_mean": 0.5448929667472839,
           "all_sessions_mean": 0.8888930082321167,
-          "z": -1.0942059755325317,
+          "z": -1.0942060947418213,
           "measures": "block deletion seen"
         }
       ],
@@ -922,7 +922,7 @@
           "cluster_mean": 4.507505893707275,
           "overall_anomaly_mean": 2.5716025829315186,
           "all_sessions_mean": 2.986393690109253,
-          "z": 1.4381741285324097,
+          "z": 1.4381742477416992,
           "measures": "count of events in hash bucket 15: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\""
         },
         {
@@ -930,11 +930,11 @@
           "cluster_mean": 6.286951541900635,
           "overall_anomaly_mean": 3.0504610538482666,
           "all_sessions_mean": 3.973012685775757,
-          "z": 1.2746065855026245,
-          "measures": "distinct hosts involved"
+          "z": 1.274606466293335,
+          "measures": "distinct hosts/nodes involved"
         }
       ],
-      "interpretation": "Cluster 3 holds 15.1% of the clustered anomalies. Compared with the overall anomaly population, its members show: event_hash_26 is above the anomaly average (1.51 vs 0.23): more events like \"Received block <BLOCK> src: <PATH> dest: <PATH> of size <N>\" / \"writeBlock <BLOCK> received exception java.net.NoRouteToHostException: No route to host\"; uncommitted_acks is below the anomaly average (-2.5 vs -0.478): more stored confirmations than acknowledgements; replica_deficit is below the anomaly average (-2.5 vs 0.867): more confirmations than expected (duplicate or re-replicated copies); event_hash_15 is above the anomaly average (4.51 vs 2.57): more events like \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\"; n_hosts is above the anomaly average (6.29 vs 3.05): more hosts than usual (extra replicas or retries on other nodes). The sessions nearest its centre are dominated by: \"BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>\" (6.8/session), \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" (4.9/session), \"Deleting block <BLOCK> file <PATH>\" (4.9/session). Profile: write chain complete in 100% (anomaly avg 55%) of sessions; mean events 35.2 (anomaly avg 16.1); mean duration 39,279 (anomaly avg 17,417) s; share of failure-keyword messages 4.3% (anomaly avg 9.3%); mean hosts 6.3 (anomaly avg 3.1).",
+      "interpretation": "Cluster 3 holds 15.1% of the clustered anomalies. Compared with the overall anomaly population, its members show: event_hash_26 is above the anomaly average (1.51 vs 0.23): more events like \"Received block <BLOCK> src: <PATH> dest: <PATH> of size <N>\" / \"writeBlock <BLOCK> received exception java.net.NoRouteToHostException: No route to host\"; uncommitted_acks is below the anomaly average (-2.5 vs -0.478): more stored confirmations than acknowledgements; replica_deficit is below the anomaly average (-2.5 vs 0.867): more confirmations than expected (duplicate or re-replicated copies); event_hash_15 is above the anomaly average (4.51 vs 2.57): more events like \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\"; n_hosts is above the anomaly average (6.29 vs 3.05): more hosts than usual. The sessions nearest its centre are dominated by: \"BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>\" (6.8/session), \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" (4.9/session), \"Deleting block <BLOCK> file <PATH>\" (4.9/session). Profile: write chain complete in 100% (anomaly avg 55%) of sessions; mean events 35.2 (anomaly avg 16.1); mean duration 39,279 (anomaly avg 17,417) s; share of failure-keyword messages 4.3% (anomaly avg 9.3%); mean hosts 6.3 (anomaly avg 3.1).",
       "typical_events": [
         {
           "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
@@ -1430,7 +1430,7 @@
           "cluster_mean": 2.5625,
           "overall_anomaly_mean": 0.003567078383639455,
           "all_sessions_mean": 0.0001265561004402116,
-          "z": 26.552248001098633,
+          "z": 26.55224609375,
           "measures": "count of events in hash bucket 24: \"Changing block file offset of block <BLOCK> from <N> to <N> meta file offset to <N>\" / \"<IP>:Exception writing block <BLOCK> to mirror <IP>\" (bucket shared by several event kinds)"
         },
         {
@@ -1438,7 +1438,7 @@
           "cluster_mean": 1.125,
           "overall_anomaly_mean": 0.001566034508869052,
           "all_sessions_mean": 5.556121323024854e-05,
-          "z": 23.275184631347656,
+          "z": 23.275182723999023,
           "measures": "count of events in hash bucket 18: \"PacketResponder <BLOCK> <N> Exception java.net.SocketTimeoutException: <N> millis timeout while waiting for channel to be ready for read. ch : java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH>\" / \"Exception in receiveBlock for block <BLOCK> java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH> <N> millis timeout left.\" (bucket shared by several event kinds)"
         },
         {
@@ -1446,7 +1446,7 @@
           "cluster_mean": 1.8125,
           "overall_anomaly_mean": 0.004437097813934088,
           "all_sessions_mean": 0.00015742344839964062,
-          "z": 20.66049575805664,
+          "z": 20.660497665405273,
           "measures": "count of events in hash bucket 07: \"Exception in receiveBlock for block <BLOCK> java.io.IOException: Connection reset by peer\""
         },
         {
@@ -1462,7 +1462,7 @@
           "cluster_mean": 0.1875,
           "overall_anomaly_mean": 0.0002610057417768985,
           "all_sessions_mean": 9.260202205041423e-06,
-          "z": 11.59118938446045,
+          "z": 11.591188430786133,
           "measures": "count of events in hash bucket 03: \"PacketResponder <BLOCK> <N> Exception java.io.IOException: Connection reset by peer\""
         }
       ],

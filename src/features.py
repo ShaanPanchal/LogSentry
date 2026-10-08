@@ -23,8 +23,10 @@ G4  Topology: distinct hosts and threads touched.  HDFS replicates each block
 G5  Lifecycle completeness ("absence") features.  A healthy HDFS block follows
     allocate -> receive x3 -> acknowledge x3 -> store x3 -> delete.  These
     columns measure what is *missing* from that chain, because the common HDFS
-    failure is a step that never happens.  They are HDFS-specific and are
-    zero for other sources.
+    failure is a step that never happens.  They are HDFS-specific: for
+    sources without that write chain (BGL) replica_deficit, unacked_writes,
+    uncommitted_acks and lifecycle_complete are fixed at 0 (not applicable) and
+    has_allocate / has_delete are 0 because those messages never occur.
 G6  Severity: share of WARN and ERROR-level events, and of messages that
     contain failure keywords (error, exception, timeout, ...).
 G7  Sequence regularity: share of consecutive event pairs that change bucket,
@@ -131,9 +133,14 @@ class Session:
         if self.events is not None:
             self.events.append({'time': t, 'level': level, 'message': msg})
 
-    def row(self, sid, source):
-        """[session_id, source, t_start, t_end, label] + the 52 COLS values."""
-        hdfs = source == 'HDFS'
+    def row(self, sid, source, lifecycle=True):
+        """[session_id, source, t_start, t_end, label] + the 52 COLS values.
+
+        `lifecycle=False` (sources without an HDFS-style write chain, e.g. BGL) sets the
+        four chain-completeness features to 0: the events they count do not exist there,
+        so 0 means 'not applicable' rather than a measurement.
+        """
+        hdfs = lifecycle
         n_gaps = max(self.n - 1, 1)
         duration = self.last - self.first
         gap_mean = self.gap_sum / n_gaps
