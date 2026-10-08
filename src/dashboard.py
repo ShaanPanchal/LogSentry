@@ -101,17 +101,13 @@ def dataset_summaries():
     return out
 
 
-BAR_FLOOR = .8  # comparison bars start at 0.80 so differences among strong models stay visible
-
-
 def comparison_rows(saved):
-    """Test-period rows of the saved model comparison, with bar widths for the chart."""
+    """Test-period rows of the saved model comparison, for the table."""
     rows = []
     for r in saved['models']:
         if r['period'] != 'test':
             continue
-        bars = {k: max(0, round(100 * (r[k] - BAR_FLOOR) / (1 - BAR_FLOOR))) for k in ('precision', 'recall', 'f1')}
-        rows.append({**r, 'bars': bars, 'final': r['role'].startswith('final'),
+        rows.append({**r, 'final': r['role'].startswith('final'),
                      'profile': saved.get('profiles', {}).get(r['model'])})
     return rows
 
