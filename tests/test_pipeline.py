@@ -235,9 +235,9 @@ class PipelineTests(unittest.TestCase):
             try:
                 c = dashboard.app.test_client()
                 r = c.get('/?results=BGL');self.assertEqual(r.status_code, 200)
-                self.assertIn(b'FINAL MODEL \xc2\xb7 BGL', r.data);self.assertIn(b'Random forest', r.data)
+                self.assertIn(b'show results for <b>BGL</b>', r.data);self.assertIn(b'<tr class="sel"><td><b>BGL</b>', r.data);self.assertIn(b'Random forest', r.data)
                 self.assertIn(b'class="tab active" href="/?results=BGL', r.data)
-                r = c.get('/?results=HDFS');self.assertIn(b'FINAL MODEL \xc2\xb7 HDFS', r.data)
+                r = c.get('/?results=HDFS');self.assertIn(b'show results for <b>HDFS</b>', r.data);self.assertIn(b'<tr class="sel"><td><b>HDFS</b>', r.data)
                 r = c.get('/?results=NOPE');self.assertEqual(r.status_code, 200)   # unknown dataset falls back safely
                 self.assertEqual(len(dashboard.dataset_summaries()), 2)
             finally:dashboard.ROOT = old

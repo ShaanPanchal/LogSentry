@@ -219,7 +219,7 @@ def index():
                            pages=pages, prev_url=prev_url, next_url=next_url, ready=ready, error=error,
                            total=total, flagged=flagged, rows=rows, audit=STATE['audit'], q=q, only=only,
                            detail=detail, events=events, truncated=truncated, histogram=histogram,
-                           clusters=clusters, model=view['model'], comparison=view['comparison'],
+                           clusters=clusters, comparison=view['comparison'],
                            comparison_split=view['comparison_split'], profile_note=view['profile_note'],
                            folds=view['folds'], spec=spec, datasets=datasets, view_source=view_source,
                            upload_model=info['model'])
