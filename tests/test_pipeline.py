@@ -205,6 +205,43 @@ class PipelineTests(unittest.TestCase):
         self.assertTrue(all(m['fit_seconds'] is not None and m['predict_seconds'] is not None
                             for m in rec['models'] if m['period'] == 'test'))
 
+    def test_rolling_origin_folds_are_temporal(self):
+        import evaluation, train
+        df = self._synthetic_sessions(n=4000)
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / 'data' / 'processed').mkdir(parents=True);(Path(d) / 'results').mkdir()
+            df.to_csv(Path(d) / 'data' / 'processed' / 'HDFS_sessions.csv.gz', index=False)
+            old = (train.PROCESSED_DIR, evaluation.ROOT);train.PROCESSED_DIR = Path(d) / 'data' / 'processed';evaluation.ROOT = Path(d)
+            try:res = evaluation.rolling_origin('HDFS', n_chunks=4)
+            finally:train.PROCESSED_DIR, evaluation.ROOT = old
+        self.assertEqual([f['fold'] for f in res['folds']], [1, 2, 3])
+        # each fold trains only on earlier data, so training grows and the test windows move forward in time
+        self.assertEqual([f['train_sessions'] for f in res['folds']], sorted(f['train_sessions'] for f in res['folds']))
+        starts = [f['test_start'] for f in res['folds']]
+        self.assertEqual(starts, sorted(starts))
+        self.assertEqual(set(res['results']), set(list(train.FINAL_CANDIDATES) + list(train.EXTRA_MODELS)))
+        for r in res['results'].values():self.assertEqual(len(r['folds']), 3)
+
+    def test_dashboard_dataset_selector(self):
+        import json
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d);(root / 'results').mkdir()
+            for name, model in (('HDFS', 'Histogram gradient boosting'), ('BGL', 'Random forest')):
+                row = {'model': model, 'accuracy': .99, 'precision': .9, 'recall': .8, 'f1': .85, 'average_precision': .9,
+                       'tn': 90, 'fp': 2, 'fn': 4, 'tp': 4, 'threshold': .5}
+                (root / 'results' / f'{name}_evaluation.json').write_text(json.dumps(
+                    {'selected_model': model, 'temporal_test': [row], 'validation': [row], 'final_model': {'n_features': 52}}))
+            old = dashboard.ROOT;dashboard.ROOT = root
+            try:
+                c = dashboard.app.test_client()
+                r = c.get('/?results=BGL');self.assertEqual(r.status_code, 200)
+                self.assertIn(b'FINAL MODEL \xc2\xb7 BGL', r.data);self.assertIn(b'Random forest', r.data)
+                self.assertIn(b'class="tab active" href="/?results=BGL', r.data)
+                r = c.get('/?results=HDFS');self.assertIn(b'FINAL MODEL \xc2\xb7 HDFS', r.data)
+                r = c.get('/?results=NOPE');self.assertEqual(r.status_code, 200)   # unknown dataset falls back safely
+                self.assertEqual(len(dashboard.dataset_summaries()), 2)
+            finally:dashboard.ROOT = old
+
     def test_missing_model_message(self):
         with tempfile.TemporaryDirectory() as d:
             old=predict.ROOT;predict.ROOT=Path(d)

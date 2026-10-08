@@ -138,7 +138,7 @@ report-ready `results/HDFS_model_comparison.md`. `python src/comparison.py` re-v
 the same test set and prints the table; the dashboard shows it as a table plus a precision/recall/F1 bar chart.
 
 Individual steps can be re-run: `python src/clustering.py`, `python src/evaluation.py`,
-`python src/evaluation.py --stability` (refits every model under 5 seeds, ~10+ min), `python src/charts.py` (figures).
+`python src/evaluation.py --stability` (refits every model under 5 seeds), `python src/evaluation.py --folds` (rolling-origin temporal evaluation over several test periods, see BGL below), `python src/charts.py` (figures).
 
 `python setup_data.py --source HDFS` does everything end to end (download -> process -> train).
 `python setup_data.py --source HDFS --raw-only` only re-fetches and sorts the raw log (needed for the example events below).
@@ -174,7 +174,7 @@ print(df[["session_id", "score", "decision", "cluster"]].sort_values("score", as
 python src/dashboard.py              # http://127.0.0.1:5000
 ```
 
-Pick the log source (HDFS or BGL) and upload a log (try `data/supporting/sample_HDFS.log` or `sample_BGL.log`). An "Analysis details" panel shows the source, model used, session definition, sessions analysed, sessions the model flagged, sessions labelled anomalous in the log itself (BGL only), events assigned and the parsing statistics (raw lines, malformed lines, lines without a session). The page shows the final model and its
+The **Log sources** table at the top lists each trained dataset (session definition, sizes, final model, test precision/recall/F1); click the **HDFS** / **BGL** tab to switch the model panel, five-model comparison (and, for BGL, the temporal-robustness table) between the two datasets without uploading anything. The datasets are never mixed. Pick the log source (HDFS or BGL) and upload a log (try `data/supporting/sample_HDFS.log` or `sample_BGL.log`). An "Analysis details" panel shows the source, model used, session definition, sessions analysed, sessions the model flagged, sessions labelled anomalous in the log itself (BGL only), events assigned and the parsing statistics (raw lines, malformed lines, lines without a session). The page shows the final model and its
 test metrics, sessions analysed / flagged, the anomaly-score distribution, the anomaly clusters present in the
 upload with their descriptions, and a searchable/sortable session table. **Inspect** opens a session: its score,
 decision, cluster and the real raw events read back from the uploaded file. Results can be exported as CSV.
@@ -210,6 +210,30 @@ the single false positive of the final model are analysed in `results/HDFS_error
 | **Histogram gradient boosting (final)** | **0.9586** | **0.8571** | **0.5600** | **0.6774** | **0.8804** | 21 | 99 |
 | Extra trees | 0.9486 | 0.8276 | 0.4267 | 0.5630 | 0.7950 | 20 | 129 |
 | XGBoost | 0.9683 | 0.8482 | 0.7200 | 0.7788 | 0.8965 | 29 | 63 |
+
+**How BGL is split and why.** BGL sessions carry timestamps, so the same purged chronological 60/20/20 split as HDFS is used
+(train 8,696 / validation 2,899 / test 2,899 windows, June-October 2005 / October-November / November 2005-January 2006); a random
+split would leak the future. BGL windows do not overlap, so nothing is purged. Because the anomaly rate drifts over time
+(8.5% train, 3.0% validation, 7.8% test) and the test period holds only 225 anomalies, one test period is a noisy basis for ranking
+models, so two further checks are stored:
+
+* **Rolling-origin temporal folds** (`results/BGL_temporal_folds.json`): the windows are cut into 5 time chunks; fold k trains on chunks
+  before k and tests on chunk k (4 folds, test anomaly rates 8.0%, 10.3%, 3.0%, 7.8%), thresholds tuned on the last 25% of each
+  training window. Fold 4 is the same period as the table above.
+
+| Model (BGL, 4 folds) | Mean F1 | Min | Max | Mean precision | Mean recall | Total FP | Total FN |
+|---|---|---|---|---|---|---|---|
+| Logistic regression | 0.598 | 0.529 | 0.661 | 0.557 | 0.712 | 495 | 246 |
+| Random forest | 0.777 | 0.716 | 0.839 | 0.795 | 0.784 | 191 | 176 |
+| Histogram gradient boosting | 0.776 | 0.677 | 0.863 | 0.786 | 0.787 | 189 | 192 |
+| Extra trees | 0.720 | 0.563 | 0.838 | 0.725 | 0.774 | 231 | 190 |
+| XGBoost | 0.784 | 0.636 | 0.871 | 0.760 | 0.819 | 242 | 152 |
+
+* **Seed stability** (`results/BGL_stability.json`, standard split, 5 seeds, F1): XGBoost 0.779 (identical across seeds), random forest
+  0.716 +/- 0.021, HGB 0.683 +/- 0.022, Extra trees 0.572 +/- 0.011, logistic regression 0.635 (deterministic).
+
+Reading: on BGL, XGBoost, random forest and HGB are statistically indistinguishable (mean F1 about 0.78, fold-to-fold spread about 0.09);
+Extra trees is the least stable; logistic regression is clearly worst. The single-split ranking should not be over-interpreted.
 
 BGL is a much harder problem than HDFS under the same temporal protocol (F1 0.56-0.78 vs about 0.99). The final model is chosen by the
 same validation rule as for HDFS (HGB), and XGBoost is best on the test period here. Note the anomaly share differs sharply between

@@ -1,4 +1,4 @@
-"""Error analysis, a hard test subset and seed-stability of the classifiers.
+"""Error analysis, a hard test subset, seed-stability and rolling-origin temporal folds.
 
 `run()` is called by train.py after the final model is fitted and writes
 results/<SOURCE>_error_analysis.json.  `stability()` (python src/evaluation.py
@@ -138,13 +138,70 @@ def stability(source, seeds=(0, 1, 7, 13, 42)):
     return summary
 
 
+def rolling_origin(source, n_chunks=5):
+    """Rolling-origin (expanding window) temporal evaluation.
+
+    The sessions, ordered by start time, are cut into `n_chunks` equal time chunks. Fold k trains on chunks
+    0..k-1 and tests on chunk k, so every model is always scored on data *later* than everything it was
+    trained on, and on several different periods rather than a single one. This matters when the anomaly
+    rate drifts over time (e.g. BGL): one 20% test period can flatter or punish a model by chance.
+    The decision threshold is tuned on the last 25% (by time) of each training window, then the model is
+    refit on the whole window. Sessions that straddle the train/test boundary are purged from training.
+    """
+    from train import candidates, best_threshold, load_dataset, metrics
+    df = load_dataset(source).sort_values(['t_start', 'session_id']).reset_index(drop=True)
+    X = df[COLS].to_numpy(dtype=np.float32)
+    y = df.label.to_numpy()
+    bounds = [int(len(df) * k / n_chunks) for k in range(n_chunks + 1)]
+    idx = np.arange(len(df))
+    folds, per_model = [], {}
+    for k in range(1, n_chunks):
+        test = (idx >= bounds[k]) & (idx < bounds[k + 1])
+        t0 = df.t_start.iloc[bounds[k]]
+        train = (idx < bounds[k]) & (df.t_end.to_numpy() < t0)
+        inner = int(train.sum() * .75)
+        fit_part = train & (np.cumsum(train) <= inner)
+        tune_part = train & ~fit_part
+        usable = len(set(y[train])) == 2 and len(set(y[test])) == 2 and len(set(y[tune_part])) == 2
+        fold = {'fold': k, 'train_sessions': int(train.sum()), 'test_sessions': int(test.sum()),
+                'test_anomalies': int(y[test].sum()), 'test_anomaly_rate': float(y[test].mean()),
+                'test_start': int(df.t_start[test].min()), 'test_end': int(df.t_end[test].max()), 'usable': bool(usable)}
+        folds.append(fold)
+        if not usable:
+            print(f'fold {k}: skipped (a partition lacks one of the classes)', flush=True)
+            continue
+        for name, model in candidates().items():
+            model.fit(X[fit_part], y[fit_part])
+            threshold = best_threshold(y[tune_part], model.predict_proba(X[tune_part])[:, 1])
+            model.fit(X[train], y[train])
+            m = metrics(y[test], model.predict_proba(X[test])[:, 1], threshold)
+            per_model.setdefault(name, []).append({'fold': k, **m})
+            print(f'fold {k} {name:28s} F1={m["f1"]:.3f} P={m["precision"]:.3f} R={m["recall"]:.3f}', flush=True)
+    summary = {}
+    for name, runs in per_model.items():
+        f1s = [r['f1'] for r in runs]
+        summary[name] = {'folds': runs, 'mean_f1': float(np.mean(f1s)), 'std_f1': float(np.std(f1s)),
+                         'min_f1': float(min(f1s)), 'max_f1': float(max(f1s)),
+                         'mean_precision': float(np.mean([r['precision'] for r in runs])),
+                         'mean_recall': float(np.mean([r['recall'] for r in runs])),
+                         'mean_pr_auc': float(np.mean([r['average_precision'] for r in runs])),
+                         'total_fp': int(sum(r['fp'] for r in runs)), 'total_fn': int(sum(r['fn'] for r in runs))}
+    result = {'source': source, 'method': 'rolling-origin expanding window, temporal, purged', 'n_chunks': n_chunks,
+              'folds': folds, 'results': summary}
+    (ROOT / 'results' / f'{source}_temporal_folds.json').write_text(json.dumps(result, indent=2))
+    return result
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Error analysis (re-run) or seed stability.')
     parser.add_argument('--source', choices=['HDFS', 'BGL'], default='HDFS')
     parser.add_argument('--stability', action='store_true', help='refit models under several seeds')
+    parser.add_argument('--folds', action='store_true', help='rolling-origin temporal evaluation (several test periods)')
     args = parser.parse_args()
     if args.stability:
         stability(args.source)
+    elif args.folds:
+        rolling_origin(args.source)
     else:
         from train import load_dataset, split
         d, tr_, va_, te_ = split(load_dataset(args.source))

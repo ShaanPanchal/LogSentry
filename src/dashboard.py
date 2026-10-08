@@ -45,7 +45,7 @@ atexit.register(cleanup)
 
 def load_model_info(source):
     """Final-model test metrics and cluster blurbs saved by training (None if untrained)."""
-    info = {'model': None, 'clusters': {}, 'comparison': [], 'comparison_split': None, 'profile_note': ''}
+    info = {'model': None, 'clusters': {}, 'comparison': [], 'comparison_split': None, 'profile_note': '', 'folds': None}
     if not source:
         return info
     evaluation = ROOT / 'results' / f'{source}_evaluation.json'
@@ -60,10 +60,45 @@ def load_model_info(source):
         info['comparison'] = comparison_rows(saved)
         info['profile_note'] = saved.get('training_protocol', '')
         info['comparison_split'] = saved['split'] | {'shared': saved['models_share_test_set']}
+    folds = ROOT / 'results' / f'{source}_temporal_folds.json'
+    if folds.exists():
+        info['folds'] = folds_summary(json.loads(folds.read_text()))
     clusters = ROOT / 'models' / f'{source}_clusters.joblib'
     if clusters.exists():
         info['clusters'] = joblib.load(clusters).get('summaries', {})
     return info
+
+
+def folds_summary(saved):
+    """Rolling-origin results: per-model mean/min/max F1 across the temporal folds."""
+    usable = [f for f in saved['folds'] if f['usable']]
+    rows = [{'model': name, **{k: v[k] for k in ('mean_f1', 'min_f1', 'max_f1', 'std_f1', 'mean_precision',
+                                                 'mean_recall', 'total_fp', 'total_fn')}}
+            for name, v in saved['results'].items()]
+    return {'n_folds': len(usable), 'rows': rows,
+            'rates': ', '.join(f"{f['test_anomaly_rate']:.1%}" for f in usable)}
+
+
+def dataset_summaries():
+    """One row per dataset that has a trained, evaluated model - lets the user tell the sources apart."""
+    out = []
+    for name in SOURCES:
+        spec = get_source(name)
+        path = ROOT / 'results' / f'{name}_evaluation.json'
+        if not path.exists():
+            continue
+        ev = json.loads(path.read_text())
+        final = next(t for t in ev['temporal_test'] if t['model'] == ev['selected_model'])
+        eda = ROOT / 'results' / f'{name}_eda_summary.json'
+        total = anomalies = None
+        if eda.exists():
+            cb = json.loads(eda.read_text())
+            total, anomalies = cb['n_sessions'], cb['class_balance']['anomaly']
+        out.append({'name': name, 'title': spec.title, 'session': spec.session_definition, 'sessions': total,
+                    'anomalies': anomalies, 'test_sessions': final['tn'] + final['fp'] + final['fn'] + final['tp'],
+                    'test_anomalies': final['tp'] + final['fn'], 'final': ev['selected_model'],
+                    'f1': final['f1'], 'precision': final['precision'], 'recall': final['recall']})
+    return out
 
 
 BAR_FLOOR = .8  # comparison bars start at 0.80 so differences among strong models stay visible
@@ -141,17 +176,25 @@ def index():
     histogram, clusters = [], []
     spec = get_source(STATE['source']) if STATE['source'] else None
     ready = [s for s in SOURCES if (ROOT / 'models' / f'{s}_final.joblib').exists()]
-    info = load_model_info(STATE['source'] or (ready[0] if ready else None))
+    datasets = dataset_summaries()
+    evaluated = [d['name'] for d in datasets]
+    # Which dataset's results are on show: ?results=BGL, else the uploaded source, else the first trained one.
+    view_source = request.args.get('results')
+    if view_source not in evaluated:
+        view_source = STATE['source'] if STATE['source'] in evaluated else (evaluated[0] if evaluated else None)
+    info = load_model_info(STATE['source'])          # the uploaded log's source: clusters, drill-down text
+    view = load_model_info(view_source)               # the selected dataset: model, comparison, folds
+    keep = {'results': request.args.get('results')}
 
     if df is not None:
         total = len(df)
         flagged = int((df.decision == 'ANOMALY').sum())
-        view = df
+        table = df
         if q:
-            view = view[view.session_id.str.contains(q, regex=False)]
+            table = table[table.session_id.str.contains(q, regex=False)]
         if only:
-            view = view[view.decision == 'ANOMALY']
-        matching = len(view)
+            table = table[table.decision == 'ANOMALY']
+        matching = len(table)
         pages = max(1, math.ceil(matching / PAGE_SIZE))
         try:
             page = max(1, min(pages, int(request.args.get('page', 1))))
@@ -159,12 +202,12 @@ def index():
             page = 1
         column = {'score': 'score', 'events': 'n_events', 'id': 'session_id'}.get(sort, 'score')
         start = (page - 1) * PAGE_SIZE
-        rows = view.sort_values(column, ascending=column == 'session_id').iloc[start:start + PAGE_SIZE].to_dict('records')
+        rows = table.sort_values(column, ascending=column == 'session_id').iloc[start:start + PAGE_SIZE].to_dict('records')
         flag = '1' if only else '0'
         if page > 1:
-            prev_url = url_for('index', q=q, sort=sort, anomalies=flag, page=page - 1)
+            prev_url = url_for('index', q=q, sort=sort, anomalies=flag, page=page - 1, **keep)
         if page < pages:
-            next_url = url_for('index', q=q, sort=sort, anomalies=flag, page=page + 1)
+            next_url = url_for('index', q=q, sort=sort, anomalies=flag, page=page + 1, **keep)
 
         match = df[df.session_id == request.args.get('session')]
         if len(match):
@@ -180,8 +223,10 @@ def index():
                            pages=pages, prev_url=prev_url, next_url=next_url, ready=ready, error=error,
                            total=total, flagged=flagged, rows=rows, audit=STATE['audit'], q=q, only=only,
                            detail=detail, events=events, truncated=truncated, histogram=histogram,
-                           clusters=clusters, model=info['model'], comparison=info['comparison'], comparison_split=info['comparison_split'],
-                           profile_note=info['profile_note'], spec=spec)
+                           clusters=clusters, model=view['model'], comparison=view['comparison'],
+                           comparison_split=view['comparison_split'], profile_note=view['profile_note'],
+                           folds=view['folds'], spec=spec, datasets=datasets, view_source=view_source,
+                           upload_model=info['model'])
 
 
 @app.errorhandler(413)
