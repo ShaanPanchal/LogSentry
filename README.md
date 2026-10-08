@@ -101,6 +101,10 @@ This one command:
 4. clusters the anomalies (`src/clustering.py`) -> `results/HDFS_cluster_analysis.json`, `HDFS_cluster_report.md`, `models/HDFS_clusters.joblib`,
 5. analyses false positives/negatives (`src/evaluation.py`) -> `results/HDFS_error_analysis.json`.
 
+The five-model comparison is written to `results/HDFS_model_comparison.csv` / `.json` (validation and test rows, role of
+each model, and a hash of the test session ids). `python src/comparison.py` re-verifies that every model was scored on
+the same test set and prints the table; the dashboard shows it as a table plus a precision/recall/F1 bar chart.
+
 Individual steps can be re-run: `python src/clustering.py`, `python src/evaluation.py`,
 `python src/evaluation.py --stability` (refits every model under 5 seeds, ~10+ min), `python src/charts.py` (figures).
 
@@ -179,6 +183,7 @@ src/
   processing.py   raw log parsing, session grouping, process() -> feature table
   train.py        split, classifier comparison, final model; orchestrates the steps below
   clustering.py   K-means within the anomaly class + automatic cluster interpretation
+  comparison.py   five-model comparison record + shared-test-set verification
   evaluation.py   error analysis, hard subset, seed stability
   eda.py          exploratory analysis       charts.py   result figures
   predict.py      scoring entry point (CLI + dashboard)

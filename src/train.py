@@ -10,7 +10,7 @@ and scored once on the later test period.  A random split would let a model see
 the future; this one cannot.
 
 Running this module trains the classifiers, then runs the clustering analysis
-(clustering.py) and error analysis (evaluation.py) and writes everything to
+(clustering.py), the five-model comparison record (comparison.py) and error analysis (evaluation.py) and writes everything to
 results/.
 """
 import argparse
@@ -154,6 +154,7 @@ def train_classifiers(df, tr, va, te, source):
 def train(source):
     # Imported here to avoid a circular import (both modules reuse split()).
     import clustering
+    import comparison
     import evaluation
 
     for d in ('models', 'results'):
@@ -167,6 +168,7 @@ def train(source):
               'split_counts': df.split.value_counts().to_dict()}
     (ROOT / 'results' / f'{source}_evaluation.json').write_text(json.dumps(result, indent=2))
 
+    comparison.write(source, comparison.build(df, tr, va, te, validation, tests, final['name']))
     clustering.run(source, df=df, dev=tr | va, te=te)
     evaluation.run(source, df=df, tr=tr, va=va, te=te)
     print('Saved model and evaluation:', source, final['name'], flush=True)

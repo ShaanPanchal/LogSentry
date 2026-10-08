@@ -144,6 +144,25 @@ class PipelineTests(unittest.TestCase):
                 p = b['model'].predict_proba(df[b['columns']].to_numpy(dtype='float32')[:5])
                 self.assertEqual(p.shape, (5, 2))
 
+    def test_comparison_record_shares_test_set(self):
+        import comparison, train
+        df, tr, va, te = split(self._synthetic_sessions())
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / 'models').mkdir();(Path(d) / 'results').mkdir()
+            old = train.ROOT;train.ROOT = Path(d)
+            try:val, tests, final = train.train_classifiers(df, tr, va, te, 'HDFS')
+            finally:train.ROOT = old
+        rec = comparison.build(df, tr, va, te, val, tests, final['name'])
+        self.assertTrue(rec['models_share_test_set'])
+        self.assertEqual(len([m for m in rec['models'] if m['period'] == 'test']), 5)
+        self.assertEqual(len([m for m in rec['models'] if m['period'] == 'validation']), 5)
+        self.assertEqual(rec['split']['test_sessions'], int(te.sum()))
+        self.assertEqual(rec['split']['test_set_sha1'], comparison.test_set_hash(df, te))
+        roles = {m['model']: m['role'] for m in rec['models'] if m['period'] == 'test'}
+        self.assertEqual(roles['Logistic regression'], 'baseline')
+        self.assertEqual(roles['XGBoost'], 'additional');self.assertEqual(roles['Extra trees'], 'additional')
+        self.assertEqual(sum(r.startswith('final') for r in roles.values()), 1)
+
     def test_missing_model_message(self):
         with tempfile.TemporaryDirectory() as d:
             old=predict.ROOT;predict.ROOT=Path(d)

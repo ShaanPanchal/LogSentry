@@ -13,7 +13,7 @@
     {
       "k": 3,
       "silhouette": 0.5128515362739563,
-      "inertia": 226971.8125
+      "inertia": 226971.84375
     },
     {
       "k": 4,
@@ -69,7 +69,7 @@
           "cluster_mean": 0.0,
           "overall_anomaly_mean": 2.091874122619629,
           "all_sessions_mean": 2.6818625926971436,
-          "z": -1.564765214920044,
+          "z": -1.5647653341293335,
           "measures": "count of events in hash bucket 19: \"Deleting block <BLOCK> file <PATH>\" / \"writeBlock <BLOCK> received exception java.io.IOException: Could not read from stream\""
         },
         {
@@ -224,7 +224,7 @@
           "cluster_mean": 0.987294614315033,
           "overall_anomaly_mean": 0.5448929667472839,
           "all_sessions_mean": 0.8888930082321167,
-          "z": 0.8883903622627258,
+          "z": 0.888390302658081,
           "measures": "block deletion seen"
         },
         {
@@ -232,7 +232,7 @@
           "cluster_mean": 2.9546549320220947,
           "overall_anomaly_mean": 1.65303635597229,
           "all_sessions_mean": 2.6652684211730957,
-          "z": 0.8721290230751038,
+          "z": 0.872128963470459,
           "measures": "count of events in hash bucket 27: \"BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>\""
         },
         {
@@ -705,7 +705,7 @@
           "cluster_mean": 0.2521359622478485,
           "overall_anomaly_mean": 0.09335900098085403,
           "all_sessions_mean": 0.04315080866217613,
-          "z": 1.5620509386062622,
+          "z": 1.5620508193969727,
           "measures": "share of messages containing error/exception/timeout/fail words"
         },
         {
@@ -713,7 +713,7 @@
           "cluster_mean": 3.7459471225738525,
           "overall_anomaly_mean": 1.5475834608078003,
           "all_sessions_mean": 1.099828839302063,
-          "z": 1.2683805227279663,
+          "z": 1.2683806419372559,
           "measures": "event rate"
         },
         {
@@ -729,7 +729,7 @@
           "cluster_mean": 0.00037230082671158016,
           "overall_anomaly_mean": 0.5500261187553406,
           "all_sessions_mean": 0.9840354323387146,
-          "z": -1.1048493385314941,
+          "z": -1.1048492193222046,
           "measures": "full allocate/receive/ack/store chain present"
         },
         {
@@ -914,7 +914,7 @@
           "cluster_mean": -2.4959583282470703,
           "overall_anomaly_mean": 0.8665390610694885,
           "all_sessions_mean": 0.02832387201488018,
-          "z": -1.5235332250595093,
+          "z": -1.5235331058502197,
           "measures": "3 minus number of \"stored\" confirmations"
         },
         {
@@ -922,7 +922,7 @@
           "cluster_mean": 4.507505893707275,
           "overall_anomaly_mean": 2.5716025829315186,
           "all_sessions_mean": 2.986393690109253,
-          "z": 1.4381742477416992,
+          "z": 1.4381741285324097,
           "measures": "count of events in hash bucket 15: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\""
         },
         {
@@ -1430,7 +1430,7 @@
           "cluster_mean": 2.5625,
           "overall_anomaly_mean": 0.003567078383639455,
           "all_sessions_mean": 0.0001265561004402116,
-          "z": 26.55224609375,
+          "z": 26.552248001098633,
           "measures": "count of events in hash bucket 24: \"Changing block file offset of block <BLOCK> from <N> to <N> meta file offset to <N>\" / \"<IP>:Exception writing block <BLOCK> to mirror <IP>\" (bucket shared by several event kinds)"
         },
         {
@@ -1454,7 +1454,7 @@
           "cluster_mean": 0.25,
           "overall_anomaly_mean": 0.00034800765570253134,
           "all_sessions_mean": 1.2346936273388565e-05,
-          "z": 13.384933471679688,
+          "z": 13.384932518005371,
           "measures": "count of events in hash bucket 30: \"writeBlock <BLOCK> received exception java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH> <N> millis timeout left.\""
         },
         {
@@ -1978,7 +1978,7 @@
           "cluster_mean": 1.375,
           "overall_anomaly_mean": 0.25326257944107056,
           "all_sessions_mean": 0.3244065046310425,
-          "z": 1.4594752788543701,
+          "z": 1.4594753980636597,
           "measures": "count of events in hash bucket 10: \"Verification succeeded for <BLOCK>\" / \"PacketResponder <BLOCK> <N> Exception java.io.EOFException\""
         },
         {
@@ -1994,7 +1994,7 @@
           "cluster_mean": 4.0,
           "overall_anomaly_mean": 2.5716025829315186,
           "all_sessions_mean": 2.986393690109253,
-          "z": 1.164292573928833,
+          "z": 1.1642924547195435,
           "measures": "count of events in hash bucket 15: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\""
         }
       ],

@@ -44,21 +44,38 @@ atexit.register(cleanup)
 
 def load_model_info(source):
     """Final-model test metrics and cluster blurbs saved by training (None if untrained)."""
-    info = {'model': None, 'clusters': {}, 'comparison': []}
+    info = {'model': None, 'clusters': {}, 'comparison': [], 'comparison_split': None}
     if not source:
         return info
     evaluation = ROOT / 'results' / f'{source}_evaluation.json'
     if evaluation.exists():
         result = json.loads(evaluation.read_text())
         test = next((t for t in result['temporal_test'] if t['model'] == result['selected_model']), None)
-        info['comparison'] = [{**t, 'final': t['model'] == result['selected_model']}
-                              for t in result['temporal_test']]
         info['model'] = {'name': result['selected_model'], 'test': test,
                          'n_features': result['final_model']['n_features']}
+    comparison = ROOT / 'results' / f'{source}_model_comparison.json'
+    if comparison.exists():
+        saved = json.loads(comparison.read_text())
+        info['comparison'] = comparison_rows(saved)
+        info['comparison_split'] = saved['split'] | {'shared': saved['models_share_test_set']}
     clusters = ROOT / 'models' / f'{source}_clusters.joblib'
     if clusters.exists():
         info['clusters'] = joblib.load(clusters).get('summaries', {})
     return info
+
+
+BAR_FLOOR = .8  # comparison bars start at 0.80 so differences among strong models stay visible
+
+
+def comparison_rows(saved):
+    """Test-period rows of the saved model comparison, with bar widths for the chart."""
+    rows = []
+    for r in saved['models']:
+        if r['period'] != 'test':
+            continue
+        bars = {k: max(0, round(100 * (r[k] - BAR_FLOOR) / (1 - BAR_FLOOR))) for k in ('precision', 'recall', 'f1')}
+        rows.append({**r, 'bars': bars, 'final': r['role'].startswith('final')})
+    return rows
 
 
 def score_histogram(df, bins=10):
@@ -159,7 +176,7 @@ def index():
                            pages=pages, prev_url=prev_url, next_url=next_url, ready=ready, error=error,
                            total=total, flagged=flagged, rows=rows, audit=STATE['audit'], q=q, only=only,
                            detail=detail, events=events, truncated=truncated, histogram=histogram,
-                           clusters=clusters, model=info['model'], comparison=info['comparison'])
+                           clusters=clusters, model=info['model'], comparison=info['comparison'], comparison_split=info['comparison_split'])
 
 
 @app.errorhandler(413)
