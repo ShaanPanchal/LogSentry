@@ -20,7 +20,7 @@ def load(source, name):
 
 def model_comparison(source, ev, out):
     names = [t['model'] for t in ev['temporal_test']]
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(11, 4))
     width = .2
     for i, (key, label) in enumerate([('precision', 'precision'), ('recall', 'recall'),
                                       ('f1', 'F1'), ('average_precision', 'PR-AUC')]):

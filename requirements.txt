@@ -4,3 +4,4 @@ scikit-learn==1.9.1   # the saved models are pickles: load them with the version
 joblib>=1.4,<2
 Flask>=3.0,<4
 matplotlib>=3.8,<4
+xgboost>=2.0,<4

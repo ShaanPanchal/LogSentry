@@ -19,16 +19,22 @@ import json
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
+from sklearn.ensemble import ExtraTreesClassifier, HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (accuracy_score, average_precision_score, confusion_matrix,
                              f1_score, precision_score, recall_score)
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
+from xgboost import XGBClassifier
 
 from processing import COLS, PROCESSED_DIR, ROOT
 
 SEED = 7
+# The final (deployed) model is chosen among these original three only. The
+# extra models below are evaluated on the identical split and saved, but do not
+# take part in final-model selection.
+FINAL_CANDIDATES = ('Logistic regression', 'Random forest', 'Histogram gradient boosting')
+EXTRA_MODELS = ('XGBoost', 'Extra trees')
 THRESHOLD_GRID = np.arange(.05, 1, .05)
 
 
@@ -81,6 +87,16 @@ def candidates(seed=SEED):
             n_jobs=2, random_state=seed),
         'Histogram gradient boosting': HistGradientBoostingClassifier(
             max_iter=100, max_leaf_nodes=31, random_state=seed),
+        # Extra trees: like the random forest but with random split thresholds;
+        # same depth/leaf limits so the comparison with it is like-for-like.
+        'Extra trees': ExtraTreesClassifier(
+            n_estimators=100, max_depth=18, min_samples_leaf=2, class_weight='balanced',
+            n_jobs=2, random_state=seed),
+        # XGBoost: regularised gradient boosting (a different implementation from
+        # the histogram GB above); no resampling needed, the threshold is tuned.
+        'XGBoost': XGBClassifier(
+            n_estimators=100, max_depth=6, learning_rate=.1, tree_method='hist',
+            n_jobs=2, random_state=seed, eval_metric='logloss'),
     }
 
 
@@ -106,7 +122,8 @@ def train_classifiers(df, tr, va, te, source):
         model.fit(X[tr], y[tr])
         p = model.predict_proba(X[va])[:, 1]
         validation.append({'model': name, **metrics(y[va], p, best_threshold(y[va], p))})
-    best = max(validation, key=lambda r: (r['f1'], r['average_precision']))
+    best = max((v for v in validation if v['model'] in FINAL_CANDIDATES),
+               key=lambda r: (r['f1'], r['average_precision']))
 
     tests, final = [], None
     for name, model in models.items():
@@ -114,10 +131,9 @@ def train_classifiers(df, tr, va, te, source):
         p = model.predict_proba(X[te])[:, 1]
         threshold = next(v['threshold'] for v in validation if v['model'] == name)
         tests.append({'model': name, **metrics(y[te], p, threshold)})
+        slug = None
         if name == best['model']:
-            joblib.dump({'model': model, 'model_name': name, 'columns': COLS,
-                         'threshold': threshold, 'source': source},
-                        ROOT / 'models' / f'{source}_final.joblib', compress=3)
+            slug = 'final'
             out = df.loc[te, ['session_id', 'label']].copy()
             out['probability'] = p
             out['prediction'] = (p >= threshold).astype(int)
@@ -126,6 +142,12 @@ def train_classifiers(df, tr, va, te, source):
                      'features': COLS, 'threshold': float(threshold),
                      'trained_on': 'train + validation (earliest 80% of sessions by time)',
                      'saved_to': f'models/{source}_final.joblib'}
+        elif name in EXTRA_MODELS:
+            slug = name.lower().replace(' ', '_')
+        if slug:  # same bundle format for the final model and the extra models
+            joblib.dump({'model': model, 'model_name': name, 'columns': COLS,
+                         'threshold': threshold, 'source': source},
+                        ROOT / 'models' / f'{source}_{slug}.joblib', compress=3)
     return validation, tests, final
 
 
@@ -140,6 +162,7 @@ def train(source):
     validation, tests, final = train_classifiers(df, tr, va, te, source)
     df[['session_id', 'split']].to_csv(ROOT / 'results' / f'{source}_splits.csv.gz', index=False)
     result = {'source': source, 'selected_model': final['name'], 'final_model': final,
+              'extra_models': {n: f"models/{source}_{n.lower().replace(' ', '_')}.joblib" for n in EXTRA_MODELS},
               'validation': validation, 'temporal_test': tests,
               'split_counts': df.split.value_counts().to_dict()}
     (ROOT / 'results' / f'{source}_evaluation.json').write_text(json.dumps(result, indent=2))

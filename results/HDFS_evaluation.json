@@ -63,6 +63,10 @@
     "trained_on": "train + validation (earliest 80% of sessions by time)",
     "saved_to": "models/HDFS_final.joblib"
   },
+  "extra_models": {
+    "XGBoost": "models/HDFS_xgboost.joblib",
+    "Extra trees": "models/HDFS_extra_trees.joblib"
+  },
   "validation": [
     {
       "model": "Logistic regression",
@@ -102,6 +106,32 @@
       "fn": 2,
       "tp": 1220,
       "threshold": 0.9500000000000001
+    },
+    {
+      "model": "Extra trees",
+      "accuracy": 0.9998825026926467,
+      "precision": 1.0,
+      "recall": 0.9950900163666121,
+      "f1": 0.9975389663658737,
+      "average_precision": 0.9993707314341029,
+      "tn": 49843,
+      "fp": 0,
+      "fn": 6,
+      "tp": 1216,
+      "threshold": 0.8
+    },
+    {
+      "model": "XGBoost",
+      "accuracy": 0.9951042788602761,
+      "precision": 0.8306122448979592,
+      "recall": 0.9991816693944353,
+      "f1": 0.9071322436849926,
+      "average_precision": 0.9982247337185743,
+      "tn": 49594,
+      "fp": 249,
+      "fn": 1,
+      "tp": 1221,
+      "threshold": 0.25
     }
   ],
   "temporal_test": [
@@ -143,6 +173,32 @@
       "fn": 22,
       "tp": 1658,
       "threshold": 0.9500000000000001
+    },
+    {
+      "model": "Extra trees",
+      "accuracy": 0.9997739484254639,
+      "precision": 1.0,
+      "recall": 0.9845238095238096,
+      "f1": 0.9922015596880623,
+      "average_precision": 0.9998120927624847,
+      "tn": 113338,
+      "fp": 0,
+      "fn": 26,
+      "tp": 1654,
+      "threshold": 0.8
+    },
+    {
+      "model": "XGBoost",
+      "accuracy": 0.9998695856300753,
+      "precision": 0.9988016776512882,
+      "recall": 0.9922619047619048,
+      "f1": 0.9955210510600179,
+      "average_precision": 0.9995796323244142,
+      "tn": 113336,
+      "fp": 2,
+      "fn": 13,
+      "tp": 1667,
+      "threshold": 0.25
     }
   ],
   "split_counts": {

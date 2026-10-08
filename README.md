@@ -35,14 +35,15 @@ Equivalent manual commands:
 ```bash
 conda create -n logsentry python=3.12 -y
 conda activate logsentry
-conda install -c conda-forge numpy pandas scikit-learn=1.9.1 joblib flask matplotlib -y
+conda install -c conda-forge numpy pandas scikit-learn=1.9.1 joblib flask matplotlib xgboost -y
 ```
 
 `pip install -r requirements.txt` also works inside any Python >= 3.11 environment.
 `scikit-learn` is pinned to 1.9.1 because the shipped models in `models/` are
 pickles and must be loaded by the version that trained them.
 
-Dependencies: numpy, pandas, scikit-learn, joblib, Flask, matplotlib.
+Dependencies: numpy, pandas, scikit-learn, joblib, Flask, matplotlib, xgboost
+(already have the environment? add XGBoost with `conda install -c conda-forge xgboost`, or `pip install "xgboost>=2.0,<4"`).
 Verify: `python -m unittest discover -s tests -v`
 
 All commands below are run from the repository root. Paths are relative; nothing
@@ -95,15 +96,16 @@ python src/train.py --source HDFS    # ~1-2 min
 
 This one command:
 1. makes the purged chronological 60/20/20 split (sessions straddling a boundary are dropped),
-2. fits three classifiers (logistic regression, random forest, histogram gradient boosting) and picks each decision threshold on validation only,
-3. refits on train+validation, scores the later **test period** once, and saves the best model to `models/HDFS_final.joblib`,
+2. fits five classifiers - logistic regression, random forest, histogram gradient boosting, **XGBoost** and **Extra trees** - on the same 52 features and picks each decision threshold on validation only,
+3. refits on train+validation, scores every model on the same later **test period** once, and saves the final model to `models/HDFS_final.joblib` (plus `HDFS_xgboost.joblib` and `HDFS_extra_trees.joblib`). The final model is selected on validation F1 among the original three only (`train.FINAL_CANDIDATES`); XGBoost and Extra trees are compared but do not change the deployed model,
 4. clusters the anomalies (`src/clustering.py`) -> `results/HDFS_cluster_analysis.json`, `HDFS_cluster_report.md`, `models/HDFS_clusters.joblib`,
 5. analyses false positives/negatives (`src/evaluation.py`) -> `results/HDFS_error_analysis.json`.
 
 Individual steps can be re-run: `python src/clustering.py`, `python src/evaluation.py`,
-`python src/evaluation.py --stability` (refits every model under 5 seeds, ~10 min), `python src/charts.py` (figures).
+`python src/evaluation.py --stability` (refits every model under 5 seeds, ~10+ min), `python src/charts.py` (figures).
 
 `python setup_data.py --source HDFS` does everything end to end (download -> process -> train).
+`python setup_data.py --source HDFS --raw-only` only re-fetches and sorts the raw log (needed for the example events below).
 
 Note: the real example events inside the cluster/error analyses are read from the raw log
 (`data/raw/HDFS_v1/HDFS.sorted.log`, created by `setup_data.py`). The committed `results/` were generated with it
@@ -143,17 +145,24 @@ The dashboard calls `predict.predict()` - the same code path as the CLI - so the
 
 ## 7. Results (HDFS, temporal test period: the latest 20% of the log, 115,018 sessions)
 
-| Model | Accuracy | Precision | Recall | F1 | PR-AUC |
-|---|---|---|---|---|---|
-| Logistic regression | 0.9980 | 0.9578 | 0.9042 | 0.9302 | 0.9328 |
-| Random forest | 0.9987 | 1.0000 | 0.9113 | 0.9536 | 0.9999 |
-| **Histogram gradient boosting (final)** | **0.9998** | **0.9994** | **0.9869** | **0.9931** | **0.9996** |
+| Model | Accuracy | Precision | Recall | F1 | PR-AUC | FP | FN |
+|---|---|---|---|---|---|---|---|
+| Logistic regression | 0.9980 | 0.9578 | 0.9042 | 0.9302 | 0.9328 | 67 | 161 |
+| Random forest | 0.9987 | 1.0000 | 0.9113 | 0.9536 | 0.9999 | 0 | 149 |
+| **Histogram gradient boosting (final)** | **0.9998** | **0.9994** | **0.9869** | **0.9931** | **0.9996** | 1 | 22 |
+| Extra trees | 0.9998 | 1.0000 | 0.9845 | 0.9922 | 0.9998 | 0 | 26 |
+| XGBoost | 0.9999 | 0.9988 | 0.9923 | 0.9955 | 0.9996 | 2 | 13 |
+
+XGBoost and Extra trees were added after the original comparison; they use the identical split and test sessions.
+XGBoost scores slightly higher than the final model on the test period but did worse on validation (F1 0.907 vs 0.994,
+threshold chosen on validation), so it was not promoted; Extra trees had the best validation F1 (0.9975) but a lower test F1.
+Changing the final model is a deliberate decision, not something the code does automatically.
 
 Final model confusion matrix: TN 113,337 · FP 1 · FN 22 · TP 1,658.
-Seed stability (5 seeds, F1): histogram GB 0.9932 ± 0.0004; random forest 0.9437 ± 0.0149 (range 0.918-0.957).
+Seed stability (5 seeds, test F1): histogram GB 0.9932 ± 0.0004; XGBoost 0.9955 (identical across seeds); Extra trees 0.9834 ± 0.0084 (0.971-0.992); random forest 0.9437 ± 0.0149 (0.918-0.957); logistic regression 0.9302 (deterministic).
 Hard subset - anomalies whose messages contain no error words (n=858): recall 0.977.
 All numbers are generated by the code and stored in `results/`; the 22 missed anomalies and
-the single false positive are analysed in `results/HDFS_error_analysis.json`.
+the single false positive of the final model are analysed in `results/HDFS_error_analysis.json`.
 
 Clustering (11,494 development-period anomalies, k=6 by silhouette among k>=3; k=2..8 sweep reported): the
 clusters are truncated 2-event sessions, long/stalled sessions that still complete, failed writes

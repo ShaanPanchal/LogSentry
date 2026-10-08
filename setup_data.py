@@ -2,6 +2,7 @@
 
     python setup_data.py --source HDFS              # everything
     python setup_data.py --source HDFS --process-only   # stop after the processed dataset
+    python setup_data.py --source HDFS --raw-only       # only (re)create data/raw/.../HDFS.sorted.log
 
 Steps
 1. Download the Loghub archive from Zenodo into data/raw/ and verify its MD5.
@@ -36,6 +37,7 @@ SOURCES = {
     'BGL': ('4452953c470f2d95fcb32d5f6e733f7a', ['BGL.log']),
 }
 CHUNK_LINES = 100000
+DOWNLOAD_ATTEMPTS = 4
 
 
 def sort_key(line, source):
@@ -79,7 +81,16 @@ def download_and_verify(archive, digest):
     zip_path = RAW_DIR / (archive + '.zip')
     if not zip_path.exists():
         print('Downloading', archive, 'from Zenodo. This may take several minutes.', flush=True)
-        urllib.request.urlretrieve(ZENODO.format(archive=archive), zip_path)
+        part = zip_path.with_suffix('.part')  # only renamed once complete, so a dropped connection can't leave a bad zip
+        for attempt in range(1, DOWNLOAD_ATTEMPTS + 1):
+            try:
+                urllib.request.urlretrieve(ZENODO.format(archive=archive), part)
+                part.replace(zip_path)
+                break
+            except OSError as e:  # includes ContentTooShortError
+                print(f'Download attempt {attempt}/{DOWNLOAD_ATTEMPTS} failed: {e}', flush=True)
+                if attempt == DOWNLOAD_ATTEMPTS:
+                    raise
     md5 = hashlib.md5()
     with zip_path.open('rb') as f:
         for block in iter(lambda: f.read(1024 * 1024), b''):
@@ -90,7 +101,8 @@ def download_and_verify(archive, digest):
     return zip_path
 
 
-def build_processed_dataset(source):
+def prepare_raw(source):
+    """Download, verify, extract and chronologically sort the raw log. Returns the labels path (HDFS)."""
     archive = ARCHIVES[source]
     digest, files = SOURCES[source]
     dest = RAW_DIR / archive
@@ -101,7 +113,11 @@ def build_processed_dataset(source):
             z.extract(name, dest)
     print('Sorting records chronologically...', flush=True)
     sort_file(dest / files[0], sorted_log_path(source), source)
-    labels = dest / files[1] if source == 'HDFS' else None
+    return dest / files[1] if source == 'HDFS' else None
+
+
+def build_processed_dataset(source):
+    labels = prepare_raw(source)
     print('Building sessions and features...', flush=True)
     df, audit, _ = process(sorted_log_path(source), source, labels)
     out = PROCESSED_DIR / f'{source}_sessions.csv.gz'
@@ -118,9 +134,12 @@ def write_bucket_inventory(source):
     (ROOT / 'results' / f'{source}_event_buckets.json').write_text(json.dumps(inventory, indent=2))
 
 
-def setup(source, process_only=False):
+def setup(source, process_only=False, raw_only=False):
     for folder in (PROCESSED_DIR, RAW_DIR, ROOT / 'models', ROOT / 'results'):
         folder.mkdir(parents=True, exist_ok=True)
+    if raw_only:  # only (re)create the sorted raw log, e.g. for cluster example events
+        prepare_raw(source)
+        return
     if not (PROCESSED_DIR / f'{source}_sessions.csv.gz').exists():
         build_processed_dataset(source)
     elif not (ROOT / 'results' / f'{source}_event_buckets.json').exists() and sorted_log_path(source).exists():
@@ -136,5 +155,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Download, process and train.')
     parser.add_argument('--source', choices=list(SOURCES), default='HDFS')
     parser.add_argument('--process-only', action='store_true', help='stop after writing the processed dataset')
+    parser.add_argument('--raw-only', action='store_true', help='only download/sort the raw log (no processing or training)')
     args = parser.parse_args()
-    setup(args.source, args.process_only)
+    setup(args.source, args.process_only, args.raw_only)

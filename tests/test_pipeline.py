@@ -124,6 +124,26 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(c['fp'] + c['fn'], int((test_rows.label != test_rows.prediction).sum()))
         self.assertEqual(c['tp'] + c['tn'] + c['fp'] + c['fn'], int(te.sum()))
 
+    def test_extra_models_same_split_and_final_unchanged(self):
+        import joblib, train
+        df, tr, va, te = split(self._synthetic_sessions())
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / 'models').mkdir();(Path(d) / 'results').mkdir()
+            old = train.ROOT;train.ROOT = Path(d)
+            try:
+                val, tests, final = train.train_classifiers(df, tr, va, te, 'HDFS')
+            finally:train.ROOT = old
+            names = [t['model'] for t in tests]
+            self.assertEqual(sorted(names), sorted(list(train.FINAL_CANDIDATES) + list(train.EXTRA_MODELS)))
+            self.assertIn(final['name'], train.FINAL_CANDIDATES)       # extra models never become final
+            # every model was scored on the identical test sessions
+            self.assertEqual({t['tn'] + t['fp'] + t['fn'] + t['tp'] for t in tests}, {int(te.sum())})
+            for slug in ('final', 'xgboost', 'extra_trees'):
+                b = joblib.load(Path(d) / 'models' / f'HDFS_{slug}.joblib')
+                self.assertEqual(b['columns'], processing.COLS)
+                p = b['model'].predict_proba(df[b['columns']].to_numpy(dtype='float32')[:5])
+                self.assertEqual(p.shape, (5, 2))
+
     def test_missing_model_message(self):
         with tempfile.TemporaryDirectory() as d:
             old=predict.ROOT;predict.ROOT=Path(d)

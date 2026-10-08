@@ -18,7 +18,7 @@
     {
       "k": 4,
       "silhouette": 0.5160900354385376,
-      "inertia": 200187.25
+      "inertia": 200187.296875
     },
     {
       "k": 5,
@@ -85,7 +85,7 @@
           "cluster_mean": 1.0,
           "overall_anomaly_mean": 2.247349262237549,
           "all_sessions_mean": 2.833458423614502,
-          "z": -1.4481281042099,
+          "z": -1.4481279850006104,
           "measures": "diversity of the event-kind distribution"
         },
         {
@@ -93,7 +93,7 @@
           "cluster_mean": 2.0,
           "overall_anomaly_mean": 6.183226108551025,
           "all_sessions_mean": 7.789596080780029,
-          "z": -1.3486987352371216,
+          "z": -1.348698616027832,
           "measures": "number of distinct event kinds"
         }
       ],
@@ -224,7 +224,7 @@
           "cluster_mean": 0.987294614315033,
           "overall_anomaly_mean": 0.5448929667472839,
           "all_sessions_mean": 0.8888930082321167,
-          "z": 0.888390302658081,
+          "z": 0.8883903622627258,
           "measures": "block deletion seen"
         },
         {
@@ -232,7 +232,7 @@
           "cluster_mean": 2.9546549320220947,
           "overall_anomaly_mean": 1.65303635597229,
           "all_sessions_mean": 2.6652684211730957,
-          "z": 0.872128963470459,
+          "z": 0.8721290230751038,
           "measures": "count of events in hash bucket 27: \"BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>\""
         },
         {
@@ -240,7 +240,7 @@
           "cluster_mean": 19582.57421875,
           "overall_anomaly_mean": 10709.67578125,
           "all_sessions_mean": 16420.6015625,
-          "z": 0.8481754064559937,
+          "z": 0.8481753468513489,
           "measures": "longest pause between events"
         }
       ],
@@ -713,7 +713,7 @@
           "cluster_mean": 3.7459471225738525,
           "overall_anomaly_mean": 1.5475834608078003,
           "all_sessions_mean": 1.099828839302063,
-          "z": 1.2683806419372559,
+          "z": 1.2683805227279663,
           "measures": "event rate"
         },
         {
@@ -721,7 +721,7 @@
           "cluster_mean": 1.9869694709777832,
           "overall_anomaly_mean": 0.9122150540351868,
           "all_sessions_mean": 0.033957161009311676,
-          "z": 1.1737593412399292,
+          "z": 1.1737594604492188,
           "measures": "\"receiving\" events minus acknowledgements"
         },
         {
@@ -729,7 +729,7 @@
           "cluster_mean": 0.00037230082671158016,
           "overall_anomaly_mean": 0.5500261187553406,
           "all_sessions_mean": 0.9840354323387146,
-          "z": -1.1048494577407837,
+          "z": -1.1048493385314941,
           "measures": "full allocate/receive/ack/store chain present"
         },
         {
@@ -737,7 +737,7 @@
           "cluster_mean": 0.0,
           "overall_anomaly_mean": 0.5448929667472839,
           "all_sessions_mean": 0.8888930082321167,
-          "z": -1.0942060947418213,
+          "z": -1.0942062139511108,
           "measures": "block deletion seen"
         }
       ],
@@ -898,7 +898,7 @@
           "cluster_mean": 1.5069284439086914,
           "overall_anomaly_mean": 0.2295110523700714,
           "all_sessions_mean": 0.009735559113323689,
-          "z": 2.287147045135498,
+          "z": 2.287147283554077,
           "measures": "count of events in hash bucket 26: \"Received block <BLOCK> src: <PATH> dest: <PATH> of size <N>\" / \"writeBlock <BLOCK> received exception java.net.NoRouteToHostException: No route to host\""
         },
         {
@@ -922,7 +922,7 @@
           "cluster_mean": 4.507505893707275,
           "overall_anomaly_mean": 2.5716025829315186,
           "all_sessions_mean": 2.986393690109253,
-          "z": 1.4381741285324097,
+          "z": 1.4381742477416992,
           "measures": "count of events in hash bucket 15: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\""
         },
         {
@@ -1430,7 +1430,7 @@
           "cluster_mean": 2.5625,
           "overall_anomaly_mean": 0.003567078383639455,
           "all_sessions_mean": 0.0001265561004402116,
-          "z": 26.552248001098633,
+          "z": 26.55224609375,
           "measures": "count of events in hash bucket 24: \"Changing block file offset of block <BLOCK> from <N> to <N> meta file offset to <N>\" / \"<IP>:Exception writing block <BLOCK> to mirror <IP>\" (bucket shared by several event kinds)"
         },
         {
@@ -1446,7 +1446,7 @@
           "cluster_mean": 1.8125,
           "overall_anomaly_mean": 0.004437097813934088,
           "all_sessions_mean": 0.00015742344839964062,
-          "z": 20.660497665405273,
+          "z": 20.66049575805664,
           "measures": "count of events in hash bucket 07: \"Exception in receiveBlock for block <BLOCK> java.io.IOException: Connection reset by peer\""
         },
         {
@@ -1454,7 +1454,7 @@
           "cluster_mean": 0.25,
           "overall_anomaly_mean": 0.00034800765570253134,
           "all_sessions_mean": 1.2346936273388565e-05,
-          "z": 13.384932518005371,
+          "z": 13.384933471679688,
           "measures": "count of events in hash bucket 30: \"writeBlock <BLOCK> received exception java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH> <N> millis timeout left.\""
         },
         {
@@ -1462,7 +1462,7 @@
           "cluster_mean": 0.1875,
           "overall_anomaly_mean": 0.0002610057417768985,
           "all_sessions_mean": 9.260202205041423e-06,
-          "z": 11.59118938446045,
+          "z": 11.591188430786133,
           "measures": "count of events in hash bucket 03: \"PacketResponder <BLOCK> <N> Exception java.io.IOException: Connection reset by peer\""
         }
       ],

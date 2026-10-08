@@ -44,13 +44,15 @@ atexit.register(cleanup)
 
 def load_model_info(source):
     """Final-model test metrics and cluster blurbs saved by training (None if untrained)."""
-    info = {'model': None, 'clusters': {}}
+    info = {'model': None, 'clusters': {}, 'comparison': []}
     if not source:
         return info
     evaluation = ROOT / 'results' / f'{source}_evaluation.json'
     if evaluation.exists():
         result = json.loads(evaluation.read_text())
         test = next((t for t in result['temporal_test'] if t['model'] == result['selected_model']), None)
+        info['comparison'] = [{**t, 'final': t['model'] == result['selected_model']}
+                              for t in result['temporal_test']]
         info['model'] = {'name': result['selected_model'], 'test': test,
                          'n_features': result['final_model']['n_features']}
     clusters = ROOT / 'models' / f'{source}_clusters.joblib'
@@ -157,7 +159,7 @@ def index():
                            pages=pages, prev_url=prev_url, next_url=next_url, ready=ready, error=error,
                            total=total, flagged=flagged, rows=rows, audit=STATE['audit'], q=q, only=only,
                            detail=detail, events=events, truncated=truncated, histogram=histogram,
-                           clusters=clusters, model=info['model'])
+                           clusters=clusters, model=info['model'], comparison=info['comparison'])
 
 
 @app.errorhandler(413)
