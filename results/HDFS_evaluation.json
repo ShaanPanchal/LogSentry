@@ -79,7 +79,8 @@
       "fp": 280,
       "fn": 38,
       "tp": 1184,
-      "threshold": 0.8
+      "threshold": 0.8,
+      "fit_seconds": 0.55
     },
     {
       "model": "Random forest",
@@ -92,7 +93,8 @@
       "fp": 0,
       "fn": 15,
       "tp": 1207,
-      "threshold": 0.9500000000000001
+      "threshold": 0.9500000000000001,
+      "fit_seconds": 4.84
     },
     {
       "model": "Histogram gradient boosting",
@@ -105,7 +107,8 @@
       "fp": 12,
       "fn": 2,
       "tp": 1220,
-      "threshold": 0.9500000000000001
+      "threshold": 0.9500000000000001,
+      "fit_seconds": 1.44
     },
     {
       "model": "Extra trees",
@@ -118,7 +121,8 @@
       "fp": 0,
       "fn": 6,
       "tp": 1216,
-      "threshold": 0.8
+      "threshold": 0.8,
+      "fit_seconds": 3.96
     },
     {
       "model": "XGBoost",
@@ -131,7 +135,8 @@
       "fp": 249,
       "fn": 1,
       "tp": 1221,
-      "threshold": 0.25
+      "threshold": 0.25,
+      "fit_seconds": 1.25
     }
   ],
   "temporal_test": [
@@ -146,7 +151,16 @@
       "fp": 67,
       "fn": 161,
       "tp": 1519,
-      "threshold": 0.8
+      "threshold": 0.8,
+      "fit_seconds": 0.78,
+      "predict_seconds": 0.015,
+      "scaling": "required - StandardScaler applied inside the model pipeline",
+      "params": {
+        "C": 1.0,
+        "max_iter": 500,
+        "class_weight": "balanced",
+        "n_iter_fitted": 101
+      }
     },
     {
       "model": "Random forest",
@@ -159,7 +173,17 @@
       "fp": 0,
       "fn": 149,
       "tp": 1531,
-      "threshold": 0.9500000000000001
+      "threshold": 0.9500000000000001,
+      "fit_seconds": 5.36,
+      "predict_seconds": 0.075,
+      "scaling": "not required",
+      "params": {
+        "n_estimators": 80,
+        "max_depth": 18,
+        "min_samples_leaf": 2,
+        "max_features": "sqrt",
+        "class_weight": "balanced"
+      }
     },
     {
       "model": "Histogram gradient boosting",
@@ -172,7 +196,17 @@
       "fp": 1,
       "fn": 22,
       "tp": 1658,
-      "threshold": 0.9500000000000001
+      "threshold": 0.9500000000000001,
+      "fit_seconds": 1.65,
+      "predict_seconds": 0.064,
+      "scaling": "not required",
+      "params": {
+        "max_iter": 100,
+        "max_leaf_nodes": 31,
+        "learning_rate": 0.1,
+        "early_stopping": "auto",
+        "n_iter_fitted": 94
+      }
     },
     {
       "model": "Extra trees",
@@ -185,7 +219,17 @@
       "fp": 0,
       "fn": 26,
       "tp": 1654,
-      "threshold": 0.8
+      "threshold": 0.8,
+      "fit_seconds": 4.95,
+      "predict_seconds": 0.104,
+      "scaling": "not required",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 18,
+        "min_samples_leaf": 2,
+        "bootstrap": false,
+        "class_weight": "balanced"
+      }
     },
     {
       "model": "XGBoost",
@@ -198,7 +242,16 @@
       "fp": 2,
       "fn": 13,
       "tp": 1667,
-      "threshold": 0.25
+      "threshold": 0.25,
+      "fit_seconds": 1.41,
+      "predict_seconds": 0.066,
+      "scaling": "not required",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 6,
+        "learning_rate": 0.1,
+        "tree_method": "hist"
+      }
     }
   ],
   "split_counts": {

@@ -15,6 +15,7 @@ results/.
 """
 import argparse
 import json
+import time
 
 import joblib
 import numpy as np
@@ -27,6 +28,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
+import comparison
 from processing import COLS, PROCESSED_DIR, ROOT
 
 SEED = 7
@@ -119,18 +121,28 @@ def train_classifiers(df, tr, va, te, source):
     models, validation = candidates(), []
     for name, model in models.items():
         print('Fitting', source, name, flush=True)
+        started = time.perf_counter()
         model.fit(X[tr], y[tr])
+        fit_seconds = time.perf_counter() - started
         p = model.predict_proba(X[va])[:, 1]
-        validation.append({'model': name, **metrics(y[va], p, best_threshold(y[va], p))})
+        validation.append({'model': name, **metrics(y[va], p, best_threshold(y[va], p)),
+                           'fit_seconds': round(fit_seconds, 2)})
     best = max((v for v in validation if v['model'] in FINAL_CANDIDATES),
                key=lambda r: (r['f1'], r['average_precision']))
 
     tests, final = [], None
     for name, model in models.items():
+        started = time.perf_counter()
         model.fit(X[dev], y[dev])
+        fit_seconds = time.perf_counter() - started
+        started = time.perf_counter()
         p = model.predict_proba(X[te])[:, 1]
+        predict_seconds = time.perf_counter() - started
         threshold = next(v['threshold'] for v in validation if v['model'] == name)
-        tests.append({'model': name, **metrics(y[te], p, threshold)})
+        tests.append({'model': name, **metrics(y[te], p, threshold),
+                      'fit_seconds': round(fit_seconds, 2), 'predict_seconds': round(predict_seconds, 3),
+                      'scaling': comparison.scaling_note(name, model),
+                      'params': comparison.key_params(name, model)})
         slug = None
         if name == best['model']:
             slug = 'final'
@@ -154,7 +166,6 @@ def train_classifiers(df, tr, va, te, source):
 def train(source):
     # Imported here to avoid a circular import (both modules reuse split()).
     import clustering
-    import comparison
     import evaluation
 
     for d in ('models', 'results'):

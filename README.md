@@ -102,7 +102,9 @@ This one command:
 5. analyses false positives/negatives (`src/evaluation.py`) -> `results/HDFS_error_analysis.json`.
 
 The five-model comparison is written to `results/HDFS_model_comparison.csv` / `.json` (validation and test rows, role of
-each model, and a hash of the test session ids). `python src/comparison.py` re-verifies that every model was scored on
+each model, fit/predict time, and a hash of the test session ids). Each model's type, hyperparameters (read from the fitted
+estimator), scaling requirement, learning approach and suitability for the 52 features are in `HDFS_model_comparison.json` and a
+report-ready `results/HDFS_model_comparison.md`. `python src/comparison.py` re-verifies that every model was scored on
 the same test set and prints the table; the dashboard shows it as a table plus a precision/recall/F1 bar chart.
 
 Individual steps can be re-run: `python src/clustering.py`, `python src/evaluation.py`,

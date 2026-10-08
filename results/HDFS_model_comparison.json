@@ -28,6 +28,8 @@
       "tp": 1184,
       "tn": 49563,
       "threshold": 0.8,
+      "fit_seconds": 0.55,
+      "predict_seconds": null,
       "f1_gain_vs_baseline": null
     },
     {
@@ -44,6 +46,8 @@
       "tp": 1207,
       "tn": 49843,
       "threshold": 0.9500000000000001,
+      "fit_seconds": 4.84,
+      "predict_seconds": null,
       "f1_gain_vs_baseline": null
     },
     {
@@ -60,6 +64,8 @@
       "tp": 1220,
       "tn": 49831,
       "threshold": 0.9500000000000001,
+      "fit_seconds": 1.44,
+      "predict_seconds": null,
       "f1_gain_vs_baseline": null
     },
     {
@@ -76,6 +82,8 @@
       "tp": 1216,
       "tn": 49843,
       "threshold": 0.8,
+      "fit_seconds": 3.96,
+      "predict_seconds": null,
       "f1_gain_vs_baseline": null
     },
     {
@@ -92,6 +100,8 @@
       "tp": 1221,
       "tn": 49594,
       "threshold": 0.25,
+      "fit_seconds": 1.25,
+      "predict_seconds": null,
       "f1_gain_vs_baseline": null
     },
     {
@@ -108,6 +118,8 @@
       "tp": 1519,
       "tn": 113271,
       "threshold": 0.8,
+      "fit_seconds": 0.78,
+      "predict_seconds": 0.015,
       "f1_gain_vs_baseline": 0.0
     },
     {
@@ -124,6 +136,8 @@
       "tp": 1531,
       "tn": 113338,
       "threshold": 0.9500000000000001,
+      "fit_seconds": 5.36,
+      "predict_seconds": 0.075,
       "f1_gain_vs_baseline": 0.023407175617037534
     },
     {
@@ -140,6 +154,8 @@
       "tp": 1658,
       "tn": 113337,
       "threshold": 0.9500000000000001,
+      "fit_seconds": 1.65,
+      "predict_seconds": 0.064,
       "f1_gain_vs_baseline": 0.06292187543270744
     },
     {
@@ -156,6 +172,8 @@
       "tp": 1654,
       "tn": 113338,
       "threshold": 0.8,
+      "fit_seconds": 4.95,
+      "predict_seconds": 0.104,
       "f1_gain_vs_baseline": 0.06201172502792762
     },
     {
@@ -172,7 +190,80 @@
       "tp": 1667,
       "tn": 113336,
       "threshold": 0.25,
+      "fit_seconds": 1.41,
+      "predict_seconds": 0.066,
       "f1_gain_vs_baseline": 0.06533121639988315
     }
-  ]
+  ],
+  "training_protocol": "Identical for all models: fit on the training period; choose the decision threshold that maximises F1 on the validation period; refit on train+validation; score once on the later test period. No shuffling, same 52 features.",
+  "profiles": {
+    "Logistic regression": {
+      "type": "Linear model (L2-regularised logistic regression)",
+      "learning_approach": "Learns one weight per feature; the anomaly probability is a sigmoid of a weighted sum, fitted by convex optimisation. It is the only model that is linear in its inputs.",
+      "scaling": "required - StandardScaler applied inside the model pipeline",
+      "suitability": "Fast, interpretable baseline; class weighting offsets the ~3% anomaly rate. It cannot express feature interactions or thresholds (e.g. \"write chain incomplete AND long gap\") unless they are hand-crafted, and durations/counts are used on their raw, heavily skewed scale.",
+      "key_params": {
+        "C": 1.0,
+        "max_iter": 500,
+        "class_weight": "balanced",
+        "n_iter_fitted": 101
+      },
+      "n_features": 52
+    },
+    "Random forest": {
+      "type": "Bagged ensemble of deep decision trees",
+      "learning_approach": "Many trees are grown independently on bootstrap samples with random feature subsets and their votes are averaged: variance is reduced by averaging, not by correcting errors.",
+      "scaling": "not required",
+      "suitability": "Splits are threshold tests, so mixed binary/count/duration features, skew and correlated timing features need no transformation, and interactions between lifecycle and timing features are learned.",
+      "key_params": {
+        "n_estimators": 80,
+        "max_depth": 18,
+        "min_samples_leaf": 2,
+        "max_features": "sqrt",
+        "class_weight": "balanced"
+      },
+      "n_features": 52
+    },
+    "Histogram gradient boosting": {
+      "type": "Gradient-boosted decision trees (scikit-learn, histogram-based)",
+      "learning_approach": "Shallow trees are added one after another, each fitted to the errors of the ensemble so far; features are pre-binned into histograms so training is fast on 575k sessions.",
+      "scaling": "not required",
+      "suitability": "Boosting concentrates on hard, borderline sessions, which matters when anomalies are rare; binning copes with the skewed feature scales. Not class-weighted: the threshold is tuned instead.",
+      "key_params": {
+        "max_iter": 100,
+        "max_leaf_nodes": 31,
+        "learning_rate": 0.1,
+        "early_stopping": "auto",
+        "n_iter_fitted": 94
+      },
+      "n_features": 52
+    },
+    "Extra trees": {
+      "type": "Extremely randomised trees ensemble",
+      "learning_approach": "Like the random forest, but split thresholds are drawn at random rather than optimised and each tree uses the whole training set: extra randomisation lowers variance and trains faster.",
+      "scaling": "not required",
+      "suitability": "Random thresholds give smoother decision boundaries on the correlated timing features and cheap training; class weighting offsets the rare anomaly class.",
+      "key_params": {
+        "n_estimators": 100,
+        "max_depth": 18,
+        "min_samples_leaf": 2,
+        "bootstrap": false,
+        "class_weight": "balanced"
+      },
+      "n_features": 52
+    },
+    "XGBoost": {
+      "type": "Gradient-boosted decision trees (XGBoost library)",
+      "learning_approach": "Boosting like the model above, but each tree is fitted using second-order (curvature) gradient information and an explicitly regularised objective that penalises complex trees.",
+      "scaling": "not required",
+      "suitability": "Same suitability as other tree boosters for mixed, skewed tabular features; the added regularisation limits over-fitting to rare failure patterns. Not class-weighted.",
+      "key_params": {
+        "n_estimators": 100,
+        "max_depth": 6,
+        "learning_rate": 0.1,
+        "tree_method": "hist"
+      },
+      "n_features": 52
+    }
+  }
 }

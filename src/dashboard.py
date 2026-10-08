@@ -44,7 +44,7 @@ atexit.register(cleanup)
 
 def load_model_info(source):
     """Final-model test metrics and cluster blurbs saved by training (None if untrained)."""
-    info = {'model': None, 'clusters': {}, 'comparison': [], 'comparison_split': None}
+    info = {'model': None, 'clusters': {}, 'comparison': [], 'comparison_split': None, 'profile_note': ''}
     if not source:
         return info
     evaluation = ROOT / 'results' / f'{source}_evaluation.json'
@@ -57,6 +57,7 @@ def load_model_info(source):
     if comparison.exists():
         saved = json.loads(comparison.read_text())
         info['comparison'] = comparison_rows(saved)
+        info['profile_note'] = saved.get('training_protocol', '')
         info['comparison_split'] = saved['split'] | {'shared': saved['models_share_test_set']}
     clusters = ROOT / 'models' / f'{source}_clusters.joblib'
     if clusters.exists():
@@ -74,7 +75,8 @@ def comparison_rows(saved):
         if r['period'] != 'test':
             continue
         bars = {k: max(0, round(100 * (r[k] - BAR_FLOOR) / (1 - BAR_FLOOR))) for k in ('precision', 'recall', 'f1')}
-        rows.append({**r, 'bars': bars, 'final': r['role'].startswith('final')})
+        rows.append({**r, 'bars': bars, 'final': r['role'].startswith('final'),
+                     'profile': saved.get('profiles', {}).get(r['model'])})
     return rows
 
 
@@ -176,7 +178,8 @@ def index():
                            pages=pages, prev_url=prev_url, next_url=next_url, ready=ready, error=error,
                            total=total, flagged=flagged, rows=rows, audit=STATE['audit'], q=q, only=only,
                            detail=detail, events=events, truncated=truncated, histogram=histogram,
-                           clusters=clusters, model=info['model'], comparison=info['comparison'], comparison_split=info['comparison_split'])
+                           clusters=clusters, model=info['model'], comparison=info['comparison'], comparison_split=info['comparison_split'],
+                           profile_note=info['profile_note'])
 
 
 @app.errorhandler(413)

@@ -162,6 +162,17 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(roles['Logistic regression'], 'baseline')
         self.assertEqual(roles['XGBoost'], 'additional');self.assertEqual(roles['Extra trees'], 'additional')
         self.assertEqual(sum(r.startswith('final') for r in roles.values()), 1)
+        # every model has a profile, real hyperparameters read from the fitted estimator, and timings
+        self.assertEqual(set(rec['profiles']), set(roles))
+        for name, prof in rec['profiles'].items():
+            for field in ('type', 'learning_approach', 'scaling', 'suitability', 'key_params'):
+                self.assertTrue(prof[field], (name, field))
+        self.assertIn('StandardScaler', rec['profiles']['Logistic regression']['scaling'])
+        self.assertEqual(rec['profiles']['Random forest']['scaling'], 'not required')
+        self.assertEqual(rec['profiles']['XGBoost']['key_params']['max_depth'], 6)
+        self.assertEqual(rec['profiles']['Extra trees']['key_params']['bootstrap'], False)
+        self.assertTrue(all(m['fit_seconds'] is not None and m['predict_seconds'] is not None
+                            for m in rec['models'] if m['period'] == 'test'))
 
     def test_missing_model_message(self):
         with tempfile.TemporaryDirectory() as d:

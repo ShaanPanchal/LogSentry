@@ -13,7 +13,7 @@
     {
       "k": 3,
       "silhouette": 0.5128515362739563,
-      "inertia": 226971.84375
+      "inertia": 226971.8125
     },
     {
       "k": 4,
@@ -61,7 +61,7 @@
           "cluster_mean": 1.0,
           "overall_anomaly_mean": 0.7555820345878601,
           "all_sessions_mean": 0.6162066459655762,
-          "z": 1.603337287902832,
+          "z": 1.6033371686935425,
           "measures": "share of consecutive events that change kind"
         },
         {
@@ -69,7 +69,7 @@
           "cluster_mean": 0.0,
           "overall_anomaly_mean": 2.091874122619629,
           "all_sessions_mean": 2.6818625926971436,
-          "z": -1.5647653341293335,
+          "z": -1.5647650957107544,
           "measures": "count of events in hash bucket 19: \"Deleting block <BLOCK> file <PATH>\" / \"writeBlock <BLOCK> received exception java.io.IOException: Could not read from stream\""
         },
         {
@@ -77,7 +77,7 @@
           "cluster_mean": 1.0,
           "overall_anomaly_mean": 2.5716025829315186,
           "all_sessions_mean": 2.986393690109253,
-          "z": -1.5645779371261597,
+          "z": -1.5645778179168701,
           "measures": "count of events in hash bucket 15: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\""
         },
         {
@@ -216,7 +216,7 @@
           "cluster_mean": 1.0,
           "overall_anomaly_mean": 0.5500261187553406,
           "all_sessions_mean": 0.9840354323387146,
-          "z": 0.9044839143753052,
+          "z": 0.9044837951660156,
           "measures": "full allocate/receive/ack/store chain present"
         },
         {
@@ -232,7 +232,7 @@
           "cluster_mean": 2.9546549320220947,
           "overall_anomaly_mean": 1.65303635597229,
           "all_sessions_mean": 2.6652684211730957,
-          "z": 0.872128963470459,
+          "z": 0.8721290230751038,
           "measures": "count of events in hash bucket 27: \"BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>\""
         },
         {
@@ -240,7 +240,7 @@
           "cluster_mean": 19582.57421875,
           "overall_anomaly_mean": 10709.67578125,
           "all_sessions_mean": 16420.6015625,
-          "z": 0.8481753468513489,
+          "z": 0.8481754064559937,
           "measures": "longest pause between events"
         }
       ],
@@ -721,7 +721,7 @@
           "cluster_mean": 1.9869694709777832,
           "overall_anomaly_mean": 0.9122150540351868,
           "all_sessions_mean": 0.033957161009311676,
-          "z": 1.1737594604492188,
+          "z": 1.1737593412399292,
           "measures": "\"receiving\" events minus acknowledgements"
         },
         {
@@ -737,7 +737,7 @@
           "cluster_mean": 0.0,
           "overall_anomaly_mean": 0.5448929667472839,
           "all_sessions_mean": 0.8888930082321167,
-          "z": -1.0942062139511108,
+          "z": -1.0942059755325317,
           "measures": "block deletion seen"
         }
       ],
@@ -930,7 +930,7 @@
           "cluster_mean": 6.286951541900635,
           "overall_anomaly_mean": 3.0504610538482666,
           "all_sessions_mean": 3.973012685775757,
-          "z": 1.274606466293335,
+          "z": 1.2746065855026245,
           "measures": "distinct hosts involved"
         }
       ],
@@ -1462,7 +1462,7 @@
           "cluster_mean": 0.1875,
           "overall_anomaly_mean": 0.0002610057417768985,
           "all_sessions_mean": 9.260202205041423e-06,
-          "z": 11.591188430786133,
+          "z": 11.59118938446045,
           "measures": "count of events in hash bucket 03: \"PacketResponder <BLOCK> <N> Exception java.io.IOException: Connection reset by peer\""
         }
       ],
@@ -1978,7 +1978,7 @@
           "cluster_mean": 1.375,
           "overall_anomaly_mean": 0.25326257944107056,
           "all_sessions_mean": 0.3244065046310425,
-          "z": 1.4594753980636597,
+          "z": 1.4594752788543701,
           "measures": "count of events in hash bucket 10: \"Verification succeeded for <BLOCK>\" / \"PacketResponder <BLOCK> <N> Exception java.io.EOFException\""
         },
         {
