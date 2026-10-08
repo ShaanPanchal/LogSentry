@@ -1,15 +1,10 @@
 #!/bin/bash
-# Double-click launcher for the existing macOS LogSentry installation.
+# macOS convenience launcher: creates a venv, installs requirements.txt and starts the dashboard.
 set -eu
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-APP_DIR="$HOME/Downloads/LogSentry/logsentry_app"
-if [ -f "$SCRIPT_DIR/logsentry_app/src/dashboard.py" ]; then
-  APP_DIR="$SCRIPT_DIR/logsentry_app"
-elif [ -f "$SCRIPT_DIR/src/dashboard.py" ]; then
-  APP_DIR="$SCRIPT_DIR"
-fi
+APP_DIR="$SCRIPT_DIR"
 pause_error() { echo; echo "$1"; read -r -p "Press Enter to close..." answer; exit 1; }
-[ -f "$APP_DIR/src/dashboard.py" ] || pause_error "Application not found. Keep your project in ~/Downloads/LogSentry/logsentry_app, or place this launcher beside logsentry_app."
+[ -f "$APP_DIR/src/dashboard.py" ] || pause_error "Application not found. Keep this launcher in the LogSentry repository root (next to src/)."
 cd "$APP_DIR"
 echo "Opening LogSentry in Visual Studio Code..."
 if ! open -a "Visual Studio Code" "$APP_DIR" 2>/dev/null; then

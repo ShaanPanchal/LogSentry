@@ -1,0 +1,6 @@
+numpy>=2.0,<3
+pandas>=2.2,<4
+scikit-learn==1.9.1   # the saved models are pickles: load them with the version that trained them
+joblib>=1.4,<2
+Flask>=3.0,<4
+matplotlib>=3.8,<4

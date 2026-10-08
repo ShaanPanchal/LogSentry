@@ -1,0 +1,8 @@
+# virtual environments
+.venv/
+venv/
+# raw downloads + the 1.5 GB sorted log (re-created by setup_data.py)
+data/raw/
+__pycache__/
+*.pyc
+predictions.csv

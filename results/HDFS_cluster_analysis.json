@@ -1,0 +1,2480 @@
+{
+  "source": "HDFS",
+  "algorithm": "KMeans (signed-log + standardised features, labels excluded)",
+  "clustered": "development-period anomalies only",
+  "n_clustered": 11494,
+  "selected_k": 6,
+  "sweep": [
+    {
+      "k": 2,
+      "silhouette": 0.6006668210029602,
+      "inertia": 253983.1875
+    },
+    {
+      "k": 3,
+      "silhouette": 0.5128515362739563,
+      "inertia": 226971.8125
+    },
+    {
+      "k": 4,
+      "silhouette": 0.5160900354385376,
+      "inertia": 200187.25
+    },
+    {
+      "k": 5,
+      "silhouette": 0.558146595954895,
+      "inertia": 179363.15625
+    },
+    {
+      "k": 6,
+      "silhouette": 0.5599706768989563,
+      "inertia": 153622.125
+    },
+    {
+      "k": 7,
+      "silhouette": 0.553765058517456,
+      "inertia": 140084.0
+    },
+    {
+      "k": 8,
+      "silhouette": 0.5531150102615356,
+      "inertia": 120680.2109375
+    }
+  ],
+  "clusters": [
+    {
+      "cluster": 0,
+      "sessions": 2487,
+      "share": 0.2163737602227249,
+      "composition": {
+        "normal": 0,
+        "anomaly": 2487,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 78,
+        "anomaly": 464
+      },
+      "top_features": [
+        {
+          "feature": "transition_change_ratio",
+          "cluster_mean": 1.0,
+          "overall_anomaly_mean": 0.7555820345878601,
+          "all_sessions_mean": 0.6162066459655762,
+          "z": 1.603337287902832,
+          "measures": "share of consecutive events that change kind"
+        },
+        {
+          "feature": "event_hash_19",
+          "cluster_mean": 0.0,
+          "overall_anomaly_mean": 2.091874122619629,
+          "all_sessions_mean": 2.6818625926971436,
+          "z": -1.564765214920044,
+          "measures": "count of events in hash bucket 19: \"Deleting block <BLOCK> file <PATH>\" / \"writeBlock <BLOCK> received exception java.io.IOException: Could not read from stream\""
+        },
+        {
+          "feature": "event_hash_15",
+          "cluster_mean": 1.0,
+          "overall_anomaly_mean": 2.5716025829315186,
+          "all_sessions_mean": 2.986393690109253,
+          "z": -1.5645779371261597,
+          "measures": "count of events in hash bucket 15: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\""
+        },
+        {
+          "feature": "event_entropy",
+          "cluster_mean": 1.0,
+          "overall_anomaly_mean": 2.247349262237549,
+          "all_sessions_mean": 2.833458423614502,
+          "z": -1.4481281042099,
+          "measures": "diversity of the event-kind distribution"
+        },
+        {
+          "feature": "n_event_buckets",
+          "cluster_mean": 2.0,
+          "overall_anomaly_mean": 6.183226108551025,
+          "all_sessions_mean": 7.789596080780029,
+          "z": -1.3486987352371216,
+          "measures": "number of distinct event kinds"
+        }
+      ],
+      "interpretation": "Cluster 0 holds 21.6% of the clustered anomalies. Compared with the overall anomaly population, its members show: transition_change_ratio is above the anomaly average (1 vs 0.756): frequent switching between event kinds; event_hash_19 is below the anomaly average (0 vs 2.09): fewer events like \"Deleting block <BLOCK> file <PATH>\" / \"writeBlock <BLOCK> received exception java.io.IOException: Could not read from stream\"; event_hash_15 is below the anomaly average (1 vs 2.57): fewer events like \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\"; event_entropy is below the anomaly average (1 vs 2.25): dominated by one event kind; n_event_buckets is below the anomaly average (2 vs 6.18): only a few kinds of event. The sessions nearest its centre are dominated by: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" (1.0/session), \"BLOCK* NameSystem.allocateBlock: <PATH> <BLOCK>\" (1.0/session). Profile: write chain complete in 0% (anomaly avg 55%) of sessions; mean events 2.0 (anomaly avg 16.1); mean duration 0 (anomaly avg 17,417) s; share of failure-keyword messages 0.0% (anomaly avg 9.3%); mean hosts 1.0 (anomaly avg 3.1).",
+      "typical_events": [
+        {
+          "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+          "per_session": 1.0
+        },
+        {
+          "template": "BLOCK* NameSystem.allocateBlock: <PATH> <BLOCK>",
+          "per_session": 1.0
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "blk_-5087939924532795057",
+          "n_events": 2,
+          "events": [
+            {
+              "time": 1226263090,
+              "level": "INFO",
+              "message": "Receiving block blk_-5087939924532795057 src: /10.251.202.181:49239 dest: /10.251.202.181:50010"
+            },
+            {
+              "time": 1226263090,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/rand/_temporary/_task_200811092030_0001_m_000028_0/part-00028. blk_-5087939924532795057"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 1.0
+            },
+            {
+              "template": "BLOCK* NameSystem.allocateBlock: <PATH> <BLOCK>",
+              "per_session": 1.0
+            }
+          ]
+        },
+        {
+          "session_id": "blk_8902542273035012990",
+          "n_events": 2,
+          "events": [
+            {
+              "time": 1226389333,
+              "level": "INFO",
+              "message": "Receiving block blk_8902542273035012990 src: /10.251.70.37:44632 dest: /10.251.70.37:50010"
+            },
+            {
+              "time": 1226389333,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/rand6/_temporary/_task_200811101024_0013_m_001552_0/part-01552. blk_8902542273035012990"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 1.0
+            },
+            {
+              "template": "BLOCK* NameSystem.allocateBlock: <PATH> <BLOCK>",
+              "per_session": 1.0
+            }
+          ]
+        },
+        {
+          "session_id": "blk_-3485229209121165067",
+          "n_events": 2,
+          "events": [
+            {
+              "time": 1226389291,
+              "level": "INFO",
+              "message": "Receiving block blk_-3485229209121165067 src: /10.250.5.161:43143 dest: /10.250.5.161:50010"
+            },
+            {
+              "time": 1226389291,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/rand6/_temporary/_task_200811101024_0013_m_001884_0/part-01884. blk_-3485229209121165067"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 1.0
+            },
+            {
+              "template": "BLOCK* NameSystem.allocateBlock: <PATH> <BLOCK>",
+              "per_session": 1.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cluster": 1,
+      "sessions": 4565,
+      "share": 0.39716373760222723,
+      "composition": {
+        "normal": 0,
+        "anomaly": 4565,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 58396,
+        "anomaly": 416
+      },
+      "top_features": [
+        {
+          "feature": "unacked_writes",
+          "cluster_mean": 0.00043811611249111593,
+          "overall_anomaly_mean": 0.9122150540351868,
+          "all_sessions_mean": 0.033957161009311676,
+          "z": -1.1573575735092163,
+          "measures": "\"receiving\" events minus acknowledgements"
+        },
+        {
+          "feature": "lifecycle_complete",
+          "cluster_mean": 1.0,
+          "overall_anomaly_mean": 0.5500261187553406,
+          "all_sessions_mean": 0.9840354323387146,
+          "z": 0.9044839143753052,
+          "measures": "full allocate/receive/ack/store chain present"
+        },
+        {
+          "feature": "has_delete",
+          "cluster_mean": 0.987294614315033,
+          "overall_anomaly_mean": 0.5448929667472839,
+          "all_sessions_mean": 0.8888930082321167,
+          "z": 0.888390302658081,
+          "measures": "block deletion seen"
+        },
+        {
+          "feature": "event_hash_27",
+          "cluster_mean": 2.9546549320220947,
+          "overall_anomaly_mean": 1.65303635597229,
+          "all_sessions_mean": 2.6652684211730957,
+          "z": 0.872128963470459,
+          "measures": "count of events in hash bucket 27: \"BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>\""
+        },
+        {
+          "feature": "gap_max_s",
+          "cluster_mean": 19582.57421875,
+          "overall_anomaly_mean": 10709.67578125,
+          "all_sessions_mean": 16420.6015625,
+          "z": 0.8481754064559937,
+          "measures": "longest pause between events"
+        }
+      ],
+      "interpretation": "Cluster 1 holds 39.7% of the clustered anomalies. Compared with the overall anomaly population, its members show: unacked_writes is below the anomaly average (0.000438 vs 0.912): few or no unacknowledged writes (acknowledgements keep up with writes); lifecycle_complete is above the anomaly average (1 vs 0.55): the full write chain completed; has_delete is above the anomaly average (0.987 vs 0.545): the block was deleted (lifecycle ran to the end); event_hash_27 is above the anomaly average (2.95 vs 1.65): more events like \"BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>\"; gap_max_s is above the anomaly average (1.96e+04 vs 1.07e+04): at least one long stall mid-session. The sessions nearest its centre are dominated by: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" (3.0/session), \"PacketResponder <N> for block <BLOCK> terminating\" (3.0/session), \"Received block <BLOCK> of size <N> from <PATH>\" (3.0/session). Profile: write chain complete in 100% (anomaly avg 55%) of sessions; mean events 23.6 (anomaly avg 16.1); mean duration 28,819 (anomaly avg 17,417) s; share of failure-keyword messages 7.0% (anomaly avg 9.3%); mean hosts 4.1 (anomaly avg 3.1).",
+      "typical_events": [
+        {
+          "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+          "per_session": 3.0
+        },
+        {
+          "template": "PacketResponder <N> for block <BLOCK> terminating",
+          "per_session": 3.0
+        },
+        {
+          "template": "Received block <BLOCK> of size <N> from <PATH>",
+          "per_session": 3.0
+        },
+        {
+          "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+          "per_session": 3.0
+        },
+        {
+          "template": "BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>",
+          "per_session": 3.0
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "blk_8890233040985796680",
+          "n_events": 22,
+          "events": [
+            {
+              "time": 1226320457,
+              "level": "INFO",
+              "message": "Receiving block blk_8890233040985796680 src: /10.251.199.150:35996 dest: /10.251.199.150:50010"
+            },
+            {
+              "time": 1226320457,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/randtxt2/_temporary/_task_200811101024_0002_m_001656_0/part-01656. blk_8890233040985796680"
+            },
+            {
+              "time": 1226320463,
+              "level": "INFO",
+              "message": "Receiving block blk_8890233040985796680 src: /10.251.123.20:57174 dest: /10.251.123.20:50010"
+            },
+            {
+              "time": 1226320463,
+              "level": "INFO",
+              "message": "Receiving block blk_8890233040985796680 src: /10.251.199.150:46287 dest: /10.251.199.150:50010"
+            },
+            {
+              "time": 1226320486,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_8890233040985796680 terminating"
+            },
+            {
+              "time": 1226320486,
+              "level": "INFO",
+              "message": "Received block blk_8890233040985796680 of size 28501363 from /10.251.123.20"
+            },
+            {
+              "time": 1226320486,
+              "level": "INFO",
+              "message": "PacketResponder 2 for block blk_8890233040985796680 terminating"
+            },
+            {
+              "time": 1226320486,
+              "level": "INFO",
+              "message": "Received block blk_8890233040985796680 of size 28501363 from /10.251.199.150"
+            },
+            {
+              "time": 1226320486,
+              "level": "INFO",
+              "message": "PacketResponder 1 for block blk_8890233040985796680 terminating"
+            },
+            {
+              "time": 1226320486,
+              "level": "INFO",
+              "message": "Received block blk_8890233040985796680 of size 28501363 from /10.251.199.150"
+            },
+            {
+              "time": 1226320486,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.199.150:50010 is added to blk_8890233040985796680 size 28501363"
+            },
+            {
+              "time": 1226320486,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.26.131:50010 is added to blk_8890233040985796680 size 28501363"
+            },
+            {
+              "time": 1226320486,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.123.20:50010 is added to blk_8890233040985796680 size 28501363"
+            },
+            {
+              "time": 1226345795,
+              "level": "WARN",
+              "message": "10.251.123.20:50010:Got exception while serving blk_8890233040985796680 to /10.251.111.209:"
+            },
+            {
+              "time": 1226348598,
+              "level": "INFO",
+              "message": "10.251.26.131:50010 Served block blk_8890233040985796680 to /10.251.26.131"
+            },
+            {
+              "time": 1226370634,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_8890233040985796680 is added to invalidSet of 10.251.123.20:50010"
+            },
+            {
+              "time": 1226370634,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_8890233040985796680 is added to invalidSet of 10.251.199.150:50010"
+            },
+            {
+              "time": 1226370634,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_8890233040985796680 is added to invalidSet of 10.251.26.131:50010"
+            },
+            {
+              "time": 1226370645,
+              "level": "INFO",
+              "message": "Deleting block blk_8890233040985796680 file /mnt/hadoop/dfs/data/current/subdir45/blk_8890233040985796680"
+            },
+            {
+              "time": 1226370781,
+              "level": "WARN",
+              "message": "Unexpected error trying to delete block blk_8890233040985796680. BlockInfo not found in volumeMap."
+            },
+            {
+              "time": 1226370854,
+              "level": "INFO",
+              "message": "Deleting block blk_8890233040985796680 file /mnt/hadoop/dfs/data/current/subdir20/blk_8890233040985796680"
+            },
+            {
+              "time": 1226370862,
+              "level": "INFO",
+              "message": "Deleting block blk_8890233040985796680 file /mnt/hadoop/dfs/data/current/subdir53/blk_8890233040985796680"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 3.0
+            },
+            {
+              "template": "PacketResponder <N> for block <BLOCK> terminating",
+              "per_session": 3.0
+            },
+            {
+              "template": "Received block <BLOCK> of size <N> from <PATH>",
+              "per_session": 3.0
+            },
+            {
+              "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+              "per_session": 3.0
+            },
+            {
+              "template": "BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>",
+              "per_session": 3.0
+            }
+          ]
+        },
+        {
+          "session_id": "blk_7370836319212068210",
+          "n_events": 23,
+          "events": [
+            {
+              "time": 1226320377,
+              "level": "INFO",
+              "message": "Receiving block blk_7370836319212068210 src: /10.251.75.49:45857 dest: /10.251.75.49:50010"
+            },
+            {
+              "time": 1226320377,
+              "level": "INFO",
+              "message": "Receiving block blk_7370836319212068210 src: /10.251.123.20:49258 dest: /10.251.123.20:50010"
+            },
+            {
+              "time": 1226320377,
+              "level": "INFO",
+              "message": "Receiving block blk_7370836319212068210 src: /10.251.123.20:49898 dest: /10.251.123.20:50010"
+            },
+            {
+              "time": 1226320377,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/randtxt2/_temporary/_task_200811101024_0002_m_001982_0/part-01982. blk_7370836319212068210"
+            },
+            {
+              "time": 1226320415,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_7370836319212068210 terminating"
+            },
+            {
+              "time": 1226320415,
+              "level": "INFO",
+              "message": "Received block blk_7370836319212068210 of size 67108864 from /10.251.75.49"
+            },
+            {
+              "time": 1226320415,
+              "level": "INFO",
+              "message": "PacketResponder 1 for block blk_7370836319212068210 terminating"
+            },
+            {
+              "time": 1226320415,
+              "level": "INFO",
+              "message": "Received block blk_7370836319212068210 of size 67108864 from /10.251.123.20"
+            },
+            {
+              "time": 1226320415,
+              "level": "INFO",
+              "message": "PacketResponder 2 for block blk_7370836319212068210 terminating"
+            },
+            {
+              "time": 1226320415,
+              "level": "INFO",
+              "message": "Received block blk_7370836319212068210 of size 67108864 from /10.251.123.20"
+            },
+            {
+              "time": 1226320415,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.107.50:50010 is added to blk_7370836319212068210 size 67108864"
+            },
+            {
+              "time": 1226320416,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.75.49:50010 is added to blk_7370836319212068210 size 67108864"
+            },
+            {
+              "time": 1226320416,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.123.20:50010 is added to blk_7370836319212068210 size 67108864"
+            },
+            {
+              "time": 1226348192,
+              "level": "INFO",
+              "message": "10.251.75.49:50010 Served block blk_7370836319212068210 to /10.251.75.49"
+            },
+            {
+              "time": 1226348410,
+              "level": "INFO",
+              "message": "10.251.123.20:50010 Served block blk_7370836319212068210 to /10.251.123.20"
+            },
+            {
+              "time": 1226348585,
+              "level": "WARN",
+              "message": "10.251.107.50:50010:Got exception while serving blk_7370836319212068210 to /10.250.6.214:"
+            },
+            {
+              "time": 1226370638,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_7370836319212068210 is added to invalidSet of 10.251.107.50:50010"
+            },
+            {
+              "time": 1226370638,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_7370836319212068210 is added to invalidSet of 10.251.123.20:50010"
+            },
+            {
+              "time": 1226370638,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_7370836319212068210 is added to invalidSet of 10.251.75.49:50010"
+            },
+            {
+              "time": 1226370672,
+              "level": "INFO",
+              "message": "Deleting block blk_7370836319212068210 file /mnt/hadoop/dfs/data/current/subdir44/blk_7370836319212068210"
+            },
+            {
+              "time": 1226370781,
+              "level": "WARN",
+              "message": "Unexpected error trying to delete block blk_7370836319212068210. BlockInfo not found in volumeMap."
+            },
+            {
+              "time": 1226370810,
+              "level": "INFO",
+              "message": "Deleting block blk_7370836319212068210 file /mnt/hadoop/dfs/data/current/subdir54/blk_7370836319212068210"
+            },
+            {
+              "time": 1226371063,
+              "level": "INFO",
+              "message": "Deleting block blk_7370836319212068210 file /mnt/hadoop/dfs/data/current/subdir45/blk_7370836319212068210"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 3.0
+            },
+            {
+              "template": "PacketResponder <N> for block <BLOCK> terminating",
+              "per_session": 3.0
+            },
+            {
+              "template": "Received block <BLOCK> of size <N> from <PATH>",
+              "per_session": 3.0
+            },
+            {
+              "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+              "per_session": 3.0
+            }
+          ]
+        },
+        {
+          "session_id": "blk_7380819197454419172",
+          "n_events": 23,
+          "events": [
+            {
+              "time": 1226320274,
+              "level": "INFO",
+              "message": "Receiving block blk_7380819197454419172 src: /10.251.31.5:42841 dest: /10.251.31.5:50010"
+            },
+            {
+              "time": 1226320274,
+              "level": "INFO",
+              "message": "Receiving block blk_7380819197454419172 src: /10.250.7.146:49664 dest: /10.250.7.146:50010"
+            },
+            {
+              "time": 1226320274,
+              "level": "INFO",
+              "message": "Receiving block blk_7380819197454419172 src: /10.250.7.146:47679 dest: /10.250.7.146:50010"
+            },
+            {
+              "time": 1226320274,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/randtxt2/_temporary/_task_200811101024_0002_m_001898_0/part-01898. blk_7380819197454419172"
+            },
+            {
+              "time": 1226320308,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_7380819197454419172 terminating"
+            },
+            {
+              "time": 1226320308,
+              "level": "INFO",
+              "message": "Received block blk_7380819197454419172 of size 67108864 from /10.251.31.5"
+            },
+            {
+              "time": 1226320308,
+              "level": "INFO",
+              "message": "PacketResponder 2 for block blk_7380819197454419172 terminating"
+            },
+            {
+              "time": 1226320308,
+              "level": "INFO",
+              "message": "Received block blk_7380819197454419172 of size 67108864 from /10.250.7.146"
+            },
+            {
+              "time": 1226320308,
+              "level": "INFO",
+              "message": "PacketResponder 1 for block blk_7380819197454419172 terminating"
+            },
+            {
+              "time": 1226320308,
+              "level": "INFO",
+              "message": "Received block blk_7380819197454419172 of size 67108864 from /10.250.7.146"
+            },
+            {
+              "time": 1226320308,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.14.224:50010 is added to blk_7380819197454419172 size 67108864"
+            },
+            {
+              "time": 1226320308,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.7.146:50010 is added to blk_7380819197454419172 size 67108864"
+            },
+            {
+              "time": 1226320308,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.31.5:50010 is added to blk_7380819197454419172 size 67108864"
+            },
+            {
+              "time": 1226347513,
+              "level": "INFO",
+              "message": "10.250.14.224:50010 Served block blk_7380819197454419172 to /10.250.14.224"
+            },
+            {
+              "time": 1226347605,
+              "level": "INFO",
+              "message": "10.251.31.5:50010 Served block blk_7380819197454419172 to /10.251.123.132"
+            },
+            {
+              "time": 1226347839,
+              "level": "WARN",
+              "message": "10.250.7.146:50010:Got exception while serving blk_7380819197454419172 to /10.250.7.146:"
+            },
+            {
+              "time": 1226370637,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_7380819197454419172 is added to invalidSet of 10.250.14.224:50010"
+            },
+            {
+              "time": 1226370637,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_7380819197454419172 is added to invalidSet of 10.250.7.146:50010"
+            },
+            {
+              "time": 1226370637,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_7380819197454419172 is added to invalidSet of 10.251.31.5:50010"
+            },
+            {
+              "time": 1226370693,
+              "level": "INFO",
+              "message": "Deleting block blk_7380819197454419172 file /mnt/hadoop/dfs/data/current/subdir24/blk_7380819197454419172"
+            },
+            {
+              "time": 1226370786,
+              "level": "WARN",
+              "message": "Unexpected error trying to delete block blk_7380819197454419172. BlockInfo not found in volumeMap."
+            },
+            {
+              "time": 1226370840,
+              "level": "INFO",
+              "message": "Deleting block blk_7380819197454419172 file /mnt/hadoop/dfs/data/current/subdir12/blk_7380819197454419172"
+            },
+            {
+              "time": 1226370980,
+              "level": "INFO",
+              "message": "Deleting block blk_7380819197454419172 file /mnt/hadoop/dfs/data/current/subdir28/blk_7380819197454419172"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 3.0
+            },
+            {
+              "template": "PacketResponder <N> for block <BLOCK> terminating",
+              "per_session": 3.0
+            },
+            {
+              "template": "Received block <BLOCK> of size <N> from <PATH>",
+              "per_session": 3.0
+            },
+            {
+              "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+              "per_session": 3.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cluster": 2,
+      "sessions": 2686,
+      "share": 0.23368714111710456,
+      "composition": {
+        "normal": 0,
+        "anomaly": 2686,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 54376,
+        "anomaly": 654
+      },
+      "top_features": [
+        {
+          "feature": "keyword_error_ratio",
+          "cluster_mean": 0.2521359622478485,
+          "overall_anomaly_mean": 0.09335900098085403,
+          "all_sessions_mean": 0.04315080866217613,
+          "z": 1.5620509386062622,
+          "measures": "share of messages containing error/exception/timeout/fail words"
+        },
+        {
+          "feature": "events_per_min",
+          "cluster_mean": 3.7459471225738525,
+          "overall_anomaly_mean": 1.5475834608078003,
+          "all_sessions_mean": 1.099828839302063,
+          "z": 1.2683806419372559,
+          "measures": "event rate"
+        },
+        {
+          "feature": "unacked_writes",
+          "cluster_mean": 1.9869694709777832,
+          "overall_anomaly_mean": 0.9122150540351868,
+          "all_sessions_mean": 0.033957161009311676,
+          "z": 1.1737593412399292,
+          "measures": "\"receiving\" events minus acknowledgements"
+        },
+        {
+          "feature": "lifecycle_complete",
+          "cluster_mean": 0.00037230082671158016,
+          "overall_anomaly_mean": 0.5500261187553406,
+          "all_sessions_mean": 0.9840354323387146,
+          "z": -1.1048494577407837,
+          "measures": "full allocate/receive/ack/store chain present"
+        },
+        {
+          "feature": "has_delete",
+          "cluster_mean": 0.0,
+          "overall_anomaly_mean": 0.5448929667472839,
+          "all_sessions_mean": 0.8888930082321167,
+          "z": -1.0942060947418213,
+          "measures": "block deletion seen"
+        }
+      ],
+      "interpretation": "Cluster 2 holds 23.4% of the clustered anomalies. Compared with the overall anomaly population, its members show: keyword_error_ratio is above the anomaly average (0.252 vs 0.0934): many failure messages; events_per_min is above the anomaly average (3.75 vs 1.55): dense bursts of events; unacked_writes is above the anomaly average (1.99 vs 0.912): writes started but never acknowledged; lifecycle_complete is below the anomaly average (0.000372 vs 0.55): the write chain did not complete; has_delete is below the anomaly average (0 vs 0.545): no deletion event (lifecycle did not reach the end). The sessions nearest its centre are dominated by: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" (2.0/session), \"BLOCK* NameSystem.allocateBlock: <PATH> <BLOCK>\" (1.0/session), \"writeBlock <BLOCK> received exception java.io.IOException: Could not read from stream\" (1.0/session). Profile: write chain complete in 0% (anomaly avg 55%) of sessions; mean events 4.1 (anomaly avg 16.1); mean duration 8 (anomaly avg 17,417) s; share of failure-keyword messages 25.2% (anomaly avg 9.3%); mean hosts 1.0 (anomaly avg 3.1).",
+      "typical_events": [
+        {
+          "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+          "per_session": 2.0
+        },
+        {
+          "template": "BLOCK* NameSystem.allocateBlock: <PATH> <BLOCK>",
+          "per_session": 1.0
+        },
+        {
+          "template": "writeBlock <BLOCK> received exception java.io.IOException: Could not read from stream",
+          "per_session": 1.0
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "blk_-6693753286275562803",
+          "n_events": 4,
+          "events": [
+            {
+              "time": 1226388528,
+              "level": "INFO",
+              "message": "Receiving block blk_-6693753286275562803 src: /10.251.202.181:39671 dest: /10.251.202.181:50010"
+            },
+            {
+              "time": 1226388528,
+              "level": "INFO",
+              "message": "Receiving block blk_-6693753286275562803 src: /10.251.202.181:37173 dest: /10.251.202.181:50010"
+            },
+            {
+              "time": 1226388528,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/rand6/_temporary/_task_200811101024_0013_m_001305_0/part-01305. blk_-6693753286275562803"
+            },
+            {
+              "time": 1226388532,
+              "level": "INFO",
+              "message": "writeBlock blk_-6693753286275562803 received exception java.io.IOException: Could not read from stream"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 2.0
+            },
+            {
+              "template": "BLOCK* NameSystem.allocateBlock: <PATH> <BLOCK>",
+              "per_session": 1.0
+            },
+            {
+              "template": "writeBlock <BLOCK> received exception java.io.IOException: Could not read from stream",
+              "per_session": 1.0
+            }
+          ]
+        },
+        {
+          "session_id": "blk_8580160985690428930",
+          "n_events": 4,
+          "events": [
+            {
+              "time": 1226388475,
+              "level": "INFO",
+              "message": "Receiving block blk_8580160985690428930 src: /10.251.42.207:41297 dest: /10.251.42.207:50010"
+            },
+            {
+              "time": 1226388475,
+              "level": "INFO",
+              "message": "Receiving block blk_8580160985690428930 src: /10.251.42.207:49326 dest: /10.251.42.207:50010"
+            },
+            {
+              "time": 1226388475,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/rand6/_temporary/_task_200811101024_0013_m_000965_0/part-00965. blk_8580160985690428930"
+            },
+            {
+              "time": 1226388479,
+              "level": "INFO",
+              "message": "writeBlock blk_8580160985690428930 received exception java.io.IOException: Could not read from stream"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 2.0
+            },
+            {
+              "template": "BLOCK* NameSystem.allocateBlock: <PATH> <BLOCK>",
+              "per_session": 1.0
+            },
+            {
+              "template": "writeBlock <BLOCK> received exception java.io.IOException: Could not read from stream",
+              "per_session": 1.0
+            }
+          ]
+        },
+        {
+          "session_id": "blk_-4875059643265521322",
+          "n_events": 4,
+          "events": [
+            {
+              "time": 1226388439,
+              "level": "INFO",
+              "message": "Receiving block blk_-4875059643265521322 src: /10.251.111.209:52550 dest: /10.251.111.209:50010"
+            },
+            {
+              "time": 1226388439,
+              "level": "INFO",
+              "message": "Receiving block blk_-4875059643265521322 src: /10.251.111.209:37541 dest: /10.251.111.209:50010"
+            },
+            {
+              "time": 1226388439,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/rand6/_temporary/_task_200811101024_0013_m_001238_0/part-01238. blk_-4875059643265521322"
+            },
+            {
+              "time": 1226388443,
+              "level": "INFO",
+              "message": "writeBlock blk_-4875059643265521322 received exception java.io.IOException: Could not read from stream"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 2.0
+            },
+            {
+              "template": "BLOCK* NameSystem.allocateBlock: <PATH> <BLOCK>",
+              "per_session": 1.0
+            },
+            {
+              "template": "writeBlock <BLOCK> received exception java.io.IOException: Could not read from stream",
+              "per_session": 1.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cluster": 3,
+      "sessions": 1732,
+      "share": 0.15068731512093267,
+      "composition": {
+        "normal": 0,
+        "anomaly": 1732,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 488,
+        "anomaly": 146
+      },
+      "top_features": [
+        {
+          "feature": "event_hash_26",
+          "cluster_mean": 1.5069284439086914,
+          "overall_anomaly_mean": 0.2295110523700714,
+          "all_sessions_mean": 0.009735559113323689,
+          "z": 2.287147045135498,
+          "measures": "count of events in hash bucket 26: \"Received block <BLOCK> src: <PATH> dest: <PATH> of size <N>\" / \"writeBlock <BLOCK> received exception java.net.NoRouteToHostException: No route to host\""
+        },
+        {
+          "feature": "uncommitted_acks",
+          "cluster_mean": -2.4959583282470703,
+          "overall_anomaly_mean": -0.47798851132392883,
+          "all_sessions_mean": -0.01937851682305336,
+          "z": -1.9113191366195679,
+          "measures": "acknowledgements minus \"stored\" confirmations"
+        },
+        {
+          "feature": "replica_deficit",
+          "cluster_mean": -2.4959583282470703,
+          "overall_anomaly_mean": 0.8665390610694885,
+          "all_sessions_mean": 0.02832387201488018,
+          "z": -1.5235332250595093,
+          "measures": "3 minus number of \"stored\" confirmations"
+        },
+        {
+          "feature": "event_hash_15",
+          "cluster_mean": 4.507505893707275,
+          "overall_anomaly_mean": 2.5716025829315186,
+          "all_sessions_mean": 2.986393690109253,
+          "z": 1.4381741285324097,
+          "measures": "count of events in hash bucket 15: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\""
+        },
+        {
+          "feature": "n_hosts",
+          "cluster_mean": 6.286951541900635,
+          "overall_anomaly_mean": 3.0504610538482666,
+          "all_sessions_mean": 3.973012685775757,
+          "z": 1.274606466293335,
+          "measures": "distinct hosts involved"
+        }
+      ],
+      "interpretation": "Cluster 3 holds 15.1% of the clustered anomalies. Compared with the overall anomaly population, its members show: event_hash_26 is above the anomaly average (1.51 vs 0.23): more events like \"Received block <BLOCK> src: <PATH> dest: <PATH> of size <N>\" / \"writeBlock <BLOCK> received exception java.net.NoRouteToHostException: No route to host\"; uncommitted_acks is below the anomaly average (-2.5 vs -0.478): more stored confirmations than acknowledgements; replica_deficit is below the anomaly average (-2.5 vs 0.867): more confirmations than expected (duplicate or re-replicated copies); event_hash_15 is above the anomaly average (4.51 vs 2.57): more events like \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\"; n_hosts is above the anomaly average (6.29 vs 3.05): more hosts than usual (extra replicas or retries on other nodes). The sessions nearest its centre are dominated by: \"BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>\" (6.8/session), \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" (4.9/session), \"Deleting block <BLOCK> file <PATH>\" (4.9/session). Profile: write chain complete in 100% (anomaly avg 55%) of sessions; mean events 35.2 (anomaly avg 16.1); mean duration 39,279 (anomaly avg 17,417) s; share of failure-keyword messages 4.3% (anomaly avg 9.3%); mean hosts 6.3 (anomaly avg 3.1).",
+      "typical_events": [
+        {
+          "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+          "per_session": 6.8
+        },
+        {
+          "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+          "per_session": 4.9
+        },
+        {
+          "template": "Deleting block <BLOCK> file <PATH>",
+          "per_session": 4.9
+        },
+        {
+          "template": "PacketResponder <N> for block <BLOCK> terminating",
+          "per_session": 3.0
+        },
+        {
+          "template": "Received block <BLOCK> of size <N> from <PATH>",
+          "per_session": 3.0
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "blk_7221246348217161430",
+          "n_events": 31,
+          "events": [
+            {
+              "time": 1226313154,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/rand/_temporary/_task_200811101024_0001_m_000173_0/part-00173. blk_7221246348217161430"
+            },
+            {
+              "time": 1226313154,
+              "level": "INFO",
+              "message": "Receiving block blk_7221246348217161430 src: /10.251.39.160:42961 dest: /10.251.39.160:50010"
+            },
+            {
+              "time": 1226313155,
+              "level": "INFO",
+              "message": "Receiving block blk_7221246348217161430 src: /10.251.39.160:53102 dest: /10.251.39.160:50010"
+            },
+            {
+              "time": 1226313155,
+              "level": "INFO",
+              "message": "Receiving block blk_7221246348217161430 src: /10.251.109.236:53602 dest: /10.251.109.236:50010"
+            },
+            {
+              "time": 1226313184,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_7221246348217161430 terminating"
+            },
+            {
+              "time": 1226313184,
+              "level": "INFO",
+              "message": "Received block blk_7221246348217161430 of size 67108864 from /10.251.109.236"
+            },
+            {
+              "time": 1226313185,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.109.236:50010 is added to blk_7221246348217161430 size 67108864"
+            },
+            {
+              "time": 1226313185,
+              "level": "INFO",
+              "message": "PacketResponder 1 for block blk_7221246348217161430 terminating"
+            },
+            {
+              "time": 1226313185,
+              "level": "INFO",
+              "message": "Received block blk_7221246348217161430 of size 67108864 from /10.251.39.160"
+            },
+            {
+              "time": 1226313192,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.39.160:50010 is added to blk_7221246348217161430 size 67108864"
+            },
+            {
+              "time": 1226313192,
+              "level": "INFO",
+              "message": "PacketResponder 2 for block blk_7221246348217161430 terminating"
+            },
+            {
+              "time": 1226313192,
+              "level": "INFO",
+              "message": "Received block blk_7221246348217161430 of size 67108864 from /10.251.39.160"
+            },
+            {
+              "time": 1226313199,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.5.161:50010 is added to blk_7221246348217161430 size 67108864"
+            },
+            {
+              "time": 1226313877,
+              "level": "INFO",
+              "message": "10.251.109.236:50010 Starting thread to transfer block blk_7221246348217161430 to 10.251.70.5:50010"
+            },
+            {
+              "time": 1226313877,
+              "level": "INFO",
+              "message": "BLOCK* ask 10.251.109.236:50010 to replicate blk_7221246348217161430 to datanode(s) 10.251.70.5:50010"
+            },
+            {
+              "time": 1226313878,
+              "level": "INFO",
+              "message": "Receiving block blk_7221246348217161430 src: /10.251.109.236:44747 dest: /10.251.109.236:50010"
+            },
+            {
+              "time": 1226313896,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.70.5:50010 is added to blk_7221246348217161430 size 67108864"
+            },
+            {
+              "time": 1226313896,
+              "level": "INFO",
+              "message": "10.251.109.236:50010:Transmitted block blk_7221246348217161430 to /10.251.70.5:50010"
+            },
+            {
+              "time": 1226313896,
+              "level": "INFO",
+              "message": "Received block blk_7221246348217161430 src: /10.251.109.236:44747 dest: /10.251.109.236:50010 of size 67108864"
+            },
+            {
+              "time": 1226314418,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.39.160:50010 is added to blk_7221246348217161430 size 67108864"
+            },
+            {
+              "time": 1226314428,
+              "level": "INFO",
+              "message": "Deleting block blk_7221246348217161430 file /mnt/hadoop/dfs/data/current/subdir57/blk_7221246348217161430"
+            },
+            {
+              "time": 1226318690,
+              "level": "INFO",
+              "message": "Verification succeeded for blk_7221246348217161430"
+            },
+            {
+              "time": 1226321331,
+              "level": "WARN",
+              "message": "10.251.109.236:50010:Got exception while serving blk_7221246348217161430 to /10.250.6.214:"
+            },
+            {
+              "time": 1226321339,
+              "level": "WARN",
+              "message": "10.251.70.5:50010:Got exception while serving blk_7221246348217161430 to /10.251.38.214:"
+            },
+            {
+              "time": 1226321350,
+              "level": "INFO",
+              "message": "10.251.70.5:50010 Served block blk_7221246348217161430 to /10.251.38.214"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+              "per_session": 6.8
+            },
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 4.9
+            },
+            {
+              "template": "Deleting block <BLOCK> file <PATH>",
+              "per_session": 4.9
+            },
+            {
+              "template": "PacketResponder <N> for block <BLOCK> terminating",
+              "per_session": 3.0
+            },
+            {
+              "template": "Received block <BLOCK> of size <N> from <PATH>",
+              "per_session": 3.0
+            }
+          ]
+        },
+        {
+          "session_id": "blk_7342022561458178142",
+          "n_events": 38,
+          "events": [
+            {
+              "time": 1226320538,
+              "level": "INFO",
+              "message": "Receiving block blk_7342022561458178142 src: /10.251.27.63:38521 dest: /10.251.27.63:50010"
+            },
+            {
+              "time": 1226320538,
+              "level": "INFO",
+              "message": "Receiving block blk_7342022561458178142 src: /10.251.27.63:41931 dest: /10.251.27.63:50010"
+            },
+            {
+              "time": 1226320538,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/randtxt2/_temporary/_task_200811101024_0002_m_001902_0/part-01902. blk_7342022561458178142"
+            },
+            {
+              "time": 1226320539,
+              "level": "INFO",
+              "message": "Receiving block blk_7342022561458178142 src: /10.251.90.134:44005 dest: /10.251.90.134:50010"
+            },
+            {
+              "time": 1226320550,
+              "level": "INFO",
+              "message": "PacketResponder 1 for block blk_7342022561458178142 terminating"
+            },
+            {
+              "time": 1226320550,
+              "level": "INFO",
+              "message": "Received block blk_7342022561458178142 of size 28493428 from /10.251.27.63"
+            },
+            {
+              "time": 1226320550,
+              "level": "INFO",
+              "message": "PacketResponder 2 for block blk_7342022561458178142 terminating"
+            },
+            {
+              "time": 1226320550,
+              "level": "INFO",
+              "message": "Received block blk_7342022561458178142 of size 28493428 from /10.251.27.63"
+            },
+            {
+              "time": 1226320550,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.90.134:50010 is added to blk_7342022561458178142 size 28493428"
+            },
+            {
+              "time": 1226320550,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.123.33:50010 is added to blk_7342022561458178142 size 28493428"
+            },
+            {
+              "time": 1226320550,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.27.63:50010 is added to blk_7342022561458178142 size 28493428"
+            },
+            {
+              "time": 1226320550,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_7342022561458178142 terminating"
+            },
+            {
+              "time": 1226320550,
+              "level": "INFO",
+              "message": "Received block blk_7342022561458178142 of size 28493428 from /10.251.90.134"
+            },
+            {
+              "time": 1226330405,
+              "level": "INFO",
+              "message": "Verification succeeded for blk_7342022561458178142"
+            },
+            {
+              "time": 1226347747,
+              "level": "WARN",
+              "message": "10.251.90.134:50010:Got exception while serving blk_7342022561458178142 to /10.251.111.130:"
+            },
+            {
+              "time": 1226348766,
+              "level": "INFO",
+              "message": "10.251.27.63:50010 Served block blk_7342022561458178142 to /10.251.27.63"
+            },
+            {
+              "time": 1226351678,
+              "level": "INFO",
+              "message": "BLOCK* ask 10.251.90.134:50010 to replicate blk_7342022561458178142 to datanode(s) 10.250.7.96:50010"
+            },
+            {
+              "time": 1226351732,
+              "level": "INFO",
+              "message": "Receiving block blk_7342022561458178142 src: /10.251.90.134:49326 dest: /10.251.90.134:50010"
+            },
+            {
+              "time": 1226351732,
+              "level": "INFO",
+              "message": "10.251.90.134:50010 Starting thread to transfer block blk_7342022561458178142 to 10.250.7.96:50010"
+            },
+            {
+              "time": 1226351746,
+              "level": "INFO",
+              "message": "10.251.90.134:50010:Transmitted block blk_7342022561458178142 to /10.250.7.96:50010"
+            },
+            {
+              "time": 1226351746,
+              "level": "INFO",
+              "message": "Received block blk_7342022561458178142 src: /10.251.90.134:49326 dest: /10.251.90.134:50010 of size 28493428"
+            },
+            {
+              "time": 1226351746,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.7.96:50010 is added to blk_7342022561458178142 size 28493428"
+            },
+            {
+              "time": 1226352309,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.123.33:50010 is added to blk_7342022561458178142 size 28493428"
+            },
+            {
+              "time": 1226352314,
+              "level": "INFO",
+              "message": "Deleting block blk_7342022561458178142 file /mnt/hadoop/dfs/data/current/subdir15/blk_7342022561458178142"
+            },
+            {
+              "time": 1226355581,
+              "level": "INFO",
+              "message": "BLOCK* ask 10.250.7.96:50010 to replicate blk_7342022561458178142 to datanode(s) 10.251.214.67:50010"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+              "per_session": 7.0
+            },
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 5.0
+            },
+            {
+              "template": "Deleting block <BLOCK> file <PATH>",
+              "per_session": 5.0
+            },
+            {
+              "template": "PacketResponder <N> for block <BLOCK> terminating",
+              "per_session": 3.0
+            }
+          ]
+        },
+        {
+          "session_id": "blk_7744954898081029105",
+          "n_events": 38,
+          "events": [
+            {
+              "time": 1226320380,
+              "level": "INFO",
+              "message": "Receiving block blk_7744954898081029105 src: /10.251.75.228:35953 dest: /10.251.75.228:50010"
+            },
+            {
+              "time": 1226320380,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/randtxt2/_temporary/_task_200811101024_0002_m_001703_0/part-01703. blk_7744954898081029105"
+            },
+            {
+              "time": 1226320381,
+              "level": "INFO",
+              "message": "Receiving block blk_7744954898081029105 src: /10.251.75.228:43795 dest: /10.251.75.228:50010"
+            },
+            {
+              "time": 1226320381,
+              "level": "INFO",
+              "message": "Receiving block blk_7744954898081029105 src: /10.251.67.211:43787 dest: /10.251.67.211:50010"
+            },
+            {
+              "time": 1226320391,
+              "level": "INFO",
+              "message": "PacketResponder 2 for block blk_7744954898081029105 terminating"
+            },
+            {
+              "time": 1226320391,
+              "level": "INFO",
+              "message": "Received block blk_7744954898081029105 of size 28490060 from /10.251.75.228"
+            },
+            {
+              "time": 1226320391,
+              "level": "INFO",
+              "message": "PacketResponder 1 for block blk_7744954898081029105 terminating"
+            },
+            {
+              "time": 1226320391,
+              "level": "INFO",
+              "message": "Received block blk_7744954898081029105 of size 28490060 from /10.251.75.228"
+            },
+            {
+              "time": 1226320391,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.67.211:50010 is added to blk_7744954898081029105 size 28490060"
+            },
+            {
+              "time": 1226320391,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.75.228:50010 is added to blk_7744954898081029105 size 28490060"
+            },
+            {
+              "time": 1226320391,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.123.33:50010 is added to blk_7744954898081029105 size 28490060"
+            },
+            {
+              "time": 1226320391,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_7744954898081029105 terminating"
+            },
+            {
+              "time": 1226320391,
+              "level": "INFO",
+              "message": "Received block blk_7744954898081029105 of size 28490060 from /10.251.67.211"
+            },
+            {
+              "time": 1226342626,
+              "level": "INFO",
+              "message": "Verification succeeded for blk_7744954898081029105"
+            },
+            {
+              "time": 1226346271,
+              "level": "WARN",
+              "message": "10.251.75.228:50010:Got exception while serving blk_7744954898081029105 to /10.250.5.237:"
+            },
+            {
+              "time": 1226348830,
+              "level": "INFO",
+              "message": "10.251.75.228:50010 Served block blk_7744954898081029105 to /10.251.75.228"
+            },
+            {
+              "time": 1226351702,
+              "level": "INFO",
+              "message": "BLOCK* ask 10.251.67.211:50010 to replicate blk_7744954898081029105 to datanode(s) 10.251.105.189:50010"
+            },
+            {
+              "time": 1226351762,
+              "level": "INFO",
+              "message": "Receiving block blk_7744954898081029105 src: /10.251.67.211:33591 dest: /10.251.67.211:50010"
+            },
+            {
+              "time": 1226351762,
+              "level": "INFO",
+              "message": "10.251.67.211:50010 Starting thread to transfer block blk_7744954898081029105 to 10.251.105.189:50010"
+            },
+            {
+              "time": 1226351778,
+              "level": "INFO",
+              "message": "Received block blk_7744954898081029105 src: /10.251.67.211:33591 dest: /10.251.67.211:50010 of size 28490060"
+            },
+            {
+              "time": 1226351778,
+              "level": "INFO",
+              "message": "10.251.67.211:50010:Transmitted block blk_7744954898081029105 to /10.251.105.189:50010"
+            },
+            {
+              "time": 1226351778,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.105.189:50010 is added to blk_7744954898081029105 size 28490060"
+            },
+            {
+              "time": 1226352309,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.123.33:50010 is added to blk_7744954898081029105 size 28490060"
+            },
+            {
+              "time": 1226352318,
+              "level": "INFO",
+              "message": "Deleting block blk_7744954898081029105 file /mnt/hadoop/dfs/data/current/subdir4/blk_7744954898081029105"
+            },
+            {
+              "time": 1226355581,
+              "level": "INFO",
+              "message": "BLOCK* ask 10.251.75.228:50010 to replicate blk_7744954898081029105 to datanode(s) 10.251.73.188:50010"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+              "per_session": 7.0
+            },
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 5.0
+            },
+            {
+              "template": "Deleting block <BLOCK> file <PATH>",
+              "per_session": 5.0
+            },
+            {
+              "template": "PacketResponder <N> for block <BLOCK> terminating",
+              "per_session": 3.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cluster": 4,
+      "sessions": 16,
+      "share": 0.001392030624673743,
+      "composition": {
+        "normal": 0,
+        "anomaly": 16,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 0,
+        "anomaly": 0
+      },
+      "top_features": [
+        {
+          "feature": "event_hash_24",
+          "cluster_mean": 2.5625,
+          "overall_anomaly_mean": 0.003567078383639455,
+          "all_sessions_mean": 0.0001265561004402116,
+          "z": 26.552248001098633,
+          "measures": "count of events in hash bucket 24: \"Changing block file offset of block <BLOCK> from <N> to <N> meta file offset to <N>\" / \"<IP>:Exception writing block <BLOCK> to mirror <IP>\" (bucket shared by several event kinds)"
+        },
+        {
+          "feature": "event_hash_18",
+          "cluster_mean": 1.125,
+          "overall_anomaly_mean": 0.001566034508869052,
+          "all_sessions_mean": 5.556121323024854e-05,
+          "z": 23.275184631347656,
+          "measures": "count of events in hash bucket 18: \"PacketResponder <BLOCK> <N> Exception java.net.SocketTimeoutException: <N> millis timeout while waiting for channel to be ready for read. ch : java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH>\" / \"Exception in receiveBlock for block <BLOCK> java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH> <N> millis timeout left.\" (bucket shared by several event kinds)"
+        },
+        {
+          "feature": "event_hash_07",
+          "cluster_mean": 1.8125,
+          "overall_anomaly_mean": 0.004437097813934088,
+          "all_sessions_mean": 0.00015742344839964062,
+          "z": 20.660497665405273,
+          "measures": "count of events in hash bucket 07: \"Exception in receiveBlock for block <BLOCK> java.io.IOException: Connection reset by peer\""
+        },
+        {
+          "feature": "event_hash_30",
+          "cluster_mean": 0.25,
+          "overall_anomaly_mean": 0.00034800765570253134,
+          "all_sessions_mean": 1.2346936273388565e-05,
+          "z": 13.384932518005371,
+          "measures": "count of events in hash bucket 30: \"writeBlock <BLOCK> received exception java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH> <N> millis timeout left.\""
+        },
+        {
+          "feature": "event_hash_03",
+          "cluster_mean": 0.1875,
+          "overall_anomaly_mean": 0.0002610057417768985,
+          "all_sessions_mean": 9.260202205041423e-06,
+          "z": 11.59118938446045,
+          "measures": "count of events in hash bucket 03: \"PacketResponder <BLOCK> <N> Exception java.io.IOException: Connection reset by peer\""
+        }
+      ],
+      "interpretation": "Cluster 4 holds 0.1% of the clustered anomalies. Compared with the overall anomaly population, its members show: event_hash_24 is above the anomaly average (2.56 vs 0.00357): more events like \"Changing block file offset of block <BLOCK> from <N> to <N> meta file offset to <N>\" / \"<IP>:Exception writing block <BLOCK> to mirror <IP>\" (bucket shared by several event kinds); event_hash_18 is above the anomaly average (1.12 vs 0.00157): more events like \"PacketResponder <BLOCK> <N> Exception java.net.SocketTimeoutException: <N> millis timeout while waiting for channel to be ready for read. ch : java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH>\" / \"Exception in receiveBlock for block <BLOCK> java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH> <N> millis timeout left.\" (bucket shared by several event kinds); event_hash_07 is above the anomaly average (1.81 vs 0.00444): more events like \"Exception in receiveBlock for block <BLOCK> java.io.IOException: Connection reset by peer\"; event_hash_30 is above the anomaly average (0.25 vs 0.000348): more events like \"writeBlock <BLOCK> received exception java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH> <N> millis timeout left.\"; event_hash_03 is above the anomaly average (0.188 vs 0.000261): more events like \"PacketResponder <BLOCK> <N> Exception java.io.IOException: Connection reset by peer\". The sessions nearest its centre are dominated by: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" (6.8/session), \"PacketResponder <N> for block <BLOCK> terminating\" (3.7/session), \"BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>\" (3.1/session). Profile: write chain complete in 100% (anomaly avg 55%) of sessions; mean events 39.9 (anomaly avg 16.1); mean duration 15,734 (anomaly avg 17,417) s; share of failure-keyword messages 22.2% (anomaly avg 9.3%); mean hosts 5.2 (anomaly avg 3.1).",
+      "typical_events": [
+        {
+          "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+          "per_session": 6.8
+        },
+        {
+          "template": "PacketResponder <N> for block <BLOCK> terminating",
+          "per_session": 3.7
+        },
+        {
+          "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+          "per_session": 3.1
+        },
+        {
+          "template": "Deleting block <BLOCK> file <PATH>",
+          "per_session": 3.1
+        },
+        {
+          "template": "BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>",
+          "per_session": 3.0
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "blk_-4380884313697280861",
+          "n_events": 36,
+          "events": [
+            {
+              "time": 1226374274,
+              "level": "INFO",
+              "message": "Receiving block blk_-4380884313697280861 src: /10.251.193.224:46827 dest: /10.251.193.224:50010"
+            },
+            {
+              "time": 1226374274,
+              "level": "INFO",
+              "message": "Receiving block blk_-4380884313697280861 src: /10.251.193.224:58661 dest: /10.251.193.224:50010"
+            },
+            {
+              "time": 1226374274,
+              "level": "INFO",
+              "message": "Receiving block blk_-4380884313697280861 src: /10.251.107.50:40367 dest: /10.251.107.50:50010"
+            },
+            {
+              "time": 1226374274,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/rand4/_temporary/_task_200811101024_0009_m_001708_1/part-01708. blk_-4380884313697280861"
+            },
+            {
+              "time": 1226374349,
+              "level": "INFO",
+              "message": "PacketResponder 1 for block blk_-4380884313697280861 terminating"
+            },
+            {
+              "time": 1226374349,
+              "level": "INFO",
+              "message": "PacketResponder blk_-4380884313697280861 1 Exception java.net.SocketTimeoutException: 60000 millis timeout while waiting for channel to be ready for read. ch : java.nio.channels.SocketChannel[connecte"
+            },
+            {
+              "time": 1226374349,
+              "level": "INFO",
+              "message": "PacketResponder 2 for block blk_-4380884313697280861 terminating"
+            },
+            {
+              "time": 1226374667,
+              "level": "INFO",
+              "message": "10.251.107.50:50010:Exception writing block blk_-4380884313697280861 to mirror 10.251.30.85:50010"
+            },
+            {
+              "time": 1226374667,
+              "level": "INFO",
+              "message": "Exception in receiveBlock for block blk_-4380884313697280861 java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226374667,
+              "level": "INFO",
+              "message": "writeBlock blk_-4380884313697280861 received exception java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226374667,
+              "level": "INFO",
+              "message": "Receiving block blk_-4380884313697280861 src: /10.251.193.224:49939 dest: /10.251.193.224:50010"
+            },
+            {
+              "time": 1226374667,
+              "level": "INFO",
+              "message": "writeBlock blk_-4380884313697280861 received exception java.io.IOException: Could not read from stream"
+            },
+            {
+              "time": 1226374667,
+              "level": "INFO",
+              "message": "Changing block file offset of block blk_-4380884313697280861 from 0 to 28704768 meta file offset to 224263"
+            },
+            {
+              "time": 1226374667,
+              "level": "INFO",
+              "message": "Receiving block blk_-4380884313697280861 src: /10.251.193.224:49940 dest: /10.251.193.224:50010"
+            },
+            {
+              "time": 1226374667,
+              "level": "INFO",
+              "message": "10.251.193.224:50010:Exception writing block blk_-4380884313697280861 to mirror 10.251.107.50:50010"
+            },
+            {
+              "time": 1226374667,
+              "level": "INFO",
+              "message": "Exception in receiveBlock for block blk_-4380884313697280861 java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226374667,
+              "level": "INFO",
+              "message": "writeBlock blk_-4380884313697280861 received exception java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226374667,
+              "level": "INFO",
+              "message": "Receiving block blk_-4380884313697280861 src: /10.251.107.50:36157 dest: /10.251.107.50:50010"
+            },
+            {
+              "time": 1226374668,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_-4380884313697280861 terminating"
+            },
+            {
+              "time": 1226374668,
+              "level": "INFO",
+              "message": "Received block blk_-4380884313697280861 of size 30852112 from /10.251.193.224"
+            },
+            {
+              "time": 1226374668,
+              "level": "INFO",
+              "message": "BLOCK* ask 10.251.107.50:50010 to replicate blk_-4380884313697280861 to datanode(s) 10.251.111.37:50010 10.251.214.130:50010"
+            },
+            {
+              "time": 1226374668,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.107.50:50010 is added to blk_-4380884313697280861 size 30852112"
+            },
+            {
+              "time": 1226374670,
+              "level": "INFO",
+              "message": "Receiving block blk_-4380884313697280861 src: /10.251.107.50:38341 dest: /10.251.107.50:50010"
+            },
+            {
+              "time": 1226374670,
+              "level": "INFO",
+              "message": "Receiving block blk_-4380884313697280861 src: /10.251.111.37:40119 dest: /10.251.111.37:50010"
+            },
+            {
+              "time": 1226374670,
+              "level": "INFO",
+              "message": "10.251.107.50:50010 Starting thread to transfer block blk_-4380884313697280861 to 10.251.111.37:50010, 10.251.214.130:50010"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 6.8
+            },
+            {
+              "template": "PacketResponder <N> for block <BLOCK> terminating",
+              "per_session": 3.7
+            },
+            {
+              "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+              "per_session": 3.1
+            },
+            {
+              "template": "Deleting block <BLOCK> file <PATH>",
+              "per_session": 3.1
+            },
+            {
+              "template": "BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>",
+              "per_session": 3.0
+            }
+          ]
+        },
+        {
+          "session_id": "blk_-3126359724254586349",
+          "n_events": 34,
+          "events": [
+            {
+              "time": 1226374242,
+              "level": "INFO",
+              "message": "Receiving block blk_-3126359724254586349 src: /10.250.17.177:58651 dest: /10.250.17.177:50010"
+            },
+            {
+              "time": 1226374242,
+              "level": "INFO",
+              "message": "Receiving block blk_-3126359724254586349 src: /10.250.17.177:48401 dest: /10.250.17.177:50010"
+            },
+            {
+              "time": 1226374242,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/rand4/_temporary/_task_200811101024_0009_m_001807_0/part-01807. blk_-3126359724254586349"
+            },
+            {
+              "time": 1226374243,
+              "level": "INFO",
+              "message": "Receiving block blk_-3126359724254586349 src: /10.251.30.85:54392 dest: /10.251.30.85:50010"
+            },
+            {
+              "time": 1226374409,
+              "level": "INFO",
+              "message": "PacketResponder 2 for block blk_-3126359724254586349 terminating"
+            },
+            {
+              "time": 1226374409,
+              "level": "INFO",
+              "message": "PacketResponder blk_-3126359724254586349 2 Exception java.net.SocketTimeoutException: 120000 millis timeout while waiting for channel to be ready for read. ch : java.nio.channels.SocketChannel[connect"
+            },
+            {
+              "time": 1226374671,
+              "level": "INFO",
+              "message": "Exception in receiveBlock for block blk_-3126359724254586349 java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226374671,
+              "level": "INFO",
+              "message": "writeBlock blk_-3126359724254586349 received exception java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226374671,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_-3126359724254586349 Interrupted."
+            },
+            {
+              "time": 1226374671,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_-3126359724254586349 terminating"
+            },
+            {
+              "time": 1226374672,
+              "level": "INFO",
+              "message": "10.250.17.177:50010:Exception writing block blk_-3126359724254586349 to mirror 10.251.30.85:50010"
+            },
+            {
+              "time": 1226374672,
+              "level": "INFO",
+              "message": "Exception in receiveBlock for block blk_-3126359724254586349 java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226374672,
+              "level": "INFO",
+              "message": "writeBlock blk_-3126359724254586349 received exception java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226374672,
+              "level": "INFO",
+              "message": "Changing block file offset of block blk_-3126359724254586349 from 0 to 45940736 meta file offset to 358919"
+            },
+            {
+              "time": 1226374672,
+              "level": "INFO",
+              "message": "Receiving block blk_-3126359724254586349 src: /10.250.17.177:38416 dest: /10.250.17.177:50010"
+            },
+            {
+              "time": 1226374672,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_-3126359724254586349 terminating"
+            },
+            {
+              "time": 1226374672,
+              "level": "INFO",
+              "message": "Received block blk_-3126359724254586349 of size 47517633 from /10.250.17.177"
+            },
+            {
+              "time": 1226374672,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.197.161:50010 is added to blk_-3126359724254586349 size 47517633"
+            },
+            {
+              "time": 1226374672,
+              "level": "INFO",
+              "message": "Receiving block blk_-3126359724254586349 src: /10.250.17.177:52548 dest: /10.250.17.177:50010"
+            },
+            {
+              "time": 1226374674,
+              "level": "INFO",
+              "message": "BLOCK* ask 10.251.197.161:50010 to replicate blk_-3126359724254586349 to datanode(s) 10.250.10.213:50010 10.250.13.240:50010"
+            },
+            {
+              "time": 1226374676,
+              "level": "INFO",
+              "message": "Receiving block blk_-3126359724254586349 src: /10.251.197.161:35111 dest: /10.251.197.161:50010"
+            },
+            {
+              "time": 1226374676,
+              "level": "INFO",
+              "message": "Receiving block blk_-3126359724254586349 src: /10.250.10.213:56105 dest: /10.250.10.213:50010"
+            },
+            {
+              "time": 1226374676,
+              "level": "INFO",
+              "message": "10.251.197.161:50010 Starting thread to transfer block blk_-3126359724254586349 to 10.250.10.213:50010, 10.250.13.240:50010"
+            },
+            {
+              "time": 1226374679,
+              "level": "INFO",
+              "message": "10.251.197.161:50010:Transmitted block blk_-3126359724254586349 to /10.250.10.213:50010"
+            },
+            {
+              "time": 1226374679,
+              "level": "INFO",
+              "message": "Received block blk_-3126359724254586349 src: /10.251.197.161:35111 dest: /10.251.197.161:50010 of size 47517633"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 7.0
+            },
+            {
+              "template": "PacketResponder <N> for block <BLOCK> terminating",
+              "per_session": 3.0
+            },
+            {
+              "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+              "per_session": 3.0
+            },
+            {
+              "template": "BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>",
+              "per_session": 3.0
+            }
+          ]
+        },
+        {
+          "session_id": "blk_6103299480368577037",
+          "n_events": 34,
+          "events": [
+            {
+              "time": 1226374256,
+              "level": "INFO",
+              "message": "Receiving block blk_6103299480368577037 src: /10.251.214.225:57591 dest: /10.251.214.225:50010"
+            },
+            {
+              "time": 1226374256,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/rand4/_temporary/_task_200811101024_0009_m_001791_0/part-01791. blk_6103299480368577037"
+            },
+            {
+              "time": 1226374257,
+              "level": "INFO",
+              "message": "Receiving block blk_6103299480368577037 src: /10.251.30.85:47085 dest: /10.251.30.85:50010"
+            },
+            {
+              "time": 1226374257,
+              "level": "INFO",
+              "message": "Receiving block blk_6103299480368577037 src: /10.251.214.225:42278 dest: /10.251.214.225:50010"
+            },
+            {
+              "time": 1226374408,
+              "level": "INFO",
+              "message": "PacketResponder 2 for block blk_6103299480368577037 terminating"
+            },
+            {
+              "time": 1226374408,
+              "level": "INFO",
+              "message": "PacketResponder blk_6103299480368577037 2 Exception java.net.SocketTimeoutException: 120000 millis timeout while waiting for channel to be ready for read. ch : java.nio.channels.SocketChannel[connecte"
+            },
+            {
+              "time": 1226374652,
+              "level": "INFO",
+              "message": "Exception in receiveBlock for block blk_6103299480368577037 java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226374652,
+              "level": "INFO",
+              "message": "writeBlock blk_6103299480368577037 received exception java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226374652,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_6103299480368577037 Interrupted."
+            },
+            {
+              "time": 1226374652,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_6103299480368577037 terminating"
+            },
+            {
+              "time": 1226374657,
+              "level": "INFO",
+              "message": "10.251.214.225:50010:Exception writing block blk_6103299480368577037 to mirror 10.251.30.85:50010"
+            },
+            {
+              "time": 1226374657,
+              "level": "INFO",
+              "message": "Exception in receiveBlock for block blk_6103299480368577037 java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226374657,
+              "level": "INFO",
+              "message": "writeBlock blk_6103299480368577037 received exception java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226374657,
+              "level": "INFO",
+              "message": "Changing block file offset of block blk_6103299480368577037 from 0 to 42205184 meta file offset to 329735"
+            },
+            {
+              "time": 1226374657,
+              "level": "INFO",
+              "message": "Receiving block blk_6103299480368577037 src: /10.251.214.225:58212 dest: /10.251.214.225:50010"
+            },
+            {
+              "time": 1226374657,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_6103299480368577037 terminating"
+            },
+            {
+              "time": 1226374657,
+              "level": "INFO",
+              "message": "Received block blk_6103299480368577037 of size 43750435 from /10.251.214.225"
+            },
+            {
+              "time": 1226374657,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.125.237:50010 is added to blk_6103299480368577037 size 43750435"
+            },
+            {
+              "time": 1226374657,
+              "level": "INFO",
+              "message": "Receiving block blk_6103299480368577037 src: /10.251.214.225:34665 dest: /10.251.214.225:50010"
+            },
+            {
+              "time": 1226374659,
+              "level": "INFO",
+              "message": "BLOCK* ask 10.251.125.237:50010 to replicate blk_6103299480368577037 to datanode(s) 10.251.39.242:50010 10.251.127.191:50010"
+            },
+            {
+              "time": 1226374660,
+              "level": "INFO",
+              "message": "Receiving block blk_6103299480368577037 src: /10.251.125.237:44427 dest: /10.251.125.237:50010"
+            },
+            {
+              "time": 1226374660,
+              "level": "INFO",
+              "message": "Receiving block blk_6103299480368577037 src: /10.251.39.242:54787 dest: /10.251.39.242:50010"
+            },
+            {
+              "time": 1226374660,
+              "level": "INFO",
+              "message": "10.251.125.237:50010 Starting thread to transfer block blk_6103299480368577037 to 10.251.39.242:50010, 10.251.127.191:50010"
+            },
+            {
+              "time": 1226374663,
+              "level": "INFO",
+              "message": "10.251.125.237:50010:Transmitted block blk_6103299480368577037 to /10.251.39.242:50010"
+            },
+            {
+              "time": 1226374663,
+              "level": "INFO",
+              "message": "Received block blk_6103299480368577037 src: /10.251.125.237:44427 dest: /10.251.125.237:50010 of size 43750435"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 7.0
+            },
+            {
+              "template": "PacketResponder <N> for block <BLOCK> terminating",
+              "per_session": 3.0
+            },
+            {
+              "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+              "per_session": 3.0
+            },
+            {
+              "template": "BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>",
+              "per_session": 3.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cluster": 5,
+      "sessions": 8,
+      "share": 0.0006960153123368715,
+      "composition": {
+        "normal": 0,
+        "anomaly": 8,
+        "note": "Only anomalies were clustered, so this is 100% anomalous by construction."
+      },
+      "test_period_assignment": {
+        "normal": 0,
+        "anomaly": 0
+      },
+      "top_features": [
+        {
+          "feature": "event_hash_20",
+          "cluster_mean": 1.0,
+          "overall_anomaly_mean": 0.000783017254434526,
+          "all_sessions_mean": 2.778060661512427e-05,
+          "z": 35.72269821166992,
+          "measures": "count of events in hash bucket 20: \"<IP>:Failed to transfer <BLOCK> to <IP> got java.io.IOException: Connection reset by peer\" / \"PacketResponder <BLOCK> <N> Exception java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[closed]. <N> millis timeout left.\" (bucket shared by several event kinds)"
+        },
+        {
+          "feature": "event_hash_13",
+          "cluster_mean": 1.0,
+          "overall_anomaly_mean": 0.0008700191392563283,
+          "all_sessions_mean": 3.086734068347141e-05,
+          "z": 33.8880500793457,
+          "measures": "count of events in hash bucket 13: \"writeBlock <BLOCK> received exception java.io.IOException: Block <BLOCK> is valid, and cannot be written to.\" / \"writeBlock <BLOCK> received exception java.net.SocketTimeoutException: <N> millis timeout while waiting for channel to be ready for write. ch : java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH>\" (bucket shared by several event kinds)"
+        },
+        {
+          "feature": "event_hash_10",
+          "cluster_mean": 1.375,
+          "overall_anomaly_mean": 0.25326257944107056,
+          "all_sessions_mean": 0.3244065046310425,
+          "z": 1.4594752788543701,
+          "measures": "count of events in hash bucket 10: \"Verification succeeded for <BLOCK>\" / \"PacketResponder <BLOCK> <N> Exception java.io.EOFException\""
+        },
+        {
+          "feature": "n_event_buckets",
+          "cluster_mean": 11.125,
+          "overall_anomaly_mean": 6.183226108551025,
+          "all_sessions_mean": 7.789596080780029,
+          "z": 1.2080018520355225,
+          "measures": "number of distinct event kinds"
+        },
+        {
+          "feature": "event_hash_15",
+          "cluster_mean": 4.0,
+          "overall_anomaly_mean": 2.5716025829315186,
+          "all_sessions_mean": 2.986393690109253,
+          "z": 1.164292573928833,
+          "measures": "count of events in hash bucket 15: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\""
+        }
+      ],
+      "interpretation": "Cluster 5 holds 0.1% of the clustered anomalies. Compared with the overall anomaly population, its members show: event_hash_20 is above the anomaly average (1 vs 0.000783): more events like \"<IP>:Failed to transfer <BLOCK> to <IP> got java.io.IOException: Connection reset by peer\" / \"PacketResponder <BLOCK> <N> Exception java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[closed]. <N> millis timeout left.\" (bucket shared by several event kinds); event_hash_13 is above the anomaly average (1 vs 0.00087): more events like \"writeBlock <BLOCK> received exception java.io.IOException: Block <BLOCK> is valid, and cannot be written to.\" / \"writeBlock <BLOCK> received exception java.net.SocketTimeoutException: <N> millis timeout while waiting for channel to be ready for write. ch : java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH>\" (bucket shared by several event kinds); event_hash_10 is above the anomaly average (1.38 vs 0.253): more events like \"Verification succeeded for <BLOCK>\" / \"PacketResponder <BLOCK> <N> Exception java.io.EOFException\"; n_event_buckets is above the anomaly average (11.1 vs 6.18): a wider variety of event kinds; event_hash_15 is above the anomaly average (4 vs 2.57): more events like \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" / \"PacketResponder <N> for block <BLOCK> Interrupted.\". The sessions nearest its centre are dominated by: \"Receiving block <BLOCK> src: <PATH> dest: <PATH>\" (4.0/session), \"PacketResponder <N> for block <BLOCK> terminating\" (3.0/session), \"Received block <BLOCK> of size <N> from <PATH>\" (3.0/session). Profile: write chain complete in 100% (anomaly avg 55%) of sessions; mean events 28.1 (anomaly avg 16.1); mean duration 41,503 (anomaly avg 17,417) s; share of failure-keyword messages 12.2% (anomaly avg 9.3%); mean hosts 4.0 (anomaly avg 3.1).",
+      "typical_events": [
+        {
+          "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+          "per_session": 4.0
+        },
+        {
+          "template": "PacketResponder <N> for block <BLOCK> terminating",
+          "per_session": 3.0
+        },
+        {
+          "template": "Received block <BLOCK> of size <N> from <PATH>",
+          "per_session": 3.0
+        },
+        {
+          "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+          "per_session": 3.0
+        },
+        {
+          "template": "BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>",
+          "per_session": 3.0
+        }
+      ],
+      "example_sessions": [
+        {
+          "session_id": "blk_-8122638974387556519",
+          "n_events": 27,
+          "events": [
+            {
+              "time": 1226318316,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/randtxt2/_temporary/_task_200811101024_0002_m_000430_0/part-00430. blk_-8122638974387556519"
+            },
+            {
+              "time": 1226318317,
+              "level": "INFO",
+              "message": "Receiving block blk_-8122638974387556519 src: /10.250.7.96:36923 dest: /10.250.7.96:50010"
+            },
+            {
+              "time": 1226318317,
+              "level": "INFO",
+              "message": "Receiving block blk_-8122638974387556519 src: /10.250.10.176:47593 dest: /10.250.10.176:50010"
+            },
+            {
+              "time": 1226318317,
+              "level": "INFO",
+              "message": "Receiving block blk_-8122638974387556519 src: /10.250.10.176:34232 dest: /10.250.10.176:50010"
+            },
+            {
+              "time": 1226318337,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_-8122638974387556519 terminating"
+            },
+            {
+              "time": 1226318337,
+              "level": "INFO",
+              "message": "Received block blk_-8122638974387556519 of size 28497677 from /10.250.7.96"
+            },
+            {
+              "time": 1226318337,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.195.52:50010 is added to blk_-8122638974387556519 size 28497677"
+            },
+            {
+              "time": 1226318338,
+              "level": "INFO",
+              "message": "PacketResponder 2 for block blk_-8122638974387556519 terminating"
+            },
+            {
+              "time": 1226318338,
+              "level": "INFO",
+              "message": "Received block blk_-8122638974387556519 of size 28497677 from /10.250.10.176"
+            },
+            {
+              "time": 1226318338,
+              "level": "INFO",
+              "message": "PacketResponder 1 for block blk_-8122638974387556519 terminating"
+            },
+            {
+              "time": 1226318338,
+              "level": "INFO",
+              "message": "Received block blk_-8122638974387556519 of size 28497677 from /10.250.10.176"
+            },
+            {
+              "time": 1226318338,
+              "level": "INFO",
+              "message": "BLOCK* ask 10.251.195.52:50010 to replicate blk_-8122638974387556519 to datanode(s) 10.250.7.96:50010"
+            },
+            {
+              "time": 1226318338,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.7.96:50010 is added to blk_-8122638974387556519 size 28497677"
+            },
+            {
+              "time": 1226318338,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.10.176:50010 is added to blk_-8122638974387556519 size 28497677"
+            },
+            {
+              "time": 1226318339,
+              "level": "INFO",
+              "message": "10.251.195.52:50010 Starting thread to transfer block blk_-8122638974387556519 to 10.250.7.96:50010"
+            },
+            {
+              "time": 1226318340,
+              "level": "WARN",
+              "message": "10.251.195.52:50010:Failed to transfer blk_-8122638974387556519 to 10.250.7.96:50010 got java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226318340,
+              "level": "INFO",
+              "message": "Receiving block blk_-8122638974387556519 src: /10.251.195.52:48410 dest: /10.251.195.52:50010"
+            },
+            {
+              "time": 1226318340,
+              "level": "INFO",
+              "message": "writeBlock blk_-8122638974387556519 received exception java.io.IOException: Block blk_-8122638974387556519 is valid, and cannot be written to."
+            },
+            {
+              "time": 1226337001,
+              "level": "WARN",
+              "message": "10.250.7.96:50010:Got exception while serving blk_-8122638974387556519 to /10.251.194.147:"
+            },
+            {
+              "time": 1226348686,
+              "level": "INFO",
+              "message": "10.251.195.52:50010 Served block blk_-8122638974387556519 to /10.251.195.52"
+            },
+            {
+              "time": 1226362111,
+              "level": "WARN",
+              "message": "10.250.10.176:50010:Got exception while serving blk_-8122638974387556519 to /10.251.194.147:"
+            },
+            {
+              "time": 1226370615,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_-8122638974387556519 is added to invalidSet of 10.250.10.176:50010"
+            },
+            {
+              "time": 1226370615,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_-8122638974387556519 is added to invalidSet of 10.250.7.96:50010"
+            },
+            {
+              "time": 1226370615,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_-8122638974387556519 is added to invalidSet of 10.251.195.52:50010"
+            },
+            {
+              "time": 1226370703,
+              "level": "INFO",
+              "message": "Deleting block blk_-8122638974387556519 file /mnt/hadoop/dfs/data/current/subdir7/blk_-8122638974387556519"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 4.0
+            },
+            {
+              "template": "PacketResponder <N> for block <BLOCK> terminating",
+              "per_session": 3.0
+            },
+            {
+              "template": "Received block <BLOCK> of size <N> from <PATH>",
+              "per_session": 3.0
+            },
+            {
+              "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+              "per_session": 3.0
+            },
+            {
+              "template": "BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>",
+              "per_session": 3.0
+            }
+          ]
+        },
+        {
+          "session_id": "blk_7162246307091465257",
+          "n_events": 27,
+          "events": [
+            {
+              "time": 1226313657,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/rand/_temporary/_task_200811101024_0001_m_000112_0/part-00112. blk_7162246307091465257"
+            },
+            {
+              "time": 1226313657,
+              "level": "INFO",
+              "message": "Receiving block blk_7162246307091465257 src: /10.251.214.67:55715 dest: /10.251.214.67:50010"
+            },
+            {
+              "time": 1226313657,
+              "level": "INFO",
+              "message": "Receiving block blk_7162246307091465257 src: /10.251.214.67:40621 dest: /10.251.214.67:50010"
+            },
+            {
+              "time": 1226313661,
+              "level": "INFO",
+              "message": "Receiving block blk_7162246307091465257 src: /10.251.123.132:49772 dest: /10.251.123.132:50010"
+            },
+            {
+              "time": 1226313662,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.214.67:50010 is added to blk_7162246307091465257 size 3536846"
+            },
+            {
+              "time": 1226313662,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.123.132:50010 is added to blk_7162246307091465257 size 3536846"
+            },
+            {
+              "time": 1226313662,
+              "level": "INFO",
+              "message": "PacketResponder 1 for block blk_7162246307091465257 terminating"
+            },
+            {
+              "time": 1226313662,
+              "level": "INFO",
+              "message": "Received block blk_7162246307091465257 of size 3536846 from /10.251.214.67"
+            },
+            {
+              "time": 1226313662,
+              "level": "INFO",
+              "message": "PacketResponder 2 for block blk_7162246307091465257 terminating"
+            },
+            {
+              "time": 1226313662,
+              "level": "INFO",
+              "message": "Received block blk_7162246307091465257 of size 3536846 from /10.251.214.67"
+            },
+            {
+              "time": 1226313662,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_7162246307091465257 terminating"
+            },
+            {
+              "time": 1226313662,
+              "level": "INFO",
+              "message": "Received block blk_7162246307091465257 of size 3536846 from /10.251.123.132"
+            },
+            {
+              "time": 1226313663,
+              "level": "INFO",
+              "message": "BLOCK* ask 10.251.123.132:50010 to replicate blk_7162246307091465257 to datanode(s) 10.251.90.64:50010"
+            },
+            {
+              "time": 1226313665,
+              "level": "INFO",
+              "message": "10.251.123.132:50010 Starting thread to transfer block blk_7162246307091465257 to 10.251.90.64:50010"
+            },
+            {
+              "time": 1226313665,
+              "level": "INFO",
+              "message": "Receiving block blk_7162246307091465257 src: /10.251.123.132:49776 dest: /10.251.123.132:50010"
+            },
+            {
+              "time": 1226313666,
+              "level": "WARN",
+              "message": "10.251.123.132:50010:Failed to transfer blk_7162246307091465257 to 10.251.90.64:50010 got java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226313666,
+              "level": "INFO",
+              "message": "writeBlock blk_7162246307091465257 received exception java.io.IOException: Block blk_7162246307091465257 is valid, and cannot be written to."
+            },
+            {
+              "time": 1226313718,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.90.64:50010 is added to blk_7162246307091465257 size 3536846"
+            },
+            {
+              "time": 1226321003,
+              "level": "INFO",
+              "message": "10.251.90.64:50010 Served block blk_7162246307091465257 to /10.251.90.64"
+            },
+            {
+              "time": 1226333984,
+              "level": "INFO",
+              "message": "Verification succeeded for blk_7162246307091465257"
+            },
+            {
+              "time": 1226347427,
+              "level": "INFO",
+              "message": "Verification succeeded for blk_7162246307091465257"
+            },
+            {
+              "time": 1226350899,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_7162246307091465257 is added to invalidSet of 10.251.123.132:50010"
+            },
+            {
+              "time": 1226350899,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_7162246307091465257 is added to invalidSet of 10.251.214.67:50010"
+            },
+            {
+              "time": 1226350899,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_7162246307091465257 is added to invalidSet of 10.251.90.64:50010"
+            },
+            {
+              "time": 1226351168,
+              "level": "INFO",
+              "message": "Deleting block blk_7162246307091465257 file /mnt/hadoop/dfs/data/current/blk_7162246307091465257"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 4.0
+            },
+            {
+              "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+              "per_session": 3.0
+            },
+            {
+              "template": "PacketResponder <N> for block <BLOCK> terminating",
+              "per_session": 3.0
+            },
+            {
+              "template": "Received block <BLOCK> of size <N> from <PATH>",
+              "per_session": 3.0
+            }
+          ]
+        },
+        {
+          "session_id": "blk_9122720022222323339",
+          "n_events": 30,
+          "events": [
+            {
+              "time": 1226313519,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.allocateBlock: /user/root/rand/_temporary/_task_200811101024_0001_m_000113_0/part-00113. blk_9122720022222323339"
+            },
+            {
+              "time": 1226313519,
+              "level": "INFO",
+              "message": "Receiving block blk_9122720022222323339 src: /10.251.91.32:33490 dest: /10.251.91.32:50010"
+            },
+            {
+              "time": 1226313520,
+              "level": "INFO",
+              "message": "Receiving block blk_9122720022222323339 src: /10.251.91.32:54566 dest: /10.251.91.32:50010"
+            },
+            {
+              "time": 1226313520,
+              "level": "INFO",
+              "message": "Receiving block blk_9122720022222323339 src: /10.251.203.179:40476 dest: /10.251.203.179:50010"
+            },
+            {
+              "time": 1226313560,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.10.213:50010 is added to blk_9122720022222323339 size 67108864"
+            },
+            {
+              "time": 1226313560,
+              "level": "INFO",
+              "message": "PacketResponder 1 for block blk_9122720022222323339 terminating"
+            },
+            {
+              "time": 1226313560,
+              "level": "INFO",
+              "message": "Received block blk_9122720022222323339 of size 67108864 from /10.251.91.32"
+            },
+            {
+              "time": 1226313560,
+              "level": "INFO",
+              "message": "Received block blk_9122720022222323339 of size 67108864 from /10.251.91.32"
+            },
+            {
+              "time": 1226313560,
+              "level": "INFO",
+              "message": "PacketResponder 0 for block blk_9122720022222323339 terminating"
+            },
+            {
+              "time": 1226313560,
+              "level": "INFO",
+              "message": "Received block blk_9122720022222323339 of size 67108864 from /10.251.203.179"
+            },
+            {
+              "time": 1226313561,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.203.179:50010 is added to blk_9122720022222323339 size 67108864"
+            },
+            {
+              "time": 1226313561,
+              "level": "INFO",
+              "message": "PacketResponder 2 for block blk_9122720022222323339 terminating"
+            },
+            {
+              "time": 1226313919,
+              "level": "INFO",
+              "message": "BLOCK* ask 10.251.203.179:50010 to replicate blk_9122720022222323339 to datanode(s) 10.251.91.32:50010"
+            },
+            {
+              "time": 1226313920,
+              "level": "INFO",
+              "message": "10.251.203.179:50010 Starting thread to transfer block blk_9122720022222323339 to 10.251.91.32:50010"
+            },
+            {
+              "time": 1226313921,
+              "level": "WARN",
+              "message": "10.251.203.179:50010:Failed to transfer blk_9122720022222323339 to 10.251.91.32:50010 got java.io.IOException: Connection reset by peer"
+            },
+            {
+              "time": 1226313921,
+              "level": "INFO",
+              "message": "Receiving block blk_9122720022222323339 src: /10.251.203.179:34926 dest: /10.251.203.179:50010"
+            },
+            {
+              "time": 1226313921,
+              "level": "INFO",
+              "message": "writeBlock blk_9122720022222323339 received exception java.io.IOException: Block blk_9122720022222323339 is valid, and cannot be written to."
+            },
+            {
+              "time": 1226314054,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.91.32:50010 is added to blk_9122720022222323339 size 67108864"
+            },
+            {
+              "time": 1226321177,
+              "level": "WARN",
+              "message": "10.251.203.179:50010:Got exception while serving blk_9122720022222323339 to /10.250.10.6:"
+            },
+            {
+              "time": 1226321196,
+              "level": "INFO",
+              "message": "10.251.203.179:50010 Served block blk_9122720022222323339 to /10.250.10.6"
+            },
+            {
+              "time": 1226321223,
+              "level": "WARN",
+              "message": "10.250.10.213:50010:Got exception while serving blk_9122720022222323339 to /10.251.126.22:"
+            },
+            {
+              "time": 1226321375,
+              "level": "INFO",
+              "message": "Verification succeeded for blk_9122720022222323339"
+            },
+            {
+              "time": 1226323634,
+              "level": "INFO",
+              "message": "Verification succeeded for blk_9122720022222323339"
+            },
+            {
+              "time": 1226338067,
+              "level": "INFO",
+              "message": "Verification succeeded for blk_9122720022222323339"
+            },
+            {
+              "time": 1226350899,
+              "level": "INFO",
+              "message": "BLOCK* NameSystem.delete: blk_9122720022222323339 is added to invalidSet of 10.250.10.213:50010"
+            }
+          ],
+          "typical_events": [
+            {
+              "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+              "per_session": 4.0
+            },
+            {
+              "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+              "per_session": 3.0
+            },
+            {
+              "template": "PacketResponder <N> for block <BLOCK> terminating",
+              "per_session": 3.0
+            },
+            {
+              "template": "Received block <BLOCK> of size <N> from <PATH>",
+              "per_session": 3.0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "example_events_available": true
+}

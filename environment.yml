@@ -1,0 +1,11 @@
+name: logsentry
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy>=2.0
+  - pandas>=2.2
+  - scikit-learn=1.9.1
+  - joblib
+  - flask>=3.0
+  - matplotlib>=3.8

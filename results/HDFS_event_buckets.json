@@ -1,0 +1,322 @@
+{
+  "event_hash_01": [
+    {
+      "template": "<IP> Starting thread to transfer block <BLOCK> to <IP>, <IP>",
+      "count": 165,
+      "share": 0.7710280373831776
+    },
+    {
+      "template": "PendingReplicationMonitor timed out block <BLOCK>",
+      "count": 47,
+      "share": 0.21962616822429906
+    },
+    {
+      "template": "PacketResponder <BLOCK> <N> Exception java.io.IOException: The stream is closed",
+      "count": 2,
+      "share": 0.009345794392523364
+    }
+  ],
+  "event_hash_03": [
+    {
+      "template": "PacketResponder <BLOCK> <N> Exception java.io.IOException: Connection reset by peer",
+      "count": 11,
+      "share": 1.0
+    }
+  ],
+  "event_hash_04": [
+    {
+      "template": "<IP>:Got exception while serving <BLOCK> to <PATH>:",
+      "count": 356207,
+      "share": 0.99568414903103
+    },
+    {
+      "template": "Receiving empty packet for block <BLOCK>",
+      "count": 1464,
+      "share": 0.0040922317477798805
+    },
+    {
+      "template": "writeBlock <BLOCK> received exception java.io.IOException: Connection reset by peer",
+      "count": 75,
+      "share": 0.00020964301986577257
+    },
+    {
+      "template": "writeBlock <BLOCK> received exception java.io.IOException: Broken pipe",
+      "count": 5,
+      "share": 1.3976201324384838e-05
+    }
+  ],
+  "event_hash_05": [
+    {
+      "template": "<IP> Served block <BLOCK> to <PATH>",
+      "count": 428726,
+      "share": 0.971826228876472
+    },
+    {
+      "template": "BLOCK* ask <IP> to replicate <BLOCK> to datanode(s) <IP>",
+      "count": 6837,
+      "share": 0.01549795423377271
+    },
+    {
+      "template": "Unexpected error trying to delete block <BLOCK>. BlockInfo not found in volumeMap.",
+      "count": 5545,
+      "share": 0.012569278371547416
+    },
+    {
+      "template": "writeBlock <BLOCK> received exception java.io.EOFException",
+      "count": 47,
+      "share": 0.00010653851820788612
+    }
+  ],
+  "event_hash_06": [
+    {
+      "template": "Exception in receiveBlock for block <BLOCK> java.nio.channels.ClosedByInterruptException",
+      "count": 8,
+      "share": 1.0
+    }
+  ],
+  "event_hash_07": [
+    {
+      "template": "Exception in receiveBlock for block <BLOCK> java.io.IOException: Connection reset by peer",
+      "count": 75,
+      "share": 1.0
+    }
+  ],
+  "event_hash_08": [
+    {
+      "template": "BLOCK* Removing block <BLOCK> from neededReplications as it does not belong to any file.",
+      "count": 4,
+      "share": 1.0
+    }
+  ],
+  "event_hash_09": [
+    {
+      "template": "Received block <BLOCK> of size <N> from <PATH>",
+      "count": 1706514,
+      "share": 0.9959136652356908
+    },
+    {
+      "template": "<IP>:Transmitted block <BLOCK> to <PATH>",
+      "count": 6937,
+      "share": 0.004048401065411703
+    },
+    {
+      "template": "Exception in receiveBlock for block <BLOCK> java.io.EOFException",
+      "count": 48,
+      "share": 2.8012577647363667e-05
+    },
+    {
+      "template": "Adding an already existing block <BLOCK>",
+      "count": 10,
+      "share": 5.835953676534097e-06
+    },
+    {
+      "template": "writeBlock <BLOCK> received exception java.nio.channels.ClosedByInterruptException",
+      "count": 7,
+      "share": 4.085167573573868e-06
+    }
+  ],
+  "event_hash_10": [
+    {
+      "template": "Verification succeeded for <BLOCK>",
+      "count": 120036,
+      "share": 0.999800099950025
+    },
+    {
+      "template": "PacketResponder <BLOCK> <N> Exception java.io.EOFException",
+      "count": 19,
+      "share": 0.0001582542062302182
+    },
+    {
+      "template": "Exception in receiveBlock for block <BLOCK> java.net.SocketTimeoutException: <N> millis timeout while waiting for channel to be ready for write. ch : java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH>",
+      "count": 5,
+      "share": 4.164584374479427e-05
+    }
+  ],
+  "event_hash_13": [
+    {
+      "template": "writeBlock <BLOCK> received exception java.io.IOException: Block <BLOCK> is valid, and cannot be written to.",
+      "count": 9,
+      "share": 0.6428571428571429
+    },
+    {
+      "template": "writeBlock <BLOCK> received exception java.net.SocketTimeoutException: <N> millis timeout while waiting for channel to be ready for write. ch : java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH>",
+      "count": 5,
+      "share": 0.35714285714285715
+    }
+  ],
+  "event_hash_15": [
+    {
+      "template": "Receiving block <BLOCK> src: <PATH> dest: <PATH>",
+      "count": 1723232,
+      "share": 0.9999489357751318
+    },
+    {
+      "template": "PacketResponder <N> for block <BLOCK> Interrupted.",
+      "count": 49,
+      "share": 2.8433488847109067e-05
+    },
+    {
+      "template": "PacketResponder <BLOCK> <N> Exception java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH> <N> millis timeout left.",
+      "count": 33,
+      "share": 1.9149084325604065e-05
+    },
+    {
+      "template": "PacketResponder <BLOCK> <N> Exception java.io.IOException: Broken pipe",
+      "count": 6,
+      "share": 3.4816516955643758e-06
+    }
+  ],
+  "event_hash_16": [
+    {
+      "template": "BLOCK* NameSystem.allocateBlock: <PATH> <BLOCK>",
+      "count": 575061,
+      "share": 0.9983073974543257
+    },
+    {
+      "template": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for <BLOCK> on <IP> size <N>",
+      "count": 975,
+      "share": 0.0016926025456742288
+    }
+  ],
+  "event_hash_18": [
+    {
+      "template": "PacketResponder <BLOCK> <N> Exception java.net.SocketTimeoutException: <N> millis timeout while waiting for channel to be ready for read. ch : java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH>",
+      "count": 22,
+      "share": 0.4489795918367347
+    },
+    {
+      "template": "Exception in receiveBlock for block <BLOCK> java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH> <N> millis timeout left.",
+      "count": 16,
+      "share": 0.32653061224489793
+    },
+    {
+      "template": "writeBlock <BLOCK> received exception java.io.IOException: Interrupted receiveBlock",
+      "count": 11,
+      "share": 0.22448979591836735
+    }
+  ],
+  "event_hash_19": [
+    {
+      "template": "Deleting block <BLOCK> file <PATH>",
+      "count": 1402047,
+      "share": 0.9976972609787494
+    },
+    {
+      "template": "writeBlock <BLOCK> received exception java.io.IOException: Could not read from stream",
+      "count": 3226,
+      "share": 0.002295623016858526
+    },
+    {
+      "template": "PacketResponder <BLOCK> <N> Exception java.nio.channels.ClosedByInterruptException",
+      "count": 10,
+      "share": 7.11600439199791e-06
+    }
+  ],
+  "event_hash_20": [
+    {
+      "template": "<IP>:Failed to transfer <BLOCK> to <IP> got java.io.IOException: Connection reset by peer",
+      "count": 9,
+      "share": 0.6428571428571429
+    },
+    {
+      "template": "PacketResponder <BLOCK> <N> Exception java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[closed]. <N> millis timeout left.",
+      "count": 5,
+      "share": 0.35714285714285715
+    }
+  ],
+  "event_hash_21": [
+    {
+      "template": "writeBlock <BLOCK> received exception java.net.SocketTimeoutException",
+      "count": 13,
+      "share": 0.7222222222222222
+    },
+    {
+      "template": "Reopen Block <BLOCK>",
+      "count": 5,
+      "share": 0.2777777777777778
+    }
+  ],
+  "event_hash_22": [
+    {
+      "template": "Exception in receiveBlock for block <BLOCK> java.io.IOException: Broken pipe",
+      "count": 3,
+      "share": 1.0
+    }
+  ],
+  "event_hash_23": [
+    {
+      "template": "BLOCK* NameSystem.addStoredBlock: blockMap updated: <IP> is added to <BLOCK> size <N>",
+      "count": 1719741,
+      "share": 1.0
+    }
+  ],
+  "event_hash_24": [
+    {
+      "template": "Changing block file offset of block <BLOCK> from <N> to <N> meta file offset to <N>",
+      "count": 65,
+      "share": 0.6565656565656566
+    },
+    {
+      "template": "<IP>:Exception writing block <BLOCK> to mirror <IP>",
+      "count": 34,
+      "share": 0.3434343434343434
+    }
+  ],
+  "event_hash_25": [
+    {
+      "template": "writeBlock <BLOCK> received exception java.net.SocketTimeoutException: <N> millis timeout while waiting for channel to be ready for read. ch : java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH>",
+      "count": 10,
+      "share": 1.0
+    }
+  ],
+  "event_hash_26": [
+    {
+      "template": "Received block <BLOCK> src: <PATH> dest: <PATH> of size <N>",
+      "count": 7097,
+      "share": 0.9998591152437306
+    },
+    {
+      "template": "writeBlock <BLOCK> received exception java.net.NoRouteToHostException: No route to host",
+      "count": 1,
+      "share": 0.00014088475626937165
+    }
+  ],
+  "event_hash_27": [
+    {
+      "template": "BLOCK* NameSystem.delete: <BLOCK> is added to invalidSet of <IP>",
+      "count": 1396174,
+      "share": 1.0
+    }
+  ],
+  "event_hash_29": [
+    {
+      "template": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for <BLOCK> on <IP> size <N> But it does not belong to any file.",
+      "count": 1288,
+      "share": 1.0
+    }
+  ],
+  "event_hash_30": [
+    {
+      "template": "writeBlock <BLOCK> received exception java.io.InterruptedIOException: Interruped while waiting for IO on channel java.nio.channels.SocketChannel[connected local=<PATH> remote=<PATH> <N> millis timeout left.",
+      "count": 7,
+      "share": 1.0
+    }
+  ],
+  "event_hash_31": [
+    {
+      "template": "PacketResponder <N> for block <BLOCK> terminating",
+      "count": 1706679,
+      "share": 0.9959140586842008
+    },
+    {
+      "template": "<IP> Starting thread to transfer block <BLOCK> to <IP>",
+      "count": 6837,
+      "share": 0.003989657351630788
+    },
+    {
+      "template": "BLOCK* ask <IP> to replicate <BLOCK> to datanode(s) <IP> <IP>",
+      "count": 165,
+      "share": 9.628396416836039e-05
+    }
+  ]
+}

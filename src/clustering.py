@@ -1,0 +1,277 @@
+"""Unsupervised clustering *within the anomaly class* and cluster interpretation.
+
+Why within one class?  The classifier already answers "normal or anomalous?".
+Clustering the anomalies asks the follow-up an operator cares about: "what
+*kinds* of failure are there?".
+
+Rules this module follows
+-------------------------
+* Labels are used only to pick which sessions to cluster (the anomaly class of
+  the development period); they are never part of the clustering input.
+* Features are signed-log transformed (counts and durations are heavy-tailed)
+  and standardised, then clustered with K-means; k is chosen by silhouette.
+* Every cluster is described by what its members have in common: cluster mean vs
+  the overall anomaly mean (and vs all sessions), the most distinctive features,
+  the real events of the sessions nearest its centre, and a plain-language
+  interpretation generated from the feature definitions.
+* Label composition is reported as an integrity check.  Because only anomalies
+  are clustered it is 100 % anomalous by construction, so we additionally assign
+  the later test period (normal and anomalous) to the nearest cluster to see
+  which clusters resemble normal behaviour.
+"""
+import argparse
+import json
+from collections import Counter
+
+import joblib
+import numpy as np
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.preprocessing import StandardScaler
+
+from processing import COLS, ROOT, collect_session_events, normalise, sorted_log_path
+from features import bucket
+
+K_RANGE = range(2, 9)   # all reported in the sweep
+MIN_K = 3               # k=2 only splits the class on one dominant feature; require >=3 groups
+N_NEAREST = 10      # sessions per cluster whose events are summarised
+N_EXAMPLES = 3      # sessions per cluster shown in full
+N_TOP_FEATURES = 5
+SEED = 7
+
+# feature -> (what it measures, meaning when high, meaning when low).
+# Wording is tied to how each feature is computed in features.py; it states
+# what the feature measures and does not claim a root cause.
+FEATURE_INFO = {
+    'n_events': ('number of log events', 'more events than a typical anomaly (repeated or retried operations)', 'very few events (the session stops early)'),
+    'n_event_buckets': ('number of distinct event kinds', 'a wider variety of event kinds', 'only a few kinds of event'),
+    'duration_s': ('seconds from first to last event', 'long-running sessions', 'sessions that finish almost instantly'),
+    'gap_mean_s': ('mean seconds between consecutive events', 'long pauses between events (slow progress)', 'events arriving back-to-back'),
+    'gap_max_s': ('longest pause between events', 'at least one long stall mid-session', 'no long stalls'),
+    'gap_std_s': ('variability of the gaps between events', 'irregular timing (bursts and stalls)', 'very regular timing'),
+    'events_per_min': ('event rate', 'dense bursts of events', 'sparse events spread over time'),
+    'n_hosts': ('distinct hosts involved', 'more hosts than usual (extra replicas or retries on other nodes)', 'fewer hosts than a healthy 3-replica write'),
+    'n_threads': ('distinct threads involved', 'more threads involved', 'few threads involved'),
+    'warning_ratio': ('share of WARN-level events', 'a high share of warnings', 'few warnings'),
+    'error_ratio': ('share of ERROR-level events', 'a high share of ERROR-level events', 'no ERROR-level events'),
+    'keyword_error_ratio': ('share of messages containing error/exception/timeout/fail words', 'many failure messages', 'few failure messages'),
+    'has_allocate': ('block allocation seen', 'the allocation event is present', 'the allocation event is missing'),
+    'has_delete': ('block deletion seen', 'the block was deleted (lifecycle ran to the end)', 'no deletion event (lifecycle did not reach the end)'),
+    'replica_deficit': ('3 minus number of "stored" confirmations', 'fewer replica confirmations than the 3 expected', 'more confirmations than expected (duplicate or re-replicated copies)'),
+    'unacked_writes': ('"receiving" events minus acknowledgements', 'writes started but never acknowledged', 'few or no unacknowledged writes (acknowledgements keep up with writes)'),
+    'uncommitted_acks': ('acknowledgements minus "stored" confirmations', 'acknowledged writes never committed to the namespace', 'more stored confirmations than acknowledgements'),
+    'lifecycle_complete': ('full allocate/receive/ack/store chain present', 'the full write chain completed', 'the write chain did not complete'),
+    'transition_change_ratio': ('share of consecutive events that change kind', 'frequent switching between event kinds', 'the same event kind repeated'),
+    'event_entropy': ('diversity of the event-kind distribution', 'a more varied mix of events', 'dominated by one event kind'),
+}
+
+
+def signed_log(X):
+    """log1p that keeps sign: tames heavy-tailed counts/durations."""
+    return np.sign(X) * np.log1p(np.abs(X))
+
+
+def load_bucket_templates(source):
+    """Event inventory per hash bucket written by setup_data.py (empty if absent)."""
+    path = ROOT / 'results' / f'{source}_event_buckets.json'
+    return json.loads(path.read_text()) if path.exists() else {}
+
+
+def describe_feature(name, bucket_templates):
+    """(what it measures, high meaning, low meaning) for any feature name."""
+    if name in FEATURE_INFO:
+        return FEATURE_INFO[name]
+    seen = bucket_templates.get(name, [])[:2]
+    if seen:
+        kind = ' / '.join(f'"{e["template"]}"' for e in seen)
+        shared = '' if seen[0].get('share', 1) >= .9 else ' (bucket shared by several event kinds)'
+        return (f'count of events in hash bucket {name[-2:]}: {kind}{shared}',
+                f'more events like {kind}{shared}', f'fewer events like {kind}{shared}')
+    return (f'count of events in hash bucket {name[-2:]} (no example available)',
+            f'more events in bucket {name[-2:]}', f'fewer events in bucket {name[-2:]}')
+
+
+def profile_sentence(cluster_mean, anomaly_mean):
+    """Key operational statistics, cluster vs anomaly average."""
+    def pair(feature, fmt):
+        j = COLS.index(feature)
+        return f'{fmt.format(cluster_mean[j])} (anomaly avg {fmt.format(anomaly_mean[j])})'
+    return (f"Profile: write chain complete in {pair('lifecycle_complete', '{:.0%}')} of sessions; "
+            f"mean events {pair('n_events', '{:.1f}')}; mean duration {pair('duration_s', '{:,.0f}')} s; "
+            f"share of failure-keyword messages {pair('keyword_error_ratio', '{:.1%}')}; "
+            f"mean hosts {pair('n_hosts', '{:.1f}')}.")
+
+
+def interpret(cluster, feats, share, examples, profile=''):
+    """Plain-language description assembled from the cluster's real statistics."""
+    clauses = []
+    for f in feats:
+        _, high, low = f['_meaning']
+        direction = 'above' if f['z'] > 0 else 'below'
+        clauses.append(f"{f['feature']} is {direction} the anomaly average "
+                       f"({f['cluster_mean']:.3g} vs {f['overall_anomaly_mean']:.3g}): {high if f['z'] > 0 else low}")
+    text = (f"Cluster {cluster} holds {share:.1%} of the clustered anomalies. Compared with the "
+            f"overall anomaly population, its members show: " + '; '.join(clauses) + '.')
+    if examples and examples[0].get('typical_events'):
+        top = ', '.join(f"\"{e['template']}\" ({e['per_session']:.1f}/session)"
+                        for e in examples[0]['typical_events'][:3])
+        text += f" The sessions nearest its centre are dominated by: {top}."
+    return text + ' ' + profile
+
+
+def event_templates_for(events_by_session):
+    """Summarise events: normalised template -> (bucket, total count, example)."""
+    stats = {}
+    for events in events_by_session.values():
+        for ev in events:
+            t = normalise(ev['message'])
+            s = stats.setdefault(t, {'template': t, 'bucket': bucket(t), 'count': 0})
+            s['count'] += 1
+    return stats
+
+
+def run(source, df=None, dev=None, te=None, log_path=None):
+    """Cluster development-period anomalies of `source` and write the analysis."""
+    from train import load_dataset, split  # local import: train imports this module
+    if df is None:
+        df, tr, va, te = split(load_dataset(source))
+        dev = tr | va
+    for d in ('models', 'results'):
+        (ROOT / d).mkdir(exist_ok=True)
+
+    X = df[COLS].to_numpy(dtype=np.float32)
+    y = df.label.to_numpy()
+    ids = np.flatnonzero(dev & (y == 1))           # labels only SELECT the class
+    if len(ids) < 4:
+        raise ValueError('Not enough development anomalies for clustering')
+    L = signed_log(X)
+    scaler = StandardScaler().fit(L[ids])
+    Z = scaler.transform(L[ids])                   # clustering input: features only
+
+    sweep, models = [], []
+    for k in K_RANGE:
+        if k > len(ids) - 1:
+            break
+        km = KMeans(n_clusters=k, n_init=10, random_state=SEED).fit(Z)
+        sil = silhouette_score(Z, km.labels_, sample_size=min(3000, len(ids)), random_state=SEED)
+        sweep.append({'k': k, 'silhouette': float(sil), 'inertia': float(km.inertia_)})
+        models.append(km)
+    eligible = [i for i, s_ in enumerate(sweep) if s_['k'] >= MIN_K] or range(len(sweep))
+    km = models[max(eligible, key=lambda i: sweep[i]['silhouette'])]
+
+    # Composition check on the later test period: nearest-cluster assignment.
+    test_idx = np.flatnonzero(te)
+    test_cluster = km.predict(scaler.transform(L[test_idx]))
+    test_comp = pd.crosstab(test_cluster, y[test_idx]).reindex(range(km.n_clusters), fill_value=0)
+
+    # Real events of the sessions nearest each centroid.
+    log_path = log_path or sorted_log_path(source)
+    nearest = {}
+    for c in range(km.n_clusters):
+        members = np.flatnonzero(km.labels_ == c)
+        order = members[np.argsort(((Z[members] - km.cluster_centers_[c]) ** 2).sum(1))]
+        nearest[c] = ids[order[:N_NEAREST]]
+    events = {}
+    if log_path.exists():
+        wanted = [df.session_id.iloc[i] for c in nearest for i in nearest[c]]
+        events = collect_session_events(log_path, source, wanted)
+    else:
+        print(f'Note: {log_path} not found - cluster descriptions will not include example events.')
+
+    bucket_templates = load_bucket_templates(source)
+    if not bucket_templates:  # no inventory: fall back to the sampled sessions' events
+        for ev_list in events.values():
+            for ev in ev_list:
+                t = normalise(ev['message'])
+                entries = bucket_templates.setdefault(f'event_hash_{bucket(t):02d}', [])
+                if all(e['template'] != t for e in entries) and len(entries) < 2:
+                    entries.append({'template': t, 'share': None})
+
+    anomaly_mean = X[ids].mean(0)
+    all_mean = X[dev].mean(0)
+    clusters = []
+    for c in range(km.n_clusters):
+        members = ids[km.labels_ == c]
+        mean = X[members].mean(0)
+        z = km.cluster_centers_[c]                 # standardised log-scale offset vs anomaly mean
+        top = np.argsort(np.abs(z))[::-1][:N_TOP_FEATURES]
+        feats = [{'feature': COLS[j], 'cluster_mean': float(mean[j]),
+                  'overall_anomaly_mean': float(anomaly_mean[j]),
+                  'all_sessions_mean': float(all_mean[j]), 'z': float(z[j]),
+                  '_meaning': describe_feature(COLS[j], bucket_templates)} for j in top]
+
+        examples = []
+        for i in nearest[c][:N_EXAMPLES]:
+            sid = df.session_id.iloc[i]
+            ev = events.get(sid, [])
+            summary = Counter(normalise(e['message']) for e in ev)
+            examples.append({'session_id': sid, 'n_events': int(X[i][COLS.index('n_events')]),
+                             'events': [{**e, 'message': e['message'][:200]} for e in ev[:25]],
+                             'typical_events': [{'template': t, 'per_session': n / 1.0}
+                                                for t, n in summary.most_common(4)]})
+        # Typical events across all N_NEAREST sessions (per-session average)
+        agg = Counter()
+        n_have = 0
+        for i in nearest[c]:
+            ev = events.get(df.session_id.iloc[i])
+            if ev:
+                n_have += 1
+                agg.update(normalise(e['message']) for e in ev)
+        typical = [{'template': t, 'per_session': n / max(n_have, 1)} for t, n in agg.most_common(5)]
+        if examples:
+            examples[0]['typical_events'] = typical
+
+        clusters.append({
+            'cluster': c, 'sessions': int(len(members)), 'share': float(len(members) / len(ids)),
+            'composition': {'normal': int((y[members] == 0).sum()), 'anomaly': int((y[members] == 1).sum()),
+                            'note': 'Only anomalies were clustered, so this is 100% anomalous by construction.'},
+            'test_period_assignment': {'normal': int(test_comp.loc[c].get(0, 0)),
+                                       'anomaly': int(test_comp.loc[c].get(1, 0))},
+            'top_features': [{k: v for k, v in f.items() if k != '_meaning'} | {'measures': f['_meaning'][0]}
+                             for f in feats],
+            'interpretation': interpret(c, feats, len(members) / len(ids), examples, profile_sentence(mean, anomaly_mean)),
+            'typical_events': typical,
+            'example_sessions': examples,
+        })
+
+    result = {'source': source, 'algorithm': 'KMeans (signed-log + standardised features, labels excluded)',
+              'clustered': 'development-period anomalies only', 'n_clustered': int(len(ids)),
+              'selected_k': int(km.n_clusters), 'sweep': sweep, 'clusters': clusters,
+              'example_events_available': bool(events)}
+    (ROOT / 'results' / f'{source}_cluster_analysis.json').write_text(json.dumps(result, indent=2))
+    pd.DataFrame({'session_id': df.session_id.iloc[ids].to_numpy(), 'cluster': km.labels_}) \
+        .to_csv(ROOT / 'results' / f'{source}_anomaly_clusters.csv', index=False)
+    # Small per-cluster blurbs for the dashboard.
+    joblib.dump({'scaler': scaler, 'kmeans': km, 'columns': COLS, 'transform': 'signed log1p',
+                 'summaries': {c['cluster']: {'sessions': c['sessions'], 'share': c['share'],
+                                              'interpretation': c['interpretation']} for c in clusters}},
+                ROOT / 'models' / f'{source}_clusters.joblib', compress=3)
+    write_markdown_report(source, result)
+    print(f'Clustered {len(ids):,} anomalies into k={km.n_clusters} (silhouette '
+          f'{next(s_["silhouette"] for s_ in sweep if s_["k"] == km.n_clusters):.3f})', flush=True)
+    return result
+
+
+def write_markdown_report(source, result):
+    lines = [f'# {source} anomaly clusters', '',
+             f"{result['algorithm']}. Clustered: {result['clustered']} (n={result['n_clustered']:,}); "
+             f"k={result['selected_k']} chosen by silhouette among k>={MIN_K}.", '']
+    for c in result['clusters']:
+        lines += [f"## Cluster {c['cluster']} - {c['sessions']:,} sessions ({c['share']:.1%})", '',
+                  c['interpretation'], '',
+                  '| feature | cluster mean | anomaly mean | all-sessions mean | z |', '|---|---|---|---|---|']
+        lines += [f"| {f['feature']} | {f['cluster_mean']:.4g} | {f['overall_anomaly_mean']:.4g} | "
+                  f"{f['all_sessions_mean']:.4g} | {f['z']:+.2f} |" for f in c['top_features']]
+        t = c['test_period_assignment']
+        lines += ['', f"Test-period sessions nearest this cluster: {t['anomaly']:,} anomalous, {t['normal']:,} normal.", '']
+        for ex in c['example_sessions'][:2]:
+            lines += [f"Example session `{ex['session_id']}` ({ex['n_events']} events):", '']
+            lines += [f"    {e['level']:5} {e['message'][:120]}" for e in ex['events'][:8]] + ['']
+    (ROOT / 'results' / f'{source}_cluster_report.md').write_text('\n'.join(lines))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Cluster the anomaly class and describe each cluster.')
+    parser.add_argument('--source', choices=['HDFS', 'BGL'], default='HDFS')
+    run(parser.parse_args().source)
