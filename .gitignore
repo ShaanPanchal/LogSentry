@@ -1,8 +1,18 @@
-# virtual environments
+# virtual / conda environments (recreate with environment.yml or requirements.txt)
 .venv/
 venv/
+env/
+ENV/
+.conda/
 # raw downloads + the 1.5 GB sorted log (re-created by setup_data.py)
 data/raw/
+# caches and editor/OS junk
 __pycache__/
 *.pyc
-predictions.csv
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+*.part
+# local prediction output from the CLI examples
+predictions*.csv
