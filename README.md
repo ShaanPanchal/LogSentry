@@ -1,12 +1,8 @@
 # LogSentry - Log Anomaly Detection
 
-COS30049 Assignment 2 · Session 12, Group 3 · Shaan Panchal, Neeven Emmanuel, Dominique
+COS30049 Assignment 2 - Session 12, Group 3 - Shaan Panchal, Neeven Emmanuel, Dominique Tait
 
-LogSentry turns raw HDFS and BGL logs into sessions, classifies each session as normal or anomalous, clusters the anomalies,
-and shows the results in a Flask dashboard. Run every command from the repository root.
-
-> *Explain how to configure your project environment using conda commands, how to perform further data processing based on your
-> prepared training dataset, how to train your model, and how to use your model for prediction.*
+LogSentry turns raw HDFS and BGL logs into sessions, classifies each session as normal or anomalous, clusters the anomalies, and shows the results in a Flask dashboard. Run every command from the repository root.
 
 ## 1. Configure the environment (conda)
 
@@ -57,9 +53,7 @@ On macOS you can use `./Start-LogSentry.command` instead (it creates a `.venv` a
 
 ## Notes
 
-* Data: Curated by LOGPAI. (2023). Loghub: A Large Collection of System Log Datasets for AI-driven Log Analytics [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.8196385 
-  
-  The raw data is not in the zip; `setup_data.py` downloads it into `data/raw/`.
+* Data Credits: Curated by LOGPAI. (2023). Loghub: A Large Collection of System Log Datasets for AI-driven Log Analytics [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.8196385 
+* Raw data is not included in the submission ZIP; `setup_data.py` downloads it into `data/raw/`. 
 * `scikit-learn` is pinned to 1.9.1 to maintain compatibility with the saved models.
 * On Windows, `src/mkl_setup.py` automatically applies a workaround for an MKL threading issue.
-* Retraining reproduces the final model results; the logistic regression baseline may differ slightly due to numerical-library differences.
