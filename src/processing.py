@@ -1,12 +1,10 @@
-"""Raw log -> sessions -> feature table (HDFS and BGL adapters).
+"""Turns a raw log into sessions and then into a feature table (HDFS and BGL).
 
-Pipeline:  parse each line  ->  group lines into sessions  ->  `features.Session`
-turns every session into the fixed 52-feature row used by the model.
+Each line is parsed, lines are grouped into sessions, and `features.Session` turns every
+session into one row of 52 features. The parts that differ between datasets (line format,
+session definition, labels) are in sources.py.
 
-Raw formats, session definitions and label sources are dataset-specific and live in
-sources.py (HDFS: one session per block; BGL: five-minute windows, labels in the log).
-
-Logs must be in chronological order (setup_data.py sorts the raw downloads).
+The log must be in time order (setup_data.py sorts the raw downloads).
 """
 import gzip
 from collections import Counter, defaultdict
@@ -27,25 +25,25 @@ ARCHIVES = {name: s.archive for name, s in SOURCES.items()}  # folder names unde
 
 
 def sorted_log_path(source):
-    """Where setup_data.py leaves the chronologically sorted raw log."""
+    """Path of the time-sorted raw log made by setup_data.py."""
     return RAW_DIR / ARCHIVES[source] / f'{source}.sorted.log'
 
 
 def parse(line, source):
-    """Parse one raw line with the source's adapter (see sources.py).
+    """Parse one raw line using the adapter for the source (see sources.py).
 
     Returns (session_ids, unix_time, thread, level, message, host_ips, label).
-    Raises ValueError on malformed lines or an unsupported source.
+    Raises ValueError for a bad line or an unsupported source.
     """
     return get_source(source).parse(line)
 
 
 def process(path, source, labels=None, keep=False):
-    """Stream a log file into a session feature table.
+    """Read a log file and build the session feature table.
 
-    Returns (DataFrame with META_COLS + COLS, audit counters, events-by-session).
-    `labels` is the HDFS anomaly_label.csv path; without it HDFS labels are -1
-    (unlabelled, e.g. a user upload).  `keep=True` retains each session's events.
+    Returns (feature table, audit counters, events by session).
+    `labels` is the HDFS anomaly_label.csv path. Without it HDFS labels are -1 (unknown).
+    `keep=True` also keeps the events of each session.
     """
     # The log is read line by line, so a huge file never has to fit in memory.
     # Each session id gets one Session object that collects its events.
@@ -87,7 +85,7 @@ def process(path, source, labels=None, keep=False):
 
 
 def attach_hdfs_labels(df, labels_path):
-    """Map block ids to 0/1 using Loghub's anomaly_label.csv (-1 if not given)."""
+    """Turn the block labels in anomaly_label.csv into 0 or 1 (-1 if no file is given)."""
     if not labels_path:
         return -1
     lab = pd.read_csv(labels_path, dtype={'BlockId': str})
@@ -101,9 +99,9 @@ def attach_hdfs_labels(df, labels_path):
 
 
 def collect_session_events(path, source, session_ids, limit=200):
-    """One streaming pass returning the real events of the requested sessions.
+    """Read the log once and return the real events of the requested sessions.
 
-    Used to attach concrete examples to cluster and error analyses.
+    Used to show example events in the cluster and error analyses.
     """
     # One pass over the log that only keeps lines of the sessions we ask for (at most `limit` each).
     wanted, found = set(session_ids), {s: [] for s in session_ids}
@@ -121,11 +119,10 @@ def collect_session_events(path, source, session_ids, limit=200):
 
 
 def bucket_inventory(path, source, top=5):
-    """Which normalised event templates fall into each hash bucket (whole log).
+    """List which message templates fall into each hash bucket.
 
-    Hashing is lossy (several templates can share a bucket), so this inventory is
-    what lets us say what a feature like event_hash_27 actually counts.
-    Returns {feature_name: [{'template', 'count', 'share'}, ...]}.
+    Several templates can share a bucket, so this shows what a feature like
+    event_hash_27 really counts. Returns {feature_name: [{template, count, share}, ...]}.
     """
     counts = defaultdict(Counter)
     opener = gzip.open if str(path).endswith('.gz') else open
@@ -146,7 +143,7 @@ def bucket_inventory(path, source, top=5):
 
 
 def verify_parser(path, source, head=5, sample=200000):
-    """Show how the parser reads a log: first parsed lines and parse statistics."""
+    """Print the first parsed lines and some parsing statistics for a log."""
     import itertools
     opener = gzip.open if str(path).endswith('.gz') else open
     ok = bad = 0

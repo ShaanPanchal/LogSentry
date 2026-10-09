@@ -1,13 +1,12 @@
 """Exploratory data analysis of the processed session table.
 
-Checks data quality (missing values, duplicates, constant columns), compares the
-structural features between normal and anomalous sessions and looks at feature
-redundancy.  The findings motivate the modelling choices:
+Checks data quality (missing values, duplicates, constant columns), compares normal and
+anomalous sessions, and looks at correlated features. The findings explain some choices:
 
-* heavy class imbalance -> class weights; judge models by PR-AUC / F1, not accuracy
-* heavily skewed counts and durations -> signed-log transform before clustering
-* strongly correlated timing features -> tree ensembles cope; no feature dropped
-* lifecycle ("absence") features separate the classes -> kept as first-class features
+* very few anomalies, so class weights are used and models are judged by PR-AUC and F1
+* counts and durations are very skewed, so a signed log is used before clustering
+* some timing features are strongly correlated, but tree models cope, so none are dropped
+* the write chain features separate the classes well, so they are kept
 
 Writes results/<SOURCE>_eda_summary.json and figures/<SOURCE>_eda*.png.
 """

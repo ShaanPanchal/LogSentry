@@ -1,7 +1,7 @@
-"""Figures for the model comparison, final-model errors and clustering.
+"""Makes the result figures (model comparison, confusion matrix, clusters).
 
-Reads results/<SOURCE>_evaluation.json, _cluster_analysis.json (written by
-train.py) and writes figures/<SOURCE>_*.png.  Safe to re-run at any time.
+Reads results/<SOURCE>_evaluation.json and _cluster_analysis.json and saves
+the pictures to figures/. It is safe to run again at any time.
 """
 import argparse
 import json

@@ -1,21 +1,17 @@
-"""Dataset adapters: everything specific to one log format lives here.
+"""Dataset adapters. Everything that is specific to one log format is in this file.
 
-The shared pipeline (processing.py -> features.py -> models) never looks at raw
-line formats.  An adapter turns one raw line into the common event tuple
+The rest of the pipeline never reads raw lines. An adapter turns a line into this tuple:
 
     (session_ids, unix_time, thread, level, message, host_ips, line_label)
 
-and states how that dataset defines a session and where its labels come from.
-Adding a log source means adding one `Source` here and nothing else.
+It also says how the dataset defines a session and where its labels come from.
 
-HDFS  - a session is a block (`blk_<id>`): every line mentioning a block belongs
-        to that block's session.  Labels come from a separate per-block file.
-BGL   - Blue Gene/L has no session identifier, so a session is a fixed
-        five-minute time window (a standard choice for BGL).  Labels are in the
-        log itself: the first field of each line is '-' for normal lines and an
-        alert category otherwise.  A window is anomalous if any line in it is an
-        alert.  That tag is returned only as the line label; it is never passed
-        to the feature code.
+HDFS: a session is a block (blk_<id>). Any line that mentions a block belongs to it.
+      Labels come from a separate file.
+BGL:  there is no session id, so a session is a fixed five minute time window. The label
+      is in the log: the first field is '-' for normal lines and an alert name otherwise.
+      A window is anomalous if any of its lines is an alert. The alert name is only used
+      as the label and is never given to the features.
 """
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -29,13 +25,13 @@ BGL_WINDOW_SECONDS = 300
 
 @lru_cache(maxsize=200000)
 def stamp(date, time):
-    """HDFS 'yymmdd' + 'HHMMSS' -> unix seconds (UTC)."""
+    """Convert an HDFS date and time ('yymmdd', 'HHMMSS') to unix seconds (UTC)."""
     return int(datetime.strptime(date + time, '%y%m%d%H%M%S').replace(tzinfo=timezone.utc).timestamp())
 
 
 # --------------------------------------------------------------------------- HDFS
 def parse_hdfs(line):
-    """`081109 203518 143 INFO dfs.DataNode$PacketResponder: <message>`"""
+    """Line format: `081109 203518 143 INFO dfs.DataNode$PacketResponder: <message>`"""
     parts = line.strip().split(None, 5)
     if len(parts) != 6:
         raise ValueError('Invalid HDFS fields')
@@ -67,10 +63,10 @@ def bgl_window(t):
 
 
 def parse_bgl(line):
-    """`<tag> <unix_ts> <date> <node> <time> <node> RAS <component> <level> <message>`
+    """Line format: `<tag> <unix_ts> <date> <node> <time> <node> RAS <component> <level> <message>`
 
-    Fields used: node (host), component (stands in for HDFS's thread), level and
-    message.  The alert tag is the line's label only.
+    Used fields: node (host), component (in place of the HDFS thread), level and message.
+    The tag is only the label.
     """
     parts = line.strip().split(None, 9)
     # A BGL line with an empty message gives one field fewer, so add an empty message back.

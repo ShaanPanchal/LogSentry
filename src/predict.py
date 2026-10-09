@@ -1,8 +1,7 @@
-"""Prediction: raw log -> session features -> anomaly score, decision and cluster.
+"""Scores a raw log: parse, build session features, then give a score, decision and cluster.
 
-Uses exactly the same `processing.process()` / `features.Session` code that built
-the training table, then applies the saved final classifier.  Sessions flagged
-as anomalous are also assigned to the nearest anomaly cluster (clustering.py).
+It uses the same processing code that built the training data and then applies the saved
+final model. Flagged sessions are also given the nearest anomaly cluster.
 
     python src/predict.py --source HDFS --log data/raw/HDFS_v1/HDFS.sorted.log --out predictions.csv
 """
@@ -16,7 +15,7 @@ from processing import ROOT, process
 
 
 def assign_clusters(df, flagged, source):
-    """Nearest anomaly cluster for flagged sessions; -1 for the rest / if no cluster model."""
+    """Give each flagged session its nearest cluster. Other sessions get -1."""
     # Only flagged sessions get a cluster. Everything else stays at -1 (no cluster).
     clusters = np.full(len(df), -1, dtype=int)
     path = ROOT / 'models' / f'{source}_clusters.joblib'
@@ -28,7 +27,7 @@ def assign_clusters(df, flagged, source):
 
 
 def predict(path, source, keep=False):
-    """Score a log file. Returns (per-session DataFrame, parse audit, events-by-session)."""
+    """Score a log file. Returns (session table, parse audit, events by session)."""
     model_path = ROOT / 'models' / f'{source}_final.joblib'
     if not model_path.exists():
         raise ValueError(f'{source} model has not been trained. Run python setup_data.py --source {source} first.')

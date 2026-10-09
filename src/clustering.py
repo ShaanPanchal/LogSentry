@@ -1,23 +1,16 @@
-"""Unsupervised clustering *within the anomaly class* and cluster interpretation.
+"""Clusters the anomalous sessions and explains each cluster.
 
-Why within one class?  The classifier already answers "normal or anomalous?".
-Clustering the anomalies asks the follow-up an operator cares about: "what
-*kinds* of failure are there?".
+The classifier says whether a session is anomalous. Clustering the anomalies shows
+what kinds of failure there are.
 
-Rules this module follows
--------------------------
-* Labels are used only to pick which sessions to cluster (the anomaly class of
-  the development period); they are never part of the clustering input.
-* Features are signed-log transformed (counts and durations are heavy-tailed)
-  and standardised, then clustered with K-means; k is chosen by silhouette.
-* Every cluster is described by what its members have in common: cluster mean vs
-  the overall anomaly mean (and vs all sessions), the most distinctive features,
-  the real events of the sessions nearest its centre, and a plain-language
-  interpretation generated from the feature definitions.
-* Label composition is reported as an integrity check.  Because only anomalies
-  are clustered it is 100 % anomalous by construction, so we additionally assign
-  the later test period (normal and anomalous) to the nearest cluster to see
-  which clusters resemble normal behaviour.
+How it works:
+* Labels are only used to pick which sessions to cluster. They are not a clustering input.
+* Features get a signed log transform (counts and durations have a few huge values) and
+  are standardised. K-means is used, and k is chosen with the silhouette score.
+* Each cluster is described by its most distinctive features, the real events of the
+  sessions nearest its centre, and a short plain English summary.
+* All clustered sessions are anomalies, so we also assign the later test period to the
+  nearest cluster to see which clusters look like normal behaviour.
 """
 import argparse
 import json
@@ -70,18 +63,18 @@ FEATURE_INFO = {
 # Counts and durations have a few huge values. log1p shrinks them, and np.sign keeps negative values
 # (replica_deficit can be negative). predict.py imports this so it uses the same transform.
 def signed_log(X):
-    """log1p that keeps sign: tames heavy-tailed counts/durations."""
+    """log1p that keeps the sign, so very large values are shrunk."""
     return np.sign(X) * np.log1p(np.abs(X))
 
 
 def load_bucket_templates(source):
-    """Event inventory per hash bucket written by setup_data.py (empty if absent)."""
+    """Load the list of events in each hash bucket (empty if the file is missing)."""
     path = ROOT / 'results' / f'{source}_event_buckets.json'
     return json.loads(path.read_text()) if path.exists() else {}
 
 
 def describe_feature(name, bucket_templates):
-    """(what it measures, high meaning, low meaning) for any feature name."""
+    """Return (what the feature measures, meaning when high, meaning when low)."""
     if name in FEATURE_INFO:
         return FEATURE_INFO[name]
     seen = bucket_templates.get(name, [])[:2]
@@ -95,7 +88,7 @@ def describe_feature(name, bucket_templates):
 
 
 def profile_sentence(cluster_mean, anomaly_mean):
-    """Key operational statistics, cluster vs anomaly average."""
+    """One sentence with key numbers: cluster average compared with the anomaly average."""
     def pair(feature, fmt):
         j = COLS.index(feature)
         return f'{fmt.format(cluster_mean[j])} (anomaly avg {fmt.format(anomaly_mean[j])})'
@@ -108,7 +101,7 @@ def profile_sentence(cluster_mean, anomaly_mean):
 # Builds the plain English description of a cluster from its top features and example events.
 # It only reports what the numbers show (higher or lower than the anomaly average), not a root cause.
 def interpret(cluster, feats, share, examples, profile=''):
-    """Plain-language description assembled from the cluster's real statistics."""
+    """Write a plain English description of a cluster from its statistics."""
     clauses = []
     for f in feats:
         _, high, low = f['_meaning']
@@ -125,7 +118,7 @@ def interpret(cluster, feats, share, examples, profile=''):
 
 
 def event_templates_for(events_by_session):
-    """Summarise events: normalised template -> (bucket, total count, example)."""
+    """Count how often each message template appears in the given events."""
     stats = {}
     for events in events_by_session.values():
         for ev in events:
@@ -136,7 +129,7 @@ def event_templates_for(events_by_session):
 
 
 def run(source, df=None, dev=None, te=None, log_path=None):
-    """Cluster development-period anomalies of `source` and write the analysis."""
+    """Cluster the anomalies from train + validation and save the analysis."""
     from train import load_dataset, split  # local import: train imports this module
     if df is None:
         df, tr, va, te = split(load_dataset(source))

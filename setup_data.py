@@ -1,19 +1,16 @@
-"""One-time pipeline: download -> verify -> sort -> process -> (train).
+"""One-time setup: download, check, sort, process and (optionally) train.
 
-    python setup_data.py --source HDFS              # everything
+    python setup_data.py --source HDFS                 # everything
     python setup_data.py --source HDFS --process-only   # stop after the processed dataset
-    python setup_data.py --source HDFS --raw-only       # only (re)create data/raw/.../HDFS.sorted.log
+    python setup_data.py --source HDFS --raw-only       # only make the sorted raw log
 
-Steps
-1. Download the Loghub archive from Zenodo into data/raw/ and verify its MD5.
-2. Extract the raw log (and, for HDFS, the per-block labels).
-3. Sort the log chronologically (external merge sort, constant memory) - the
-   session features and the temporal split both require time order.
-4. processing.process() builds the session feature table and it is written to
-   data/processed/<SOURCE>_sessions.csv.gz  (the dataset the model trains on).
-5. train.train() fits the classifiers, clusters the anomalies and writes
-   models/ and results/.
-If data/processed/<SOURCE>_sessions.csv.gz already exists, steps 1-4 are skipped.
+Steps:
+1. Download the Loghub zip from Zenodo into data/raw/ and check its MD5.
+2. Extract the raw log (and the labels file for HDFS).
+3. Sort the log by time. The sessions and the temporal split both need time order.
+4. Build the session feature table and save it to data/processed/<SOURCE>_sessions.csv.gz.
+5. Train the models, cluster the anomalies and write models/ and results/.
+If the processed file already exists, steps 1 to 4 are skipped.
 """
 import argparse
 import hashlib
@@ -37,7 +34,7 @@ DOWNLOAD_ATTEMPTS = 4
 
 
 def sort_file(path, out, source):
-    """External merge sort: sort chunks in memory, then k-way merge them."""
+    """Sort a big file in chunks, then merge the sorted chunks (external merge sort)."""
     # The raw log is too big to sort in memory. So sort it in chunks, save each chunk,
     # then merge the sorted chunks into one file.
     key = get_source(source).sort_key  # chronological key for this source's line format
@@ -91,7 +88,7 @@ def download_and_verify(archive, digest):
 
 
 def prepare_raw(source):
-    """Download, verify, extract and chronologically sort the raw log. Returns the labels path (HDFS)."""
+    """Download, check, extract and sort the raw log. Returns the labels file path (HDFS only)."""
     spec = get_source(source)
     archive, digest, files = spec.archive, spec.md5, spec.files
     dest = RAW_DIR / archive
@@ -119,7 +116,7 @@ def build_processed_dataset(source):
 
 
 def write_bucket_inventory(source):
-    """results/<SOURCE>_event_buckets.json: what each event_hash_NN feature counts."""
+    """Save what each event_hash_NN feature counts to results/<SOURCE>_event_buckets.json."""
     print('Building event-bucket inventory...', flush=True)
     inventory = bucket_inventory(sorted_log_path(source), source)
     (ROOT / 'results' / f'{source}_event_buckets.json').write_text(json.dumps(inventory, indent=2))

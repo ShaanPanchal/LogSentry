@@ -1,9 +1,8 @@
-"""Disk-backed raw log index for large dashboard uploads.
+"""Keeps an index of an uploaded log on disk, so big files can be used without loading them.
 
-`build_index` records, for every session, the byte offsets of its lines in the
-uploaded file; `read_events` seeks straight to them for the drill-down view, so
-the whole log never has to be held in memory.  Which session a line belongs to is
-decided by the source adapter (sources.py).
+`build_index` saves the byte position of every line of each session. `read_events` jumps
+straight to those positions for the drill-down view. The source adapter (sources.py)
+decides which session a line belongs to.
 """
 import sqlite3
 
@@ -37,7 +36,7 @@ def build_index(log_path, index_path, source):
 
 
 def read_events(log_path, index_path, source, sid, limit=500):
-    """First `limit` events of a session. Returns (events, truncated)."""
+    """Get the first `limit` events of a session. Returns (events, truncated)."""
     events = []
     with sqlite3.connect(index_path) as db, log_path.open('rb') as f:
         # Look up the saved offsets for this session, then jump straight to those lines in the file.

@@ -1,37 +1,26 @@
-"""Session feature extraction (the single authoritative feature schema).
+"""Turns the events of a session into one row of 52 features (the feature schema).
 
-One `Session` accumulates the events of one session (an HDFS block, or a BGL
-five-minute window) and `Session.row()` turns it into one fixed-length feature
-vector.  The same code produces the training table, the dashboard's live
-features and the command-line predictions, so the model can never see a
-different schema at prediction time than it was trained on.
+A `Session` collects the events of one session (an HDFS block, or a BGL five minute window).
+`Session.row()` then gives the feature values. Training, the dashboard and the command line
+all use this code, so the model always sees the same features it was trained on.
 
-Feature groups and why each is here
------------------------------------
-G1  Event-type counts (32 hashed buckets).  The standard session representation
-    in the log-anomaly literature (Xu et al. 2009; He et al. 2016): how many
-    times each kind of event fired.  Each message is first normalised so that
-    variable parts (block ids, IPs, paths, numbers) disappear, then hashed into
-    one of 32 buckets.  Hashing keeps the schema fixed for logs whose template
-    set is unknown in advance (e.g. a user upload) - no template miner or
-    vocabulary has to be shipped with the model.
-G2  Volume and variety: total events, number of distinct buckets used.
-G3  Timing: duration and the distribution of gaps between consecutive events.
-    A healthy HDFS write is a tight burst; a stalled one leaves a long gap.
-G4  Topology: distinct hosts and threads touched.  HDFS replicates each block
-    to three datanodes, so host count tracks whether replication completed.
-G5  Lifecycle completeness ("absence") features.  A healthy HDFS block follows
-    allocate -> receive x3 -> acknowledge x3 -> store x3 -> delete.  These
-    columns measure what is *missing* from that chain, because the common HDFS
-    failure is a step that never happens.  They are HDFS-specific: for
-    sources without that write chain (BGL) replica_deficit, unacked_writes,
-    uncommitted_acks and lifecycle_complete are fixed at 0 (not applicable) and
-    has_allocate / has_delete are 0 because those messages never occur.
-G6  Severity: share of WARN and ERROR-level events, and of messages that
-    contain failure keywords (error, exception, timeout, ...).
-G7  Sequence regularity: share of consecutive event pairs that change bucket,
-    and the Shannon entropy of the bucket distribution.  Counts discard order;
-    these two recover a little of it (cf. DeepLog, Du et al. 2017).
+Feature groups:
+G1  Event counts (32 hash buckets). Counting event types is a standard approach in log
+    anomaly research (Xu et al. 2009; He et al. 2016). Messages are first cleaned so that
+    ids, IPs, paths and numbers disappear, then hashed into 32 buckets. This works even
+    when we do not know the event types in advance (e.g. an uploaded log).
+G2  Volume: total events and number of different buckets used.
+G3  Timing: duration and the gaps between events. A healthy HDFS write is quick, a stalled
+    one has a long gap.
+G4  Topology: number of hosts and threads. HDFS keeps 3 copies of each block, so the host
+    count shows whether replication finished.
+G5  Write chain (HDFS only): a healthy block is allocated, received x3, acknowledged x3,
+    stored x3 and later deleted. These features measure which step is missing. For BGL the
+    chain features are fixed at 0, meaning "not applicable".
+G6  Severity: share of WARN and ERROR events, and of messages with failure words.
+G7  Order: how often consecutive events change type, and the entropy of the event types.
+    Counts lose the order of events, and these two bring a little of it back (cf. DeepLog,
+    Du et al. 2017).
 """
 import re
 import zlib
@@ -77,7 +66,7 @@ COLS = BUCKET_COLS + STRUCTURAL_COLS  # the 52 model input columns
 # Turns a raw message into a "template", e.g. "Receiving block blk_1 src: /10.0.0.1" becomes
 # "Receiving block <BLOCK> src: <PATH>". This lets us count how often each kind of event happens.
 def normalise(msg):
-    """Replace variable tokens so messages of one kind look identical."""
+    """Replace ids, IPs, paths and numbers so messages of the same kind look identical."""
     msg = BLOCK.sub('<BLOCK>', msg)
     msg = IP.sub('<IP>', msg)
     msg = PATH.sub('<PATH>', msg)
@@ -86,12 +75,12 @@ def normalise(msg):
 
 @lru_cache(maxsize=100000)
 def bucket(text):
-    """Stable hash bucket of a normalised message (crc32, not Python's hash())."""
+    """Hash a cleaned message into a bucket number (crc32, which gives the same result every run)."""
     return zlib.crc32(text.encode()) % N_BUCKETS
 
 
 class Session:
-    """Streaming accumulator: feed events in time order, then call `row()`."""
+    """Collects the events of one session. Add events in time order, then call row()."""
 
     def __init__(self, keep=False):
         # We only keep running totals (event count, sum of gaps, sum of squared gaps) instead of every event.
@@ -147,11 +136,10 @@ class Session:
             self.events.append({'time': t, 'level': level, 'message': msg})
 
     def row(self, sid, source, lifecycle=True):
-        """[session_id, source, t_start, t_end, label] + the 52 COLS values.
+        """Return [session_id, source, t_start, t_end, label] followed by the 52 feature values.
 
-        `lifecycle=False` (sources without an HDFS-style write chain, e.g. BGL) sets the
-        four chain-completeness features to 0: the events they count do not exist there,
-        so 0 means 'not applicable' rather than a measurement.
+        lifecycle=False is for sources without an HDFS write chain (BGL). The four chain
+        features are set to 0, which means "not applicable" and not a real measurement.
         """
         hdfs = lifecycle
         # Number of gaps between events = events - 1. max(..., 1) avoids dividing by zero for a 1 event session.

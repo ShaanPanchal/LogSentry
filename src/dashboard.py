@@ -1,11 +1,11 @@
-"""Local Flask dashboard: upload a log, score sessions, filter, drill down.
+"""Local Flask dashboard: upload a log, score its sessions, filter them and drill down.
 
-The page is backed by the real pipeline: an upload is parsed and grouped into
-sessions, features are extracted by features.py, the saved final classifier
-scores each session (predict.py) and flagged sessions are assigned to an anomaly
-cluster.  Training results (results/*.json) supply the model/cluster context.
+An upload goes through the same pipeline as the command line: parse, group into
+sessions, extract features (features.py) and score with the saved model (predict.py).
+Flagged sessions are also given an anomaly cluster. Saved results in results/ give
+the model and cluster information.
 
-Run:  python src/dashboard.py   ->  http://127.0.0.1:5000
+Run:  python src/dashboard.py   then open http://127.0.0.1:5000
 """
 import atexit
 import csv
@@ -44,7 +44,7 @@ atexit.register(cleanup)
 
 
 def load_model_info(source):
-    """Final-model test metrics and cluster blurbs saved by training (None if untrained)."""
+    """Load the saved model results, cluster descriptions, comparison and folds for a source."""
     info = {'model': None, 'clusters': {}, 'comparison': [], 'comparison_split': None, 'profile_note': '', 'folds': None}
     if not source:
         return info
@@ -70,7 +70,7 @@ def load_model_info(source):
 
 
 def folds_summary(saved):
-    """Rolling-origin results: per-model mean/min/max F1 across the temporal folds."""
+    """Summarise the rolling temporal folds: mean, min and max F1 for each model."""
     usable = [f for f in saved['folds'] if f['usable']]
     rows = [{'model': name, **{k: v[k] for k in ('mean_f1', 'min_f1', 'max_f1', 'std_f1', 'mean_precision',
                                                  'mean_recall', 'total_fp', 'total_fn')}}
@@ -80,7 +80,7 @@ def folds_summary(saved):
 
 
 def dataset_summaries():
-    """One row per dataset that has a trained, evaluated model - lets the user tell the sources apart."""
+    """One row for each dataset that has a trained model, so the sources can be told apart."""
     out = []
     for name in SOURCES:
         spec = get_source(name)
@@ -102,7 +102,7 @@ def dataset_summaries():
 
 
 def comparison_rows(saved):
-    """Test-period rows of the saved model comparison, for the table."""
+    """Get the test period rows of the saved model comparison."""
     rows = []
     for r in saved['models']:
         if r['period'] != 'test':
@@ -113,8 +113,7 @@ def comparison_rows(saved):
 
 
 def score_histogram(df, bins=10):
-    """Counts of sessions per anomaly-score bin, with bar heights on a sqrt scale
-    so the rare high-score bins stay visible next to the huge normal bin."""
+    """Count sessions in each score bin. Bar heights use a square root so small bins are still visible."""
     counts, edges = np.histogram(df.score, bins=bins, range=(0, 1))
     # Bar heights use a square root, otherwise the huge normal bin would make the other bars too small to see.
     top = max(math.sqrt(counts.max()), 1)
@@ -123,7 +122,7 @@ def score_histogram(df, bins=10):
 
 
 def cluster_rows(df, summaries):
-    """Flagged sessions of this upload grouped by anomaly cluster."""
+    """Group the flagged sessions of this upload by anomaly cluster."""
     flagged = df[df.decision == 'ANOMALY']
     rows = []
     for cluster, n in flagged.cluster.value_counts().sort_index().items():
@@ -136,7 +135,7 @@ def cluster_rows(df, summaries):
 
 
 def run_upload():
-    """Handle the POSTed upload. Returns an error message or None."""
+    """Handle an uploaded log. Returns an error message, or None if it worked."""
     source, upload = request.form.get('source'), request.files.get('log')
     if source not in SOURCES or not upload:
         return 'Choose a supported source and a log file.'
@@ -244,7 +243,7 @@ def too_large(e):
 
 @app.route('/export')
 def export():
-    """Stream the per-session results as CSV."""
+    """Download the per-session results as a CSV file."""
     df = STATE['df']
     if df is None:
         return 'Upload and analyse a log first.', 400

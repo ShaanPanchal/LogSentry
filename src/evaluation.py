@@ -1,9 +1,7 @@
-"""Error analysis, a hard test subset, seed-stability and rolling-origin temporal folds.
+"""Extra evaluation: error analysis, a hard subset, seed stability and rolling temporal folds.
 
-`run()` is called by train.py after the final model is fitted and writes
-results/<SOURCE>_error_analysis.json.  `stability()` (python src/evaluation.py
---stability) refits the models under several random seeds on the same temporal
-split to show how much of the reported score is luck.
+run() is called by train.py after the final model is trained. stability() and
+rolling_origin() can be run from the command line (--stability, --folds).
 """
 import argparse
 import json
@@ -20,7 +18,7 @@ KEY_FEATURES = ['n_events', 'duration_s', 'gap_max_s', 'n_hosts', 'keyword_error
 
 
 def differences(group, reference, scale, buckets, top=5):
-    """Features whose mean differs most between two groups (in units of `scale`)."""
+    """Find the features whose average differs most between two groups (divided by `scale`)."""
     if len(group) == 0 or len(reference) == 0:
         return []
     diff = (group.mean(0) - reference.mean(0)) / scale
@@ -55,7 +53,7 @@ def examples(rows, df, X, events):
 
 
 def run(source, df, tr, va, te):
-    """Analyse test-period mistakes of the saved final model."""
+    """Look at the mistakes the final model made on the test period."""
     pred = pd.read_csv(ROOT / 'results' / f'{source}_test_predictions.csv.gz', dtype={'session_id': str})
     pos = df.reset_index().set_index('session_id')['index']
     X = df[COLS].to_numpy(dtype=np.float32)
@@ -120,7 +118,7 @@ def run(source, df, tr, va, te):
 
 
 def stability(source, seeds=(0, 1, 7, 13, 42)):
-    """Refit each model under several seeds (same split, same thresholds)."""
+    """Retrain every model with several random seeds (same split and thresholds)."""
     from sklearn.metrics import average_precision_score, f1_score
     from train import candidates, load_dataset, split
     df, tr, va, te = split(load_dataset(source))
@@ -149,14 +147,12 @@ def stability(source, seeds=(0, 1, 7, 13, 42)):
 
 
 def rolling_origin(source, n_chunks=5):
-    """Rolling-origin (expanding window) temporal evaluation.
+    """Test the models on several later time periods, not just one.
 
-    The sessions, ordered by start time, are cut into `n_chunks` equal time chunks. Fold k trains on chunks
-    0..k-1 and tests on chunk k, so every model is always scored on data *later* than everything it was
-    trained on, and on several different periods rather than a single one. This matters when the anomaly
-    rate drifts over time (e.g. BGL): one 20% test period can flatter or punish a model by chance.
-    The decision threshold is tuned on the last 25% (by time) of each training window, then the model is
-    refit on the whole window. Sessions that straddle the train/test boundary are purged from training.
+    The sessions are sorted by time and cut into `n_chunks` equal chunks. Fold k trains on
+    the chunks before k and tests on chunk k, so a model is always tested on data later than
+    its training data. The threshold is tuned on the last 25% of each training window.
+    Sessions that cross the train/test boundary are removed from training.
     """
     from train import candidates, best_threshold, load_dataset, metrics
     df = load_dataset(source).sort_values(['t_start', 'session_id']).reset_index(drop=True)

@@ -1,17 +1,12 @@
-"""Five-model comparison on one shared temporal split.
+"""Compares the five models on one shared temporal split.
 
-Every model is trained on the same training period (and refit on train+validation),
-uses the same 52 features, and is scored on the same, never-shuffled test period.
-This module records that comparison and *proves* the test set is shared:
+All models use the same training period, the same 52 features and the same test period.
+This module saves the comparison and checks that the test set really is shared:
 
-* `test_set_sha1` - hash of the test session ids; recomputed from the dataset by
-  `python src/comparison.py` and compared with the stored value
-* every model's confusion counts must add up to the test-set size
+* a hash of the test session ids is stored and can be re-checked with `python src/comparison.py`
+* every model's confusion counts must add up to the size of the test set
 
-Outputs (results/):  <SOURCE>_model_comparison.csv   one row per model and period
-                     <SOURCE>_model_comparison.json  the same plus split metadata
-Reproduce with `python src/train.py` (re-fits everything) or re-verify/regenerate
-the tables from saved results with `python src/comparison.py`.
+Output files (in results/): <SOURCE>_model_comparison.csv, .json and .md
 """
 import argparse
 import hashlib
@@ -84,7 +79,7 @@ PROFILES = {
 
 
 def key_params(name, model):
-    """Selected hyperparameters (and iterations actually fitted) of a fitted estimator."""
+    """Pick out the important settings of a fitted model."""
     est = model.steps[-1][1] if hasattr(model, 'steps') else model
     params = est.get_params()
     out = {k: params[k] for k in KEY_PARAMS.get(name, []) if k in params}
@@ -94,7 +89,7 @@ def key_params(name, model):
 
 
 def scaling_note(name, model):
-    """Whether this run applied feature scaling."""
+    """Say whether feature scaling was used for this model."""
     needs = PROFILES[name]['scaling']
     if hasattr(model, 'steps') and any(type(s).__name__ == 'StandardScaler' for _, s in model.steps):
         return f'{needs} - StandardScaler applied inside the model pipeline'
@@ -124,7 +119,7 @@ def test_set_hash(df, te):
 
 
 def build(df, tr, va, te, validation, tests, final_name):
-    """Assemble the comparison record from the models' validation/test metrics."""
+    """Put the validation and test results of all models into one record."""
     n_test = int(te.sum())
     # Same test set for every model: each confusion matrix covers all n_test sessions.
     # If every model's confusion matrix adds up to the test size, they were all scored on the same sessions.
@@ -158,7 +153,7 @@ def write(source, result):
 
 
 def write_markdown(source, result):
-    """Report-ready summary: results table, cost, and per-model profile."""
+    """Write a short report with a results table and a profile of each model."""
     test = [r for r in result['models'] if r['period'] == 'test']
     sp = result['split']
     lines = [f'# {source}: five-model comparison', '',
@@ -181,7 +176,7 @@ def write_markdown(source, result):
 
 
 def run(source):
-    """Re-verify a saved comparison against the dataset and regenerate its tables."""
+    """Check a saved comparison against the dataset and rewrite its tables."""
     from train import load_dataset, split
     path = ROOT / 'results' / f'{source}_model_comparison.json'
     saved = json.loads(path.read_text())

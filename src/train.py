@@ -1,17 +1,13 @@
-"""Classification: temporal split, model comparison, final model selection.
+"""Trains the classifiers: temporal split, model comparison and final model choice.
 
-Evaluation design
------------------
-Sessions are ordered by start time and split 60 / 20 / 20 into train /
-validation / test.  Sessions that straddle a boundary are *purged* so no
-session's events leak across partitions.  Models and decision thresholds are
-chosen on validation only; the selected models are then refit on train+validation
-and scored once on the later test period.  A random split would let a model see
-the future; this one cannot.
+Sessions are sorted by start time and split 60 / 20 / 20 into train, validation and test.
+Sessions that cross a boundary are removed ("purged") so no session is shared between parts.
+Models and thresholds are chosen on validation only. The chosen models are then retrained
+on train + validation and scored once on the later test period. A random split would let
+the model learn from the future, so it is not used.
 
-Running this module trains the classifiers, then runs the clustering analysis
-(clustering.py), the five-model comparison record (comparison.py) and error analysis (evaluation.py) and writes everything to
-results/.
+Running this file also runs the clustering (clustering.py), the model comparison
+(comparison.py) and the error analysis (evaluation.py), and saves the results in results/.
 """
 import argparse
 import json
@@ -43,7 +39,7 @@ THRESHOLD_GRID = np.arange(.05, 1, .05)
 
 
 def metrics(y, p, threshold):
-    """Standard binary metrics at a probability threshold (+ PR-AUC and confusion counts)."""
+    """Precision, recall, F1, PR-AUC and confusion counts at one threshold."""
     # A session is predicted as an anomaly when its score is at or above the threshold
     pred = p >= threshold
     tn, fp, fn, tp = confusion_matrix(y, pred, labels=[0, 1]).ravel()
@@ -59,7 +55,7 @@ def metrics(y, p, threshold):
 
 
 def load_dataset(source):
-    """Read the processed session table (the exact table the model trains on)."""
+    """Read the processed session table that the models train on."""
     path = PROCESSED_DIR / f'{source}_sessions.csv.gz'
     if not path.exists():
         raise FileNotFoundError(f'{path} not found. Run: python setup_data.py --source {source}')
@@ -67,7 +63,7 @@ def load_dataset(source):
 
 
 def split(df):
-    """Purged chronological 60/20/20 split. Returns (df, train_mask, val_mask, test_mask)."""
+    """Purged 60/20/20 split by time. Returns (table, train mask, validation mask, test mask)."""
     df = df.sort_values(['t_start', 'session_id']).reset_index(drop=True)
     # Sessions are sorted by time. a and b are the start times at the 60% and 80% points.
     # Train and validation sessions must also END before their cut-off. Sessions that cross a cut-off
@@ -87,8 +83,8 @@ def split(df):
 
 
 def candidates(seed=SEED):
-    """The compared classifiers. Class imbalance (~3% anomalies) is handled by
-    class weighting where the estimator supports it."""
+    """The models being compared. Anomalies are rare, so class weights are used where the model allows it.
+    """
     return {
         # class_weight="balanced" makes mistakes on the rare anomaly class count more during training.
         # Logistic regression also needs scaled features, so a StandardScaler is placed in front of it.
@@ -113,15 +109,15 @@ def candidates(seed=SEED):
 
 
 def best_threshold(y, p):
-    """Probability cut-off maximising F1 on validation data."""
+    """Find the threshold with the best F1 (used on validation data)."""
     # Try every threshold in the grid and keep the one with the highest F1.
     return max(THRESHOLD_GRID, key=lambda t: f1_score(y, p >= t, zero_division=0))
 
 
 def train_classifiers(df, tr, va, te, source):
-    """Select on validation, refit on train+val, score on the test period.
+    """Pick thresholds on validation, retrain on train + validation and score on the test period.
 
-    Returns (validation rows, test rows, final-model summary).
+    Returns (validation rows, test rows, summary of the final model).
     """
     X = df[COLS].to_numpy(dtype=np.float32)
     y = df.label.to_numpy()
