@@ -1,23 +1,163 @@
-const $=s=>document.querySelector(s);
-const theme=$('#theme-toggle');document.documentElement.dataset.theme=localStorage.getItem('logsentry-theme')||'dark';
-theme.addEventListener('click',()=>{let t=document.documentElement.dataset.theme==='light'?'dark':'light';document.documentElement.dataset.theme=t;localStorage.setItem('logsentry-theme',t)});
-const input=$('#log-file'),zone=$('#dropzone'),submit=$('#analyse'),clear=$('#clear-file'),form=$('#upload-form'),error=$('#upload-error');
-let busy=false;
-function selected(){const f=input.files[0];$('#file-title').textContent=f?f.name:'Drop your log file here';$('#file-meta').textContent=f?`${(f.size/1024/1024).toFixed(1)} MB · ready to analyse`:'or click to browse · uncompressed .log / .txt';submit.disabled=!f||busy;clear.disabled=!f||busy;zone.classList.toggle('selected',!!f)}
-input.addEventListener('change',selected);clear.addEventListener('click',()=>{input.value='';selected()});
-['dragenter','dragover'].forEach(e=>zone.addEventListener(e,x=>{x.preventDefault();if(!busy)zone.classList.add('dragging')}));
-zone.addEventListener('dragleave',()=>zone.classList.remove('dragging'));zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('dragging');if(!busy&&e.dataTransfer.files.length){input.files=e.dataTransfer.files;selected()}});
-form.addEventListener('submit',e=>{e.preventDefault();if(busy||!input.files.length)return;error.hidden=true;const file=input.files[0];if(file.size>=4*1024**3){error.textContent='Choose a log smaller than 4 GB.';error.hidden=false;return}busy=true;selected();input.disabled=true;$('#source').disabled=true;$('#progress-panel').hidden=false;submit.textContent='Analysing…';const bar=$('#progress-bar'),title=$('#progress-title'),percent=$('#progress-percent'),description=$('#progress-description');bar.classList.remove('processing');bar.style.width='0%';title.textContent='Uploading log';percent.textContent='0%';description.textContent='Transferring your file to the local engine.';
- const data=new FormData();data.append('source',$('#source').value);data.append('log',file);const xhr=new XMLHttpRequest();xhr.open('POST','/');xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
- const processing=()=>{title.textContent='Analysing sessions';percent.textContent='Processing';bar.classList.add('processing');bar.style.width='35%';description.textContent='Parsing, scoring, and indexing events. Large logs take several minutes. Keep this page open.'};
- xhr.upload.addEventListener('progress',e=>{if(e.lengthComputable){let n=Math.round(e.loaded/e.total*100);bar.style.width=n+'%';percent.textContent=n+'%';if(n===100)processing()}});xhr.upload.addEventListener('load',processing);
- // Setting only the hash on the current page does not reload it, so the results the server just computed would not
- // appear until a manual refresh. From the dashboard root, reload explicitly (with manual scroll restoration so the page lands on the #summary anchor instead of the old scroll position); from any other URL a normal navigation reloads.
- function showResults(){history.scrollRestoration='manual';if(location.pathname==='/'&&!location.search){location.hash='summary';location.reload()}else location.assign('/#summary')}
- function fail(message){busy=false;input.disabled=false;$('#source').disabled=false;submit.innerHTML='Analyse log <span>↗</span>';selected();$('#progress-panel').hidden=true;error.textContent=message;error.hidden=false}
- xhr.addEventListener('load',()=>{let r;try{r=JSON.parse(xhr.responseText)}catch{}if(xhr.status===200&&r?.success){title.textContent='Analysis complete';bar.classList.remove('processing');bar.style.width='100%';percent.textContent='100%';showResults()}else fail(r?.error||`Analysis failed (${xhr.status}). Check the dashboard Terminal for details.`)});xhr.addEventListener('error',()=>fail('Connection lost. Check that the dashboard is still running before trying again.'));xhr.send(data);
+const $ = (s) => document.querySelector(s);
+const theme = $("#theme-toggle");
+document.documentElement.dataset.theme =
+	localStorage.getItem("logsentry-theme") || "dark";
+theme.addEventListener("click", () => {
+	let t =
+		document.documentElement.dataset.theme === "light" ? "dark" : "light";
+	document.documentElement.dataset.theme = t;
+	localStorage.setItem("logsentry-theme", t);
 });
-$('#copy-events')?.addEventListener('click',async()=>{const b=$('#copy-events');try{await navigator.clipboard.writeText($('#event-list').innerText);b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy events',1800)}catch{b.textContent='Copy unavailable'}});
-document.querySelectorAll('.nav').forEach(a=>a.addEventListener('click',()=>{document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));a.classList.add('active')}));
+const input = $("#log-file"),
+	zone = $("#dropzone"),
+	submit = $("#analyse"),
+	clear = $("#clear-file"),
+	form = $("#upload-form"),
+	error = $("#upload-error");
+let busy = false;
+function selected() {
+	const f = input.files[0];
+	$("#file-title").textContent = f ? f.name : "Drop your log file here";
+	$("#file-meta").textContent = f
+		? `${(f.size / 1024 / 1024).toFixed(1)} MB · ready to analyse`
+		: "or click to browse · uncompressed .log / .txt";
+	submit.disabled = !f || busy;
+	clear.disabled = !f || busy;
+	zone.classList.toggle("selected", !!f);
+}
+input.addEventListener("change", selected);
+clear.addEventListener("click", () => {
+	input.value = "";
+	selected();
+});
+["dragenter", "dragover"].forEach((e) =>
+	zone.addEventListener(e, (x) => {
+		x.preventDefault();
+		if (!busy) zone.classList.add("dragging");
+	}),
+);
+zone.addEventListener("dragleave", () => zone.classList.remove("dragging"));
+zone.addEventListener("drop", (e) => {
+	e.preventDefault();
+	zone.classList.remove("dragging");
+	if (!busy && e.dataTransfer.files.length) {
+		input.files = e.dataTransfer.files;
+		selected();
+	}
+});
+form.addEventListener("submit", (e) => {
+	e.preventDefault();
+	if (busy || !input.files.length) return;
+	error.hidden = true;
+	const file = input.files[0];
+	if (file.size >= 4 * 1024 ** 3) {
+		error.textContent = "Choose a log smaller than 4 GB.";
+		error.hidden = false;
+		return;
+	}
+	busy = true;
+	selected();
+	input.disabled = true;
+	$("#source").disabled = true;
+	$("#progress-panel").hidden = false;
+	submit.textContent = "Analysing…";
+	const bar = $("#progress-bar"),
+		title = $("#progress-title"),
+		percent = $("#progress-percent"),
+		description = $("#progress-description");
+	bar.classList.remove("processing");
+	bar.style.width = "0%";
+	title.textContent = "Uploading log";
+	percent.textContent = "0%";
+	description.textContent = "Transferring your file to the local engine.";
+	const data = new FormData();
+	data.append("source", $("#source").value);
+	data.append("log", file);
+	const xhr = new XMLHttpRequest();
+	xhr.open("POST", "/");
+	xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+	const processing = () => {
+		title.textContent = "Analysing sessions";
+		percent.textContent = "Processing";
+		bar.classList.add("processing");
+		bar.style.width = "35%";
+		description.textContent =
+			"Parsing, scoring, and indexing events. Large logs take several minutes. Keep this page open.";
+	};
+	xhr.upload.addEventListener("progress", (e) => {
+		if (e.lengthComputable) {
+			let n = Math.round((e.loaded / e.total) * 100);
+			bar.style.width = n + "%";
+			percent.textContent = n + "%";
+			if (n === 100) processing();
+		}
+	});
+	xhr.upload.addEventListener("load", processing);
+	// Setting only the hash on the current page does not reload it, so the results the server just computed would not
+	// appear until a manual refresh. From the dashboard root, reload explicitly (with manual scroll restoration so the page lands on the #summary anchor instead of the old scroll position); from any other URL a normal navigation reloads.
+	function showResults() {
+		history.scrollRestoration = "manual";
+		if (location.pathname === "/" && !location.search) {
+			location.hash = "summary";
+			location.reload();
+		} else location.assign("/#summary");
+	}
+	function fail(message) {
+		busy = false;
+		input.disabled = false;
+		$("#source").disabled = false;
+		submit.innerHTML = "Analyse log <span>↗</span>";
+		selected();
+		$("#progress-panel").hidden = true;
+		error.textContent = message;
+		error.hidden = false;
+	}
+	xhr.addEventListener("load", () => {
+		let r;
+		try {
+			r = JSON.parse(xhr.responseText);
+		} catch {}
+		if (xhr.status === 200 && r?.success) {
+			title.textContent = "Analysis complete";
+			bar.classList.remove("processing");
+			bar.style.width = "100%";
+			percent.textContent = "100%";
+			showResults();
+		} else
+			fail(
+				r?.error ||
+					`Analysis failed (${xhr.status}). Check the dashboard Terminal for details.`,
+			);
+	});
+	xhr.addEventListener("error", () =>
+		fail(
+			"Connection lost. Check that the dashboard is still running before trying again.",
+		),
+	);
+	xhr.send(data);
+});
+$("#copy-events")?.addEventListener("click", async () => {
+	const b = $("#copy-events");
+	try {
+		await navigator.clipboard.writeText($("#event-list").innerText);
+		b.textContent = "Copied ✓";
+		setTimeout(() => (b.textContent = "Copy events"), 1800);
+	} catch {
+		b.textContent = "Copy unavailable";
+	}
+});
+document.querySelectorAll(".nav").forEach((a) =>
+	a.addEventListener("click", () => {
+		document
+			.querySelectorAll(".nav")
+			.forEach((n) => n.classList.remove("active"));
+		a.classList.add("active");
+	}),
+);
 // After an upload the page reloads at /#summary; scroll there explicitly (reload would otherwise keep the old scroll position).
-window.addEventListener('load',()=>{if(location.hash==='#summary')document.getElementById('summary')?.scrollIntoView({behavior:'instant'})});
+window.addEventListener("load", () => {
+	if (location.hash === "#summary")
+		document
+			.getElementById("summary")
+			?.scrollIntoView({ behavior: "instant" });
+});

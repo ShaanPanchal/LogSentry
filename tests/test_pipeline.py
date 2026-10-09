@@ -1,5 +1,5 @@
 """Small synthetic fixtures verify mechanics, not model accuracy."""
-import io,sys,tempfile,unittest
+import io,re,sys,tempfile,unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
 import joblib,numpy as np,pandas as pd
@@ -234,10 +234,21 @@ class PipelineTests(unittest.TestCase):
             old = dashboard.ROOT;dashboard.ROOT = root
             try:
                 c = dashboard.app.test_client()
-                r = c.get('/?results=BGL');self.assertEqual(r.status_code, 200)
-                self.assertIn(b'show results for <b>BGL</b>', r.data);self.assertIn(b'<tr class="sel"><td><b>BGL</b>', r.data);self.assertIn(b'Random forest', r.data)
-                self.assertIn(b'class="tab active" href="/?results=BGL', r.data)
-                r = c.get('/?results=HDFS');self.assertIn(b'show results for <b>HDFS</b>', r.data);self.assertIn(b'<tr class="sel"><td><b>HDFS</b>', r.data)
+                def page(q):
+                    r = c.get(q);self.assertEqual(r.status_code, 200)
+                    h = re.sub(r'\s+', ' ', r.get_data(as_text=True))   # ignore formatting whitespace / line breaks
+                    return re.sub(r'\s*([<>])\s*', lambda m: m.group(1), h)
+                h = page('/?results=BGL')
+                self.assertIn('show results for<b>BGL</b>', h)                      # results panel is for BGL
+                self.assertRegex(h, r'<tr class="sel"><td><b>BGL</b>.*?Random forest')   # BGL row selected, with its model
+                self.assertNotRegex(h, r'<tr class="sel"><td><b>HDFS</b>')
+                self.assertRegex(h, r'<a class="tab active" href="/\?results=BGL[^"]*">BGL</a>')
+                self.assertNotRegex(h, r'<a class="tab active" href="/\?results=HDFS')
+                h = page('/?results=HDFS')
+                self.assertIn('show results for<b>HDFS</b>', h)
+                self.assertRegex(h, r'<tr class="sel"><td><b>HDFS</b>.*?Histogram gradient boosting')
+                self.assertNotRegex(h, r'<tr class="sel"><td><b>BGL</b>')
+                self.assertRegex(h, r'<a class="tab active" href="/\?results=HDFS[^"]*">HDFS</a>')
                 r = c.get('/?results=NOPE');self.assertEqual(r.status_code, 200)   # unknown dataset falls back safely
                 self.assertEqual(len(dashboard.dataset_summaries()), 2)
             finally:dashboard.ROOT = old
