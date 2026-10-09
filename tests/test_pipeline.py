@@ -1,7 +1,8 @@
 """Small synthetic fixtures verify mechanics, not model accuracy."""
-import io,re,sys,tempfile,unittest
+import io,os,re,subprocess,sys,tempfile,unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
+import mkl_setup  # noqa: F401  (Windows MKL fix, must come before numpy)
 import joblib,numpy as np,pandas as pd
 from sklearn.dummy import DummyClassifier
 import processing,predict,dashboard
@@ -311,6 +312,32 @@ class PipelineTests(unittest.TestCase):
         self.assertNotIn('TEMPORAL ROBUSTNESS', h)
         self.assertEqual(h.count('<details'), h.count('</details>'))
         self.assertNotIn('Dataset exploration', h)
+
+    def run_clean(self, code, **extra):
+        """Run code in a fresh Python process that does not inherit MKL_THREADING_LAYER."""
+        root = Path(__file__).resolve().parents[1]
+        env = {k: v for k, v in os.environ.items() if k != 'MKL_THREADING_LAYER'}
+        env.update(extra, PYTHONDONTWRITEBYTECODE='1')
+        return subprocess.run([sys.executable, '-c', f'import sys; sys.path.insert(0, r"{root / "src"}")\n' + code],
+                              cwd=root, env=env, capture_output=True, text=True, timeout=300)
+
+    def test_mkl_setup_selects_tbb_on_windows_only(self):
+        code = 'import mkl_setup, os; assert "numpy" not in sys.modules; print(os.environ.get("MKL_THREADING_LAYER"))'
+        r = self.run_clean(code);self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(r.stdout.strip(), 'TBB' if sys.platform == 'win32' else 'None')
+        # A value chosen by the user is never overwritten.
+        r = self.run_clean(code, MKL_THREADING_LAYER='SEQUENTIAL');self.assertEqual(r.stdout.strip(), 'SEQUENTIAL')
+
+    def test_clustering_and_scoring_work_without_manual_mkl_setting(self):
+        # Regression test for the Windows MKL crash (OSError 0xc06d007f): no environment variable is set by hand.
+        code = ('import dashboard, clustering, numpy as np\n'                    # dashboard is what the launcher imports
+                'from sklearn.cluster import KMeans\n'
+                'KMeans(3, n_init=2, random_state=0).fit(np.random.RandomState(0).rand(60, 4))\n'   # K-Means
+                'from predict import predict\n'
+                'df, audit, _ = predict("data/supporting/sample_HDFS.log", "HDFS")\n'                # scoring + cluster assignment
+                'assert len(df) == 200 and df.cluster.ge(0).sum() == (df.decision == "ANOMALY").sum()\n'
+                'print("ok")')
+        r = self.run_clean(code);self.assertEqual((r.returncode, r.stdout.strip()), (0, 'ok'), r.stderr[-500:])
 
     def test_missing_model_message(self):
         with tempfile.TemporaryDirectory() as d:

@@ -6,6 +6,7 @@ rolling_origin() can be run from the command line (--stability, --folds).
 import argparse
 import json
 
+import mkl_setup  # noqa: F401  (Windows MKL fix, must come before numpy)
 import numpy as np
 import pandas as pd
 

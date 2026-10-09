@@ -7,6 +7,7 @@ final model. Flagged sessions are also given the nearest anomaly cluster.
 """
 import argparse
 
+import mkl_setup  # noqa: F401  (Windows MKL fix, must come before numpy)
 import joblib
 import numpy as np
 

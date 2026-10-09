@@ -10,6 +10,7 @@ import gzip
 from collections import Counter, defaultdict
 from pathlib import Path
 
+import mkl_setup  # noqa: F401  (Windows MKL fix, must come before numpy)
 import pandas as pd
 
 from features import BLOCK, COLS, IP, Session, bucket, normalise  # noqa: F401 (re-exported)

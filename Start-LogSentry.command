@@ -1,5 +1,6 @@
 #!/bin/bash
 # macOS convenience launcher: creates a venv, installs requirements.txt and starts the dashboard.
+# Needs Python 3.11 or newer. The dashboard opens at http://127.0.0.1:5050 (the same port as python src/dashboard.py).
 set -eu
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$SCRIPT_DIR"
@@ -10,9 +11,11 @@ echo "Opening LogSentry in Visual Studio Code..."
 if ! open -a "Visual Studio Code" "$APP_DIR" 2>/dev/null; then
   echo "VS Code could not be opened. The dashboard will still start."
 fi
+PORT=5050
 PYTHON_BIN="$APP_DIR/.venv/bin/python"
 if [ ! -x "$PYTHON_BIN" ]; then
   command -v python3 >/dev/null 2>&1 || pause_error "Python 3 is required. Install Python, then open this launcher again."
+  python3 -c 'import sys; sys.exit(sys.version_info < (3, 11))' || pause_error "Python 3.11 or newer is required (found $(python3 -V 2>&1))."
   echo "Creating the Python environment..."
   python3 -m venv "$APP_DIR/.venv" || pause_error "Could not create the Python environment."
 fi
@@ -21,7 +24,7 @@ if ! "$PYTHON_BIN" -c 'import flask,numpy,pandas,sklearn,joblib' 2>/dev/null; th
   echo "Installing dependencies. This first-time step needs internet access..."
   "$PYTHON_BIN" -m pip install -r requirements.txt || pause_error "Dependency installation failed. See the message above."
 fi
-DASHBOARD_URL="http://127.0.0.1:5050"
+DASHBOARD_URL="http://127.0.0.1:$PORT"
 if curl -fsS --max-time 2 "$DASHBOARD_URL/" 2>/dev/null | grep -q 'LogSentry'; then
   echo "LogSentry is already running. Opening the dashboard..."
   open "$DASHBOARD_URL/"
@@ -30,13 +33,13 @@ fi
 export OMP_NUM_THREADS=2
 export OPENBLAS_NUM_THREADS=2
 echo "Starting the dashboard..."
-"$PYTHON_BIN" -u -c "import sys; sys.path.insert(0, 'src'); from dashboard import app; app.run(host='127.0.0.1', port=5050)" &
+"$PYTHON_BIN" -u -c "import sys; sys.path.insert(0, 'src'); from dashboard import app; app.run(host='127.0.0.1', port=$PORT)" &
 SERVER_PID=$!
 trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
 trap 'exit 130' INT TERM
 for attempt in {1..30}; do
   if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-    pause_error "Dashboard startup failed. Check the error above. Another service may be using port 5050."
+    pause_error "Dashboard startup failed. Check the error above. Another service may be using port $PORT."
   fi
   if curl -fsS --max-time 1 "$DASHBOARD_URL/" 2>/dev/null | grep -q 'LogSentry'; then
     open "$DASHBOARD_URL/"

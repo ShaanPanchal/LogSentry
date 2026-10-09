@@ -12,6 +12,7 @@ import argparse
 import hashlib
 import json
 
+import mkl_setup  # noqa: F401  (Windows MKL fix, must come before numpy)
 import pandas as pd
 
 from processing import COLS, ROOT

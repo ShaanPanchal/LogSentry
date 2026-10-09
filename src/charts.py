@@ -6,6 +6,7 @@ the pictures to figures/. It is safe to run again at any time.
 import argparse
 import json
 
+import mkl_setup  # noqa: F401  (Windows MKL fix, must come before numpy)
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt  # noqa: E402

@@ -25,6 +25,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / 'src'))
 
+import mkl_setup  # noqa: F401  (Windows MKL fix, must come before numpy)
 from processing import PROCESSED_DIR, RAW_DIR, bucket_inventory, process, sorted_log_path  # noqa: E402
 from sources import SOURCES, get_source  # noqa: E402
 

@@ -5,7 +5,7 @@ sessions, extract features (features.py) and score with the saved model (predict
 Flagged sessions are also given an anomaly cluster. Saved results in results/ give
 the model and cluster information.
 
-Run:  python src/dashboard.py   then open http://127.0.0.1:5000
+Run:  python src/dashboard.py   then open http://127.0.0.1:5050
 """
 import atexit
 import csv
@@ -16,6 +16,7 @@ import shutil
 import tempfile
 from pathlib import Path
 
+import mkl_setup  # noqa: F401  (Windows MKL fix, must come before numpy)
 import joblib
 import numpy as np
 from flask import Flask, Response, jsonify, render_template, request, url_for
@@ -284,4 +285,4 @@ def export():
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=False)
+    app.run(host='127.0.0.1', port=5050, debug=False)

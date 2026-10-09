@@ -49,6 +49,23 @@ Verify: `python -m unittest discover -s tests -v`
 All commands below are run from the repository root. Paths are relative; nothing
 is machine-specific.
 
+### Platform notes
+
+**Windows (conda): MKL threading fix, already built in.** With the conda-forge packages in `environment.yml`, NumPy uses
+Intel MKL. MKL's default threading layer loads `libiomp5md.dll`, which comes from the `llvm-openmp` package and is missing
+functions MKL needs, so the first MKL call (K-Means, logistic regression, ...) crashes with `OSError 0xc06d007f`.
+`src/mkl_setup.py` selects MKL's TBB threading layer instead (`MKL_THREADING_LAYER=TBB`). It does this only on Windows, never
+overwrites a value you already set, and is imported before NumPy by every entry point (`setup_data.py`, `src/*.py`, the dashboard
+and the tests), so **no manual step is needed**. If you write your own script, put `import mkl_setup` (with `src` on the path)
+before `import numpy`, or set the variable first, e.g. in PowerShell `$env:MKL_THREADING_LAYER = "TBB"`.
+Tested: a fresh environment built from `environment.yml` reproduces the crash without the fix and passes all tests with it.
+An alternative that needs no variable is an OpenBLAS build of the numerical libraries
+(`conda install -n logsentry -c conda-forge "libblas=*=*openblas"`); it also passed the tests but is not required.
+
+**macOS.** There is no MKL problem and no variable is needed. `Start-LogSentry.command` is an optional launcher (section 6).
+If you install with `pip` instead of conda and `import xgboost` fails with an OpenMP (`libomp`) error, install the OpenMP runtime
+with `brew install libomp` (not tested by us).
+
 ## 2. Dataset
 
 | Item | Location |
@@ -135,7 +152,7 @@ The five-model comparison is written to `results/HDFS_model_comparison.csv` / `.
 each model, fit/predict time, and a hash of the test session ids). Each model's type, hyperparameters (read from the fitted
 estimator), scaling requirement, learning approach and suitability for the 52 features are in `HDFS_model_comparison.json` and a
 report-ready `results/HDFS_model_comparison.md`. `python src/comparison.py` re-verifies that every model was scored on
-the same test set and prints the table; the dashboard shows it as a table plus a precision/recall/F1 bar chart.
+the same test set and prints the table; the dashboard shows it as a table with a short profile for each model.
 
 Individual steps can be re-run: `python src/clustering.py`, `python src/evaluation.py`,
 `python src/evaluation.py --stability` (refits every model under 5 seeds), `python src/evaluation.py --folds` (rolling-origin temporal evaluation over several test periods, see BGL below), `python src/charts.py` (figures).
@@ -171,14 +188,37 @@ print(df[["session_id", "score", "decision", "cluster"]].sort_values("score", as
 ## 6. Dashboard
 
 ```bash
-python src/dashboard.py              # http://127.0.0.1:5000
+python src/dashboard.py              # http://127.0.0.1:5050
 ```
 
-The **Log sources** table at the top lists each trained dataset (session definition, sizes, final model, test precision/recall/F1); click the **HDFS** / **BGL** tab to switch the model panel, five-model comparison (and, for BGL, the temporal-robustness table) between the two datasets without uploading anything. The datasets are never mixed. Pick the log source (HDFS or BGL) and upload a log (try `data/supporting/sample_HDFS.log` or `sample_BGL.log`). An "Analysis details" panel shows the source, model used, session definition, sessions analysed, sessions the model flagged, sessions labelled anomalous in the log itself (BGL only), events assigned and the parsing statistics (raw lines, malformed lines, lines without a session). The page shows the final model and its
-test metrics, sessions analysed / flagged, the anomaly-score distribution, the anomaly clusters present in the
-upload with their descriptions, and a searchable/sortable session table. **Inspect** opens a session: its score,
-decision, cluster and the real raw events read back from the uploaded file. Results can be exported as CSV.
-The dashboard calls `predict.predict()` - the same code path as the CLI - so there is no demo data.
+Open <http://127.0.0.1:5050>. Port 5050 is used everywhere (the command above and the macOS launcher) because port 5000
+is often taken by AirPlay Receiver on macOS.
+
+**macOS launcher (optional).** `Start-LogSentry.command` (double-click it in Finder, or run `./Start-LogSentry.command` in a
+terminal) opens the project in VS Code if it is installed, creates a `.venv` with `python3` (3.11 or newer), installs
+`requirements.txt` on the first run, starts the dashboard on port 5050 and opens the browser. It uses `venv` and `pip`, not conda.
+If macOS says the file is not executable, run `chmod +x Start-LogSentry.command` once. On Windows use the conda commands above.
+
+What the page shows:
+
+* **Log sources**: a table of each trained dataset (session definition, sizes, final model, test precision/recall/F1) with an
+  **HDFS** / **BGL** tab, and a dataset overview of three figures for the selected dataset: its size, the number and percentage of
+  anomalous sessions, and the number of model features. They are read from `results/<SOURCE>_eda_summary.json` and `_evaluation.json`.
+  The datasets are never mixed.
+* **Model comparison** (collapsed by default, click to open): per-model profiles and the five-model results table for the selected
+  dataset. For BGL the same section also contains the temporal-robustness table (rolling-origin folds).
+* **Log ingestion**: choose the log source (HDFS or BGL) and upload a log (try `data/supporting/sample_HDFS.log` or
+  `sample_BGL.log`). A progress bar shows the upload, and the results appear when the analysis finishes.
+* **Analysis summary**: sessions analysed, sessions flagged, log events and parsing exceptions, plus an "Analysis details" panel
+  (source, model used, session definition, events assigned, raw/malformed lines, lines without a session, and for BGL the number of
+  windows labelled anomalous in the log itself).
+* **Anomaly score distribution** (histogram) and the **anomaly clusters** present in the upload, with their descriptions.
+* **Session explorer**: a searchable, sortable, paged session table with a "flagged only" filter and CSV export.
+  **Inspect** opens a session with its score, decision, cluster and the real raw events read back from the uploaded file
+  (there is a **Copy events** button). A light/dark theme toggle is in the top bar.
+
+The dashboard calls `predict.predict()` (the same code path as the CLI), so there is no demo data. The EDA and result figures in
+`figures/` are not shown in the dashboard.
 
 ## 7. Results (HDFS, temporal test period: the latest 20% of the log, 115,018 sessions)
 
@@ -251,7 +291,9 @@ assignment, interpretation and real example sessions are in `results/HDFS_cluste
 
 ```
 README.md  environment.yml  requirements.txt  setup_data.py
+Start-LogSentry.command   optional macOS launcher (section 6)        .gitattributes   keeps this script's LF line endings
 src/
+  mkl_setup.py    Windows MKL threading fix, imported before NumPy (section 1)
   features.py     feature schema + Session accumulator (single source of truth)
   sources.py      per-dataset adapters (HDFS, BGL): line parser, session definition, label source, download metadata
   processing.py   source-independent session grouping, process() -> feature table, parser verification
@@ -263,8 +305,10 @@ src/
   predict.py      scoring entry point (CLI + dashboard)
   dashboard.py, upload_store.py, templates/, static/    Flask application
 tests/            unit + integration tests (python -m unittest discover -s tests -v)
-data/processed/   the final processed dataset      data/supporting/  sample log + labels
-models/           HDFS_final.joblib (classifier), HDFS_clusters.joblib (scaler + K-means)
+data/processed/   the final processed datasets     data/supporting/  sample logs + labels
+data/raw/         downloaded Loghub files (not committed, created by setup_data.py)
+models/           <SOURCE>_final.joblib (deployed classifier), <SOURCE>_xgboost / _extra_trees.joblib (compared models),
+                  <SOURCE>_clusters.joblib (scaler + K-means), for SOURCE = HDFS and BGL
 results/          all metrics, cluster/error analyses, predictions     figures/  plots
 archive/          earlier experiment's outputs (see below); not used by the code
 ```
@@ -287,3 +331,5 @@ nothing here depends on it.
 * The processed CSVs store features to 8 significant digits, so a live re-computation can differ from a stored score by a tiny amount for borderline sessions (checked: identical once the same rounding is applied).
 * Hash-bucket event features can merge several event kinds into one bucket (see `results/HDFS_event_buckets.json`).
 * The dashboard keeps one analysed upload at a time and is meant for local use.
+* The macOS launcher could not be tested on a Mac by us (its syntax and start command were checked on Windows).
+* The Windows MKL fix is applied only on Windows; pip-based setups (OpenBLAS or Accelerate) do not need it.

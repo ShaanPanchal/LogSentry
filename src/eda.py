@@ -13,6 +13,7 @@ Writes results/<SOURCE>_eda_summary.json and figures/<SOURCE>_eda*.png.
 import argparse
 import json
 
+import mkl_setup  # noqa: F401  (Windows MKL fix, must come before numpy)
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt  # noqa: E402
