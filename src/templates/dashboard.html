@@ -288,8 +288,7 @@
 									value="{{s}}"
 									{%
 									if
-									s=""
-									="source"
+									s is eq source
 									%}selected{%
 									endif
 									%}
@@ -496,11 +495,12 @@
 					<span class="eyebrow">ANOMALY SCORE DISTRIBUTION</span>
 					<div class="hist">
 						{% for b in histogram %}
+						{% set bar_style %}style="height:{{ '%.1f'|format(b.height|float) }}%"{% endset %}
 						<div
 							class="bar"
 							title="{{b.label}}: {{'{:,}'.format(b.count)}} sessions"
 						>
-							<i style="height:{{b.height}}%"></i
+							<i {{ bar_style }}></i
 							><span>{{b.label.split('-')[0]}}</span>
 						</div>
 						{% endfor %}
@@ -556,8 +556,7 @@
 							value="score"
 							{%
 							if
-							sort=""
-							="score"
+							sort is eq 'score'
 							%}selected{%
 							endif
 							%}
@@ -568,8 +567,7 @@
 							value="events"
 							{%
 							if
-							sort=""
-							="events"
+							sort is eq 'events'
 							%}selected{%
 							endif
 							%}
@@ -580,8 +578,7 @@
 							value="id"
 							{%
 							if
-							sort=""
-							="id"
+							sort is eq 'id'
 							%}selected{%
 							endif
 							%}
@@ -627,10 +624,9 @@
 								</td>
 								<td>
 									<div class="score-cell">
+										{% set score_style %}style="width:{{ '%.1f'|format([[r.score|float * 100, 0]|max, 100]|min) }}%"{% endset %}
 										<div class="score-track">
-											<i
-												style="width:{{r.score*100}}%"
-											></i>
+											<i {{ score_style }}></i>
 										</div>
 										<span class="mono"
 											>{{'%.4f'|format(r.score)}}</span
