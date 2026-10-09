@@ -127,6 +127,30 @@
 						</tbody>
 					</table>
 				</div>
+				{% if overview %}
+				<div class="overview" aria-label="Dataset overview">
+					<div>
+						<span class="metric-label">DATASET SIZE</span>
+						<strong>{{'{:,}'.format(overview.sessions)}}</strong>
+						<span class="metric-foot">{{overview.session_definition}}</span>
+					</div>
+					<div>
+						<span class="metric-label">ANOMALOUS SESSIONS</span>
+						{% if overview.anomalies is not none %}
+						<strong>{{'{:,}'.format(overview.anomalies)}}</strong>
+						<span class="metric-foot">{{'%.2f'|format(overview.anomaly_rate * 100)}}% of the dataset</span>
+						{% else %}
+						<strong>n/a</strong>
+						<span class="metric-foot">labels not available for every session</span>
+						{% endif %}
+					</div>
+					<div>
+						<span class="metric-label">MODEL FEATURES</span>
+						<strong>{{overview.features if overview.features is not none else 'n/a'}}</strong>
+						<span class="metric-foot">inputs to the classifier</span>
+					</div>
+				</div>
+				{% endif %}
 				<p class="muted">
 					The datasets are trained and evaluated separately and are
 					never mixed. The panels below show results for
@@ -136,10 +160,13 @@
 			{% endif %} {% if comparison %}
 			<section class="insights">
 				<article class="panel mini wide">
-					<span class="eyebrow"
-						>MODEL COMPARISON · {{view_source}} · FIVE CLASSIFIERS ·
-						SAME TEMPORAL TEST SET</span
-					>
+					<details class="collapse">
+					<summary>
+						<span class="eyebrow"
+							>MODEL COMPARISON · {{view_source}} · FIVE CLASSIFIERS ·
+							SAME TEMPORAL TEST SET</span
+						>
+					</summary>
 					<div class="cmp-details">
 						{% for m in comparison %}{% if m.profile %}
 						<details>
@@ -167,6 +194,18 @@
 						</details>
 						{% endif %}{% endfor %}
 					</div>
+					<p class="muted">{{profile_note}}</p>
+					<p class="muted">
+						{% if comparison_split %}All models were trained on the
+						earliest part of the log and scored on the same
+						{{'{:,}'.format(comparison_split.test_sessions)}} later
+						sessions
+						({{'{:,}'.format(comparison_split.test_anomalies)}}
+						anomalous); test-set identity {{'verified' if
+						comparison_split.shared else 'NOT verified'}} (id hash
+						{{comparison_split.test_set_sha1[:10]}}). {% endif
+						%}Only the final model scores uploads.
+					</p>
 					<div class="table-wrap">
 						<table>
 							<thead>
@@ -249,18 +288,7 @@
 						</table>
 					</div>
 					{% endif %}
-					<p class="muted">{{profile_note}}</p>
-					<p class="muted">
-						{% if comparison_split %}All models were trained on the
-						earliest part of the log and scored on the same
-						{{'{:,}'.format(comparison_split.test_sessions)}} later
-						sessions
-						({{'{:,}'.format(comparison_split.test_anomalies)}}
-						anomalous); test-set identity {{'verified' if
-						comparison_split.shared else 'NOT verified'}} (id hash
-						{{comparison_split.test_set_sha1[:10]}}). {% endif
-						%}Only the final model scores uploads.
-					</p>
+					</details>
 				</article>
 			</section>
 			{% endif %}

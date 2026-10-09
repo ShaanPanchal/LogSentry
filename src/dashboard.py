@@ -101,6 +101,25 @@ def dataset_summaries():
     return out
 
 
+def dataset_overview(name):
+    """Size, anomaly share and feature count of a dataset, from its saved EDA summary and model results."""
+    eda = ROOT / 'results' / f'{name}_eda_summary.json'
+    if not eda.exists():
+        return None
+    summary = json.loads(eda.read_text())
+    balance = summary['class_balance']
+    total = summary['n_sessions']
+    # Only show the anomaly numbers if every session has a label (0 or 1), otherwise they would be misleading.
+    labelled = balance['normal'] + balance['anomaly'] == total
+    features = summary.get('n_features')
+    evaluation = ROOT / 'results' / f'{name}_evaluation.json'
+    if evaluation.exists():
+        features = json.loads(evaluation.read_text()).get('final_model', {}).get('n_features', features)
+    return {'sessions': total, 'session_definition': get_source(name).session_definition, 'features': features,
+            'anomalies': balance['anomaly'] if labelled else None,
+            'anomaly_rate': balance['anomaly'] / total if labelled and total else None}
+
+
 def comparison_rows(saved):
     """Get the test period rows of the saved model comparison."""
     rows = []
@@ -231,7 +250,8 @@ def index():
                            clusters=clusters, comparison=view['comparison'],
                            comparison_split=view['comparison_split'], profile_note=view['profile_note'],
                            folds=view['folds'], spec=spec, datasets=datasets, view_source=view_source,
-                           upload_model=info['model'])
+                           upload_model=info['model'],
+                           overview=dataset_overview(view_source) if view_source else None)
 
 
 @app.errorhandler(413)

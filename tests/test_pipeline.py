@@ -253,6 +253,65 @@ class PipelineTests(unittest.TestCase):
                 self.assertEqual(len(dashboard.dataset_summaries()), 2)
             finally:dashboard.ROOT = old
 
+    def test_dataset_overview(self):
+        import json
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d);(root / 'results').mkdir()
+            # Different numbers per dataset, so the test shows the overview follows the selected one.
+            for name, total, anomalies, features in (('HDFS', 1000, 50, 52), ('BGL', 200, 30, 46)):
+                row = {'model': 'Random forest', 'accuracy': .99, 'precision': .9, 'recall': .8, 'f1': .85, 'average_precision': .9,
+                       'tn': 90, 'fp': 2, 'fn': 4, 'tp': 4, 'threshold': .5}
+                (root / 'results' / f'{name}_evaluation.json').write_text(json.dumps(
+                    {'selected_model': 'Random forest', 'temporal_test': [row], 'validation': [row],
+                     'final_model': {'n_features': features}}))
+                (root / 'results' / f'{name}_eda_summary.json').write_text(json.dumps(
+                    {'n_sessions': total, 'n_features': 52,
+                     'class_balance': {'normal': total - anomalies, 'anomaly': anomalies}}))
+            old = dashboard.ROOT;dashboard.ROOT = root
+            try:
+                c = dashboard.app.test_client()
+                def page(q):
+                    r = c.get(q);self.assertEqual(r.status_code, 200)
+                    return re.sub(r'\s*([<>])\s*', lambda m: m.group(1), re.sub(r'\s+', ' ', r.get_data(as_text=True)))
+                h = page('/?results=HDFS')
+                self.assertIn('<strong>1,000</strong>', h);self.assertIn('<strong>50</strong>', h)
+                self.assertIn('5.00% of the dataset', h);self.assertIn('<strong>52</strong>', h)
+                h = page('/?results=BGL')
+                self.assertIn('<strong>200</strong>', h);self.assertIn('<strong>30</strong>', h)
+                self.assertIn('15.00% of the dataset', h);self.assertIn('<strong>46</strong>', h)
+
+                # Labels that do not cover every session must not produce a misleading anomaly count.
+                (root / 'results' / 'BGL_eda_summary.json').write_text(json.dumps(
+                    {'n_sessions': 200, 'class_balance': {'normal': 100, 'anomaly': 30}}))
+                o = dashboard.dataset_overview('BGL')
+                self.assertEqual((o['sessions'], o['anomalies'], o['anomaly_rate'], o['features']), (200, None, None, 46))
+                self.assertIn('n/a', page('/?results=BGL'))
+            finally:dashboard.ROOT = old
+
+    def test_evaluation_sections_are_collapsible(self):
+        # Uses the committed results: BGL has temporal folds, HDFS does not.
+        c = dashboard.app.test_client()
+        def page(q):
+            r = c.get(q);self.assertEqual(r.status_code, 200)
+            return re.sub(r'\s*([<>])\s*', lambda m: m.group(1), re.sub(r'\s+', ' ', r.get_data(as_text=True)))
+        closed = r'<details class="collapse"><summary><span class="eyebrow">MODEL COMPARISON'   # no "open": collapsed by default
+        h = page('/?results=BGL')
+        self.assertRegex(h, closed)
+        self.assertIn('Random forest', h);self.assertIn('Mean F1', h)   # the content is still there
+        # Temporal robustness is not a separate expander: it is inside the same <details> as the comparison table.
+        start = h.index('MODEL COMPARISON');fold = h.index('TEMPORAL ROBUSTNESS')
+        self.assertGreater(fold, h.index('</table>', start))                # directly below the comparison table
+        self.assertEqual(h.count('class="collapse folds"'), 0)
+        end = h.index('</details>', fold)                                   # the first close after the folds table ...
+        self.assertEqual(h[:end].count('<details') - h[:end].count('</details>'), 1)   # ... closes the comparison parent
+        self.assertEqual(h[start:end].count('<table>'), 2)                   # both tables are inside it
+        self.assertEqual(h[end:].count('TEMPORAL ROBUSTNESS'), 0)
+        h = page('/?results=HDFS')
+        self.assertRegex(h, closed)
+        self.assertNotIn('TEMPORAL ROBUSTNESS', h)
+        self.assertEqual(h.count('<details'), h.count('</details>'))
+        self.assertNotIn('Dataset exploration', h)
+
     def test_missing_model_message(self):
         with tempfile.TemporaryDirectory() as d:
             old=predict.ROOT;predict.ROOT=Path(d)
