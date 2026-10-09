@@ -9,7 +9,6 @@ LogSentry turns raw HDFS and BGL logs into sessions, classifies each session as 
 ```bash
 conda env create -f environment.yml
 conda activate logsentry
-python -m unittest discover -s tests -v    # optional check
 ```
 
 ## 2. Process the data
@@ -49,7 +48,8 @@ On macOS you can use `./Start-LogSentry.command` instead (it creates a `.venv` a
 
 * Prepared datasets: `data/processed/HDFS_sessions.csv.gz`, `data/processed/BGL_sessions.csv.gz`
 * Final models: `models/HDFS_final.joblib`, `models/BGL_final.joblib` (plus `*_clusters`, `*_xgboost`, `*_extra_trees`)
-* Results: `results/`, figures: `figures/`, sample logs: `data/supporting/`
+* Results: `results/`, sample logs: `data/supporting/`
+* Figures are not included. `python src/eda.py` and `python src/charts.py` create them in `figures/`.
 
 ## Notes
 
