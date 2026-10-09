@@ -116,6 +116,7 @@ def score_histogram(df, bins=10):
     """Counts of sessions per anomaly-score bin, with bar heights on a sqrt scale
     so the rare high-score bins stay visible next to the huge normal bin."""
     counts, edges = np.histogram(df.score, bins=bins, range=(0, 1))
+    # Bar heights use a square root, otherwise the huge normal bin would make the other bars too small to see.
     top = max(math.sqrt(counts.max()), 1)
     return [{'label': f'{edges[i]:.1f}-{edges[i + 1]:.1f}', 'count': int(c),
              'height': round(100 * math.sqrt(c) / top)} for i, c in enumerate(counts)]
@@ -143,10 +144,13 @@ def run_upload():
     try:
         path = Path(folder) / 'upload.log'
         upload.save(path)
+        # predict() is the same function the command line uses, so the dashboard shows real model output.
         df, audit, _ = predict(path, source, keep=False)
         print('Building disk index for session drill-down...', flush=True)
         build_index(path, Path(folder) / 'events.sqlite', source)
         cleanup()  # drop the previous upload
+        # Only replace the stored results after scoring and indexing both worked, so a failed upload
+        # does not wipe the previous results.
         STATE.update(df=df, audit=audit, events={}, upload_dir=folder, source=source)
     except Exception as e:
         shutil.rmtree(folder, ignore_errors=True)
@@ -158,6 +162,8 @@ def run_upload():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    # One page handles everything. A POST is an upload (the JavaScript sends it in the background and
+    # reloads the page when it finishes). A GET shows the results with the current filters and page.
     error = run_upload() if request.method == 'POST' else None
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return jsonify(success=not bool(error), error=error), 400 if error else 200
@@ -175,6 +181,8 @@ def index():
     datasets = dataset_summaries()
     evaluated = [d['name'] for d in datasets]
     # Which dataset's results are on show: ?results=BGL, else the uploaded source, else the first trained one.
+    # Two separate choices: ?results= decides which dataset's model results are shown in the tabs,
+    # and the uploaded source (STATE) decides which model scored the table and which clusters are used.
     view_source = request.args.get('results')
     if view_source not in evaluated:
         view_source = STATE['source'] if STATE['source'] in evaluated else (evaluated[0] if evaluated else None)
@@ -198,6 +206,7 @@ def index():
             page = 1
         column = {'score': 'score', 'events': 'n_events', 'id': 'session_id'}.get(sort, 'score')
         start = (page - 1) * PAGE_SIZE
+        # Sort, then cut out just the rows for the current page.
         rows = table.sort_values(column, ascending=column == 'session_id').iloc[start:start + PAGE_SIZE].to_dict('records')
         flag = '1' if only else '0'
         if page > 1:
@@ -205,6 +214,7 @@ def index():
         if page < pages:
             next_url = url_for('index', q=q, sort=sort, anomalies=flag, page=page + 1, **keep)
 
+        # If a session was clicked, find it and read its real log lines back from the uploaded file.
         match = df[df.session_id == request.args.get('session')]
         if len(match):
             detail = match.iloc[0].to_dict()

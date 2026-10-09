@@ -47,6 +47,9 @@ def process(path, source, labels=None, keep=False):
     `labels` is the HDFS anomaly_label.csv path; without it HDFS labels are -1
     (unlabelled, e.g. a user upload).  `keep=True` retains each session's events.
     """
+    # The log is read line by line, so a huge file never has to fit in memory.
+    # Each session id gets one Session object that collects its events.
+    # The audit counters (raw lines, bad lines, ...) are shown in the dashboard's parsing statistics.
     sessions, audit = {}, Counter()
     opener = gzip.open if str(path).endswith('.gz') else open
     with opener(path, 'rt', encoding='utf-8', errors='replace') as f:
@@ -57,6 +60,7 @@ def process(path, source, labels=None, keep=False):
             except (ValueError, OverflowError):
                 audit['malformed_lines'] += 1
                 continue
+            # Some lines do not belong to any session (e.g. HDFS lines without a block id). They are counted but skipped.
             if not ids:
                 audit['no_session_id'] += 1
                 continue
@@ -71,6 +75,8 @@ def process(path, source, labels=None, keep=False):
         raise ValueError('No supported sessions found in this file')
 
     spec = get_source(source)
+    # Once every line is read, turn each session into one row of features.
+    # has_lifecycle is False for BGL, which turns off the HDFS-only write chain features.
     df = pd.DataFrame([s.row(k, source, spec.has_lifecycle) for k, s in sessions.items()],
                       columns=META_COLS + COLS)
     if not spec.labels_in_log:  # e.g. HDFS: labels live in a separate per-session file
@@ -87,6 +93,7 @@ def attach_hdfs_labels(df, labels_path):
     lab = pd.read_csv(labels_path, dtype={'BlockId': str})
     if lab.BlockId.duplicated().any():
         raise ValueError('Duplicate label IDs')
+    # Stop with an error if any block has no label, otherwise it would be silently given a wrong class.
     mapped = df.session_id.map(lab.set_index('BlockId').Label.map({'Normal': 0, 'Anomaly': 1}))
     if mapped.isna().any():
         raise ValueError('Missing or unrecognised HDFS labels')
@@ -98,6 +105,7 @@ def collect_session_events(path, source, session_ids, limit=200):
 
     Used to attach concrete examples to cluster and error analyses.
     """
+    # One pass over the log that only keeps lines of the sessions we ask for (at most `limit` each).
     wanted, found = set(session_ids), {s: [] for s in session_ids}
     opener = gzip.open if str(path).endswith('.gz') else open
     with opener(path, 'rt', encoding='utf-8', errors='replace') as f:
@@ -127,6 +135,7 @@ def bucket_inventory(path, source, top=5):
                 msg = parse(line, source)[4]
             except (ValueError, OverflowError):
                 continue
+            # Count each template per bucket, so we can see what kinds of event share the same feature column.
             template = normalise(msg)
             counts[bucket(template)][template] += 1
     out = {}

@@ -42,6 +42,9 @@ import numpy as np
 # --------------------------------------------------------------------------
 # Message normalisation and hashing
 # --------------------------------------------------------------------------
+# These patterns find the parts of a message that change every time (ids, IPs, paths, numbers).
+# normalise() replaces them so two messages of the same kind end up as the same text.
+# The specific patterns run first. If plain numbers ran first they would break up the ids and IPs.
 BLOCK = re.compile(r'blk_-?\d+')
 IP = re.compile(r'\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b')
 PATH = re.compile(r'/(?:[^\s,;:]+/)*[^\s,;:]*')
@@ -49,6 +52,8 @@ NUM = re.compile(r'[-+]?\d+(?:\.\d+)?')
 HEX = re.compile(r'\b0x[0-9a-fA-F]+\b')
 ERROR_WORDS = re.compile(r'error|exception|fail|timed? out|timeout|fatal|panic|corrupt', re.I)
 
+# Every message kind is hashed into one of 32 buckets, so the number of columns is always the same.
+# Two different kinds can land in the same bucket. results/*_event_buckets.json shows what is in each one.
 N_BUCKETS = 32
 WARN_LEVELS = ('WARN', 'WARNING')
 ERROR_LEVELS = ('ERROR', 'FATAL', 'SEVERE', 'FAILURE')
@@ -65,9 +70,12 @@ STRUCTURAL_COLS = [
     'unacked_writes', 'uncommitted_acks', 'lifecycle_complete',
     'transition_change_ratio', 'event_entropy',                       # G7
 ]
+# The order of these columns matters. The saved model stores it and predict.py uses the same order.
 COLS = BUCKET_COLS + STRUCTURAL_COLS  # the 52 model input columns
 
 
+# Turns a raw message into a "template", e.g. "Receiving block blk_1 src: /10.0.0.1" becomes
+# "Receiving block <BLOCK> src: <PATH>". This lets us count how often each kind of event happens.
 def normalise(msg):
     """Replace variable tokens so messages of one kind look identical."""
     msg = BLOCK.sub('<BLOCK>', msg)
@@ -86,6 +94,8 @@ class Session:
     """Streaming accumulator: feed events in time order, then call `row()`."""
 
     def __init__(self, keep=False):
+        # We only keep running totals (event count, sum of gaps, sum of squared gaps) instead of every event.
+        # This keeps memory small and is enough to work out the mean and standard deviation of the gaps later.
         self.counts = np.zeros(N_BUCKETS, dtype=np.int32)
         self.n = 0
         self.first = self.last = 0
@@ -102,6 +112,7 @@ class Session:
     def add(self, t, thread, level, msg, hosts, label):
         b = bucket(normalise(msg))
         if self.n:
+            # The gap is the time since the previous event in this session. A negative gap means the log is not sorted.
             gap = t - self.last
             if gap < 0:
                 raise ValueError('Log is out of order within a session. Sort it chronologically first.')
@@ -120,6 +131,7 @@ class Session:
         level = level.upper()
         self.warn += level in WARN_LEVELS
         self.error += level in ERROR_LEVELS
+        # This looks for words like "error" or "timeout" in the message itself, separate from the log level.
         failed = bool(ERROR_WORDS.search(msg))
         self.keyword += failed
 
@@ -127,6 +139,7 @@ class Session:
         self.alloc += 'NameSystem.allocateBlock' in msg
         self.delete += 'Deleting block' in msg
         self.recv += 'Receiving block' in msg
+        # An acknowledgement is only counted if the message has no failure word in it.
         self.ack += 'PacketResponder' in msg and 'terminating' in msg and not failed
         self.stored += 'addStoredBlock: blockMap updated' in msg
         self.label = max(self.label, label)
@@ -141,19 +154,28 @@ class Session:
         so 0 means 'not applicable' rather than a measurement.
         """
         hdfs = lifecycle
+        # Number of gaps between events = events - 1. max(..., 1) avoids dividing by zero for a 1 event session.
         n_gaps = max(self.n - 1, 1)
         duration = self.last - self.first
         gap_mean = self.gap_sum / n_gaps
+        # Standard deviation from the running totals (mean of squares minus square of the mean).
+        # max(0, ...) stops a tiny negative number from rounding breaking the square root.
         gap_std = float(np.sqrt(max(0, self.gap_sq / n_gaps - gap_mean ** 2)))
+        # share = what fraction of this session's events fall in each bucket. It is used for the entropy feature.
         share = self.counts[self.counts > 0] / self.n
+        # A write is "complete" if the block was allocated and all 3 copies were received, acknowledged and stored.
         complete = hdfs and self.alloc > 0 and min(self.recv, self.ack, self.stored) >= EXPECTED_REPLICAS
+        # The values below must be in the same order as COLS: the 32 bucket counts first, then the structural features.
         features = (
             self.counts.tolist()
             + [self.n, int((self.counts > 0).sum()),
+               # events per minute: the +1 stops a huge value when a session lasts only a few seconds
                duration, gap_mean, self.gap_max, gap_std, self.n / (duration / 60 + 1),
                len(self.hosts), len(self.threads),
                self.warn / self.n, self.error / self.n, self.keyword / self.n,
                int(self.alloc > 0), int(self.delete > 0),
+               # These three show where the write chain stopped: copies missing, writes never acknowledged,
+               # and acknowledgements never stored. They are 0 for BGL because it has no write chain.
                # shortfall vs. expected replicas: "the next step never happened"
                EXPECTED_REPLICAS - self.stored if hdfs else 0,
                self.recv - self.ack if hdfs else 0,

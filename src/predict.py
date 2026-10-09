@@ -17,6 +17,7 @@ from processing import ROOT, process
 
 def assign_clusters(df, flagged, source):
     """Nearest anomaly cluster for flagged sessions; -1 for the rest / if no cluster model."""
+    # Only flagged sessions get a cluster. Everything else stays at -1 (no cluster).
     clusters = np.full(len(df), -1, dtype=int)
     path = ROOT / 'models' / f'{source}_clusters.joblib'
     if flagged.any() and path.exists():
@@ -32,10 +33,12 @@ def predict(path, source, keep=False):
     if not model_path.exists():
         raise ValueError(f'{source} model has not been trained. Run python setup_data.py --source {source} first.')
     bundle = joblib.load(model_path)
+    # The uploaded log goes through the same processing code that built the training data.
     df, audit, events = process(path, source, keep=keep)
 
     # bundle['columns'] is the exact feature order the model was trained on.
     scores = bundle['model'].predict_proba(df[bundle['columns']].to_numpy(dtype='float32'))[:, 1]
+    # Use the threshold saved with the model (chosen on validation) instead of 0.5.
     flagged = scores >= bundle['threshold']
     # Sessions whose label is known from the log itself (BGL alert tags); -1 means unlabelled (HDFS uploads).
     audit = {**audit, 'labelled_sessions': int((df.label >= 0).sum()), 'labelled_anomalous': int((df.label == 1).sum())}

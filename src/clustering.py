@@ -67,6 +67,8 @@ FEATURE_INFO = {
 }
 
 
+# Counts and durations have a few huge values. log1p shrinks them, and np.sign keeps negative values
+# (replica_deficit can be negative). predict.py imports this so it uses the same transform.
 def signed_log(X):
     """log1p that keeps sign: tames heavy-tailed counts/durations."""
     return np.sign(X) * np.log1p(np.abs(X))
@@ -103,6 +105,8 @@ def profile_sentence(cluster_mean, anomaly_mean):
             f"mean hosts {pair('n_hosts', '{:.1f}')}.")
 
 
+# Builds the plain English description of a cluster from its top features and example events.
+# It only reports what the numbers show (higher or lower than the anomaly average), not a root cause.
 def interpret(cluster, feats, share, examples, profile=''):
     """Plain-language description assembled from the cluster's real statistics."""
     clauses = []
@@ -142,26 +146,35 @@ def run(source, df=None, dev=None, te=None, log_path=None):
 
     X = df[COLS].to_numpy(dtype=np.float32)
     y = df.label.to_numpy()
+    # Only anomalies from train + validation are clustered, so the test period is not used to build clusters.
+    # The label is only used to choose these rows. It is not given to K-means.
     ids = np.flatnonzero(dev & (y == 1))           # labels only SELECT the class
     if len(ids) < 4:
         raise ValueError('Not enough development anomalies for clustering')
     L = signed_log(X)
+    # Standardise so each feature has mean 0 and spread 1. Otherwise big-valued features would dominate K-means.
     scaler = StandardScaler().fit(L[ids])
     Z = scaler.transform(L[ids])                   # clustering input: features only
 
+    # Try several values of k. Keep every fitted model so we can pick the best k afterwards.
     sweep, models = [], []
     for k in K_RANGE:
         if k > len(ids) - 1:
             break
         km = KMeans(n_clusters=k, n_init=10, random_state=SEED).fit(Z)
+        # Silhouette score is slow on many points, so it is measured on a sample of up to 3000.
         sil = silhouette_score(Z, km.labels_, sample_size=min(3000, len(ids)), random_state=SEED)
         sweep.append({'k': k, 'silhouette': float(sil), 'inertia': float(km.inertia_)})
         models.append(km)
+    # Pick the k with the best silhouette score, but only from k >= 3 (see MIN_K).
+    # If there are too few anomalies for that, all values of k are allowed.
     eligible = [i for i, s_ in enumerate(sweep) if s_['k'] >= MIN_K] or range(len(sweep))
     km = models[max(eligible, key=lambda i: sweep[i]['silhouette'])]
 
     # Composition check on the later test period: nearest-cluster assignment.
     test_idx = np.flatnonzero(te)
+    # Assign the test sessions (normal and anomalous) to the nearest cluster. This shows which clusters
+    # look like normal behaviour, since the clusters were only built from anomalies.
     test_cluster = km.predict(scaler.transform(L[test_idx]))
     test_comp = pd.crosstab(test_cluster, y[test_idx]).reindex(range(km.n_clusters), fill_value=0)
 
@@ -170,6 +183,8 @@ def run(source, df=None, dev=None, te=None, log_path=None):
     nearest = {}
     for c in range(km.n_clusters):
         members = np.flatnonzero(km.labels_ == c)
+        # Sort the members by distance to the cluster centre. The closest ones are the most typical,
+        # so their real log events are used as examples of the cluster.
         order = members[np.argsort(((Z[members] - km.cluster_centers_[c]) ** 2).sum(1))]
         nearest[c] = ids[order[:N_NEAREST]]
     events = {}
@@ -188,12 +203,15 @@ def run(source, df=None, dev=None, te=None, log_path=None):
                 if all(e['template'] != t for e in entries) and len(entries) < 2:
                     entries.append({'template': t, 'share': None})
 
+    # For each cluster, compare its average feature values with the average of all anomalies.
     anomaly_mean = X[ids].mean(0)
     all_mean = X[dev].mean(0)
     clusters = []
     for c in range(km.n_clusters):
         members = ids[km.labels_ == c]
         mean = X[members].mean(0)
+        # The data was standardised, so each centre value says how far this cluster is from the average anomaly
+        # for that feature. The features with the biggest values are what make the cluster different.
         z = km.cluster_centers_[c]                 # standardised log-scale offset vs anomaly mean
         top = np.argsort(np.abs(z))[::-1][:N_TOP_FEATURES]
         feats = [{'feature': COLS[j], 'cluster_mean': float(mean[j]),
@@ -242,6 +260,7 @@ def run(source, df=None, dev=None, te=None, log_path=None):
     (ROOT / 'results' / f'{source}_cluster_analysis.json').write_text(json.dumps(result, indent=2))
     pd.DataFrame({'session_id': df.session_id.iloc[ids].to_numpy(), 'cluster': km.labels_}) \
         .to_csv(ROOT / 'results' / f'{source}_anomaly_clusters.csv', index=False)
+    # Save the scaler, K-means model and column list. predict.py uses them to give new flagged sessions a cluster.
     # Small per-cluster blurbs for the dashboard.
     joblib.dump({'scaler': scaler, 'kmeans': km, 'columns': COLS, 'transform': 'signed log1p',
                  'summaries': {c['cluster']: {'sessions': c['sessions'], 'share': c['share'],

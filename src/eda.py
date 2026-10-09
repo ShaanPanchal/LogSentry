@@ -32,6 +32,7 @@ COLORS = {0: '#2a78d6', 1: '#eb6a35'}
 def summarise(df):
     y = df.label
     X = df[COLS]
+    # Skew and correlation are only checked for the structural columns, not the 32 event count columns.
     skew = X[STRUCTURAL_COLS].skew()
     corr = X[STRUCTURAL_COLS].corr().abs()
     pairs = [(a, b, float(corr.loc[a, b])) for i, a in enumerate(STRUCTURAL_COLS)

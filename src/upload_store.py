@@ -20,6 +20,8 @@ def build_index(log_path, index_path, source):
         batch = []
         with log_path.open('rb') as f:
             while True:
+                # Remember where each line starts in the file (its byte offset) and which session it belongs to.
+                # Binary mode is used so the offsets are exact.
                 offset = f.tell()
                 line = f.readline()
                 if not line:
@@ -38,6 +40,8 @@ def read_events(log_path, index_path, source, sid, limit=500):
     """First `limit` events of a session. Returns (events, truncated)."""
     events = []
     with sqlite3.connect(index_path) as db, log_path.open('rb') as f:
+        # Look up the saved offsets for this session, then jump straight to those lines in the file.
+        # The query asks for limit + 1 rows so we can tell if there were more events than we show.
         offsets = db.execute('SELECT offset FROM events WHERE session=? ORDER BY offset LIMIT ?',
                              (sid, limit + 1)).fetchall()
         for (offset,) in offsets[:limit]:

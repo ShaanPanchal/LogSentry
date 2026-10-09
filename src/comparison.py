@@ -118,6 +118,7 @@ def row(entry, period, final_name):
 
 
 def test_set_hash(df, te):
+    # Hash of the sorted test session ids. If two runs give the same hash they used the same test sessions.
     ids = sorted(df.loc[te, 'session_id'])
     return hashlib.sha1('\n'.join(ids).encode()).hexdigest()
 
@@ -126,6 +127,7 @@ def build(df, tr, va, te, validation, tests, final_name):
     """Assemble the comparison record from the models' validation/test metrics."""
     n_test = int(te.sum())
     # Same test set for every model: each confusion matrix covers all n_test sessions.
+    # If every model's confusion matrix adds up to the test size, they were all scored on the same sessions.
     same_size = all(t['tn'] + t['fp'] + t['fn'] + t['tp'] == n_test for t in tests)
     base_f1 = next(t['f1'] for t in tests if t['model'] == BASELINE)
     rows = ([row(v, 'validation', final_name) for v in validation]

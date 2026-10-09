@@ -40,7 +40,9 @@ def parse_hdfs(line):
     if len(parts) != 6:
         raise ValueError('Invalid HDFS fields')
     msg = parts[5]
+    # One line can mention several blocks. dict.fromkeys removes repeats but keeps the order.
     session_ids = list(dict.fromkeys(BLOCK.findall(msg)))
+    # Hosts are the IP addresses in the message. The port is removed so one machine counts once.
     hosts = [h.split(':')[0] for h in IP.findall(msg)]
     return session_ids, stamp(parts[0], parts[1]), parts[2], parts[3], msg, hosts, 0
 
@@ -49,6 +51,7 @@ def hdfs_session_ids(line):
     return set(BLOCK.findall(line))
 
 
+# The sort keys are used by setup_data.py to put the raw log in time order (-1 for lines that cannot be read).
 def hdfs_sort_key(line):
     parts = line.split(None, 2)
     try:
@@ -58,6 +61,7 @@ def hdfs_sort_key(line):
 
 
 # --------------------------------------------------------------------------- BGL
+# BGL has no session id, so the session is the 5 minute window the timestamp falls in.
 def bgl_window(t):
     return f'window_{t // BGL_WINDOW_SECONDS}'
 
@@ -69,11 +73,14 @@ def parse_bgl(line):
     message.  The alert tag is the line's label only.
     """
     parts = line.strip().split(None, 9)
+    # A BGL line with an empty message gives one field fewer, so add an empty message back.
     if len(parts) == 9:  # empty message
         parts.append('')
     if len(parts) != 10:
         raise ValueError('Invalid BGL fields')
     t = int(parts[1])
+    # The first field is "-" for normal lines. It becomes the label (0 or 1) and is never used as a feature.
+    # The BGL component (e.g. KERNEL) is used where HDFS has a thread id.
     return [bgl_window(t)], t, parts[7], parts[8], parts[9], [parts[3]], int(parts[0] != '-')
 
 

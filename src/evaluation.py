@@ -61,9 +61,13 @@ def run(source, df, tr, va, te):
     X = df[COLS].to_numpy(dtype=np.float32)
     idx = pos.loc[pred.session_id].to_numpy()
     Xt = X[idx]
+    # scale = spread of each feature, so differences are comparable between features.
+    # Features that never change get scale 1 to avoid dividing by zero.
     scale = np.where(Xt.std(0) > 0, Xt.std(0), 1)
     y, yhat = pred.label.to_numpy(), pred.prediction.to_numpy()
 
+    # tp/tn/fp/fn are masks over the test sessions. We compare the wrong predictions with the
+    # correct ones to see what is different about them.
     tp, tn = (y == 1) & (yhat == 1), (y == 0) & (yhat == 0)
     fp, fn = (y == 0) & (yhat == 1), (y == 1) & (yhat == 0)
 
@@ -76,10 +80,14 @@ def run(source, df, tr, va, te):
     buckets = load_bucket_templates(source)
     fp_diff = differences(Xt[fp], Xt[tn], scale, buckets)
     fn_diff = differences(Xt[fn], Xt[tp], scale, buckets)
+    # Missed anomalies are compared with detected anomalies and with normal sessions,
+    # to see which group they look more like.
     fn_vs_normal = differences(Xt[fn], Xt[tn], scale, buckets)
 
     # Deliberately difficult subset: anomalies with no failure keywords at all.
     kw = Xt[:, COLS.index('keyword_error_ratio')]
+    # "Hard" anomalies are the ones with no error words at all. A simple keyword search would miss them,
+    # so the recall on them shows if the model also learned from timing and the write chain.
     quiet = (y == 1) & (kw == 0)
     loud = (y == 1) & (kw > 0)
     hard = {'definition': 'test anomalies whose messages contain no error/exception/timeout words',
@@ -120,6 +128,8 @@ def stability(source, seeds=(0, 1, 7, 13, 42)):
     y = df.label.to_numpy()
     dev = tr | va
     saved = json.loads((ROOT / 'results' / f'{source}_evaluation.json').read_text())
+    # Each seed gives a slightly different model. The thresholds stay fixed (from validation),
+    # so only the effect of the random seed is measured.
     thresholds = {v['model']: v['threshold'] for v in saved['validation']}
     runs = {}
     for seed in seeds:
@@ -152,16 +162,21 @@ def rolling_origin(source, n_chunks=5):
     df = load_dataset(source).sort_values(['t_start', 'session_id']).reset_index(drop=True)
     X = df[COLS].to_numpy(dtype=np.float32)
     y = df.label.to_numpy()
+    # Cut the time-ordered sessions into equal sized chunks.
     bounds = [int(len(df) * k / n_chunks) for k in range(n_chunks + 1)]
     idx = np.arange(len(df))
     folds, per_model = [], {}
     for k in range(1, n_chunks):
         test = (idx >= bounds[k]) & (idx < bounds[k + 1])
         t0 = df.t_start.iloc[bounds[k]]
+        # Fold k trains on all chunks before k. Training sessions must also end before the test chunk starts.
         train = (idx < bounds[k]) & (df.t_end.to_numpy() < t0)
+        # Inside the training window: the first 75% trains a model, the last 25% (most recent) is used to
+        # pick the threshold. Then the model is trained again on the whole window.
         inner = int(train.sum() * .75)
         fit_part = train & (np.cumsum(train) <= inner)
         tune_part = train & ~fit_part
+        # Skip a fold if any of its parts has only one class, because F1 and the threshold need both.
         usable = len(set(y[train])) == 2 and len(set(y[test])) == 2 and len(set(y[tune_part])) == 2
         fold = {'fold': k, 'train_sessions': int(train.sum()), 'test_sessions': int(test.sum()),
                 'test_anomalies': int(y[test].sum()), 'test_anomaly_rate': float(y[test].mean()),

@@ -34,6 +34,8 @@ def confusion(source, ev, out):
     final = next(t for t in ev['temporal_test'] if t['model'] == ev['selected_model'])
     m = np.array([[final['tn'], final['fp']], [final['fn'], final['tp']]])
     fig, ax = plt.subplots(figsize=(4.2, 3.8))
+    # The colours use a log scale because there are far more true negatives than anything else.
+    # The numbers written in the boxes are the real counts.
     ax.imshow(np.log10(m + 1), cmap='Blues')
     for (i, j), v in np.ndenumerate(m):
         ax.text(j, i, f'{v:,}', ha='center', va='center', fontsize=12)

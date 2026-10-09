@@ -37,11 +37,14 @@ SEED = 7
 # take part in final-model selection.
 FINAL_CANDIDATES = ('Logistic regression', 'Random forest', 'Histogram gradient boosting')
 EXTRA_MODELS = ('XGBoost', 'Extra trees')
+# Cut-offs to try for turning a probability into "anomaly". With so few anomalies, 0.5 is not always
+# the best choice, so each model gets its own threshold, picked on the validation data only.
 THRESHOLD_GRID = np.arange(.05, 1, .05)
 
 
 def metrics(y, p, threshold):
     """Standard binary metrics at a probability threshold (+ PR-AUC and confusion counts)."""
+    # A session is predicted as an anomaly when its score is at or above the threshold
     pred = p >= threshold
     tn, fp, fn, tp = confusion_matrix(y, pred, labels=[0, 1]).ravel()
     return {
@@ -66,13 +69,18 @@ def load_dataset(source):
 def split(df):
     """Purged chronological 60/20/20 split. Returns (df, train_mask, val_mask, test_mask)."""
     df = df.sort_values(['t_start', 'session_id']).reset_index(drop=True)
+    # Sessions are sorted by time. a and b are the start times at the 60% and 80% points.
+    # Train and validation sessions must also END before their cut-off. Sessions that cross a cut-off
+    # are marked "purged" and not used, so no session is split between two parts.
     a = df.t_start.iloc[int(len(df) * .6)]
     b = df.t_start.iloc[int(len(df) * .8)]
     train = (df.t_start < a) & (df.t_end < a)
     val = (df.t_start >= a) & (df.t_start < b) & (df.t_end < b)
     test = df.t_start >= b
+    # The test part is everything after b, so it does not need purging.
     df['split'] = np.select([train, val, test], ['train', 'validation', 'test'], default='purged')
     for name, mask in [('train', train), ('validation', val), ('test', test)]:
+        # Every part needs both normal and anomalous sessions, otherwise precision and recall make no sense.
         if df.loc[mask, 'label'].nunique() != 2:
             raise ValueError(f'{name} must contain both classes. Use the full labelled dataset.')
     return df, train.to_numpy(), val.to_numpy(), test.to_numpy()
@@ -82,6 +90,8 @@ def candidates(seed=SEED):
     """The compared classifiers. Class imbalance (~3% anomalies) is handled by
     class weighting where the estimator supports it."""
     return {
+        # class_weight="balanced" makes mistakes on the rare anomaly class count more during training.
+        # Logistic regression also needs scaled features, so a StandardScaler is placed in front of it.
         'Logistic regression': make_pipeline(
             StandardScaler(), LogisticRegression(max_iter=500, class_weight='balanced', random_state=seed)),
         'Random forest': RandomForestClassifier(
@@ -104,6 +114,7 @@ def candidates(seed=SEED):
 
 def best_threshold(y, p):
     """Probability cut-off maximising F1 on validation data."""
+    # Try every threshold in the grid and keep the one with the highest F1.
     return max(THRESHOLD_GRID, key=lambda t: f1_score(y, p >= t, zero_division=0))
 
 
@@ -118,6 +129,7 @@ def train_classifiers(df, tr, va, te, source):
     if not np.isfinite(X).all():
         raise ValueError('Nonfinite features')
 
+    # Step 1: train each model on the training part, then pick its threshold on the validation part.
     models, validation = candidates(), []
     for name, model in models.items():
         print('Fitting', source, name, flush=True)
@@ -127,9 +139,13 @@ def train_classifiers(df, tr, va, te, source):
         p = model.predict_proba(X[va])[:, 1]
         validation.append({'model': name, **metrics(y[va], p, best_threshold(y[va], p)),
                            'fit_seconds': round(fit_seconds, 2)})
+    # The final model is the one with the best validation F1 (PR-AUC if tied).
+    # The test part is not used here, so the choice is not tuned to the test results.
     best = max((v for v in validation if v['model'] in FINAL_CANDIDATES),
                key=lambda r: (r['f1'], r['average_precision']))
 
+    # Step 2: retrain each model on train + validation, then score it once on the later test part
+    # using the threshold from step 1.
     tests, final = [], None
     for name, model in models.items():
         started = time.perf_counter()
@@ -156,6 +172,7 @@ def train_classifiers(df, tr, va, te, source):
                      'saved_to': f'models/{source}_final.joblib'}
         elif name in EXTRA_MODELS:
             slug = name.lower().replace(' ', '_')
+        # The saved file holds the model, its column order and its threshold, which is all predict.py needs.
         if slug:  # same bundle format for the final model and the extra models
             joblib.dump({'model': model, 'model_name': name, 'columns': COLS,
                          'threshold': threshold, 'source': source},
@@ -179,6 +196,7 @@ def train(source):
               'split_counts': df.split.value_counts().to_dict()}
     (ROOT / 'results' / f'{source}_evaluation.json').write_text(json.dumps(result, indent=2))
 
+    # The comparison, clustering and error analysis all reuse the same split, so they use the same test sessions.
     comparison.write(source, comparison.build(df, tr, va, te, validation, tests, final['name']))
     clustering.run(source, df=df, dev=tr | va, te=te)
     evaluation.run(source, df=df, tr=tr, va=va, te=te)

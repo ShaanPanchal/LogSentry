@@ -38,6 +38,8 @@ DOWNLOAD_ATTEMPTS = 4
 
 def sort_file(path, out, source):
     """External merge sort: sort chunks in memory, then k-way merge them."""
+    # The raw log is too big to sort in memory. So sort it in chunks, save each chunk,
+    # then merge the sorted chunks into one file.
     key = get_source(source).sort_key  # chronological key for this source's line format
     with tempfile.TemporaryDirectory(dir=path.parent) as temp:
         chunk_files, chunk = [], []
@@ -108,6 +110,8 @@ def build_processed_dataset(source):
     print('Building sessions and features...', flush=True)
     df, audit, _ = process(sorted_log_path(source), source, labels)
     out = PROCESSED_DIR / f'{source}_sessions.csv.gz'
+    # Numbers are saved with 8 significant digits to keep the file small.
+    # This can change a score by a tiny amount (see README).
     df.to_csv(out, index=False, float_format='%.8g')
     (ROOT / 'results' / f'{source}_parse_audit.json').write_text(json.dumps(audit, indent=2))
     print(f'Wrote {out} ({len(df):,} sessions)', flush=True)
@@ -129,6 +133,7 @@ def setup(source, process_only=False, raw_only=False):
         return
     if not (PROCESSED_DIR / f'{source}_sessions.csv.gz').exists():
         build_processed_dataset(source)
+    # The dataset exists but the bucket inventory does not, so only rebuild the inventory.
     elif not (ROOT / 'results' / f'{source}_event_buckets.json').exists() and sorted_log_path(source).exists():
         write_bucket_inventory(source)
     if process_only:
