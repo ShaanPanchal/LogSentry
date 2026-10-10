@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
-		<title>LogSentry • Security workspace</title>
+		<title>LogSentry - Monitoring Dashboard</title>
 		<link
 			rel="stylesheet"
 			href="{{url_for('static',filename='dashboard.css')}}"
@@ -20,10 +20,10 @@
 					>ML</span
 				></a
 			>
-			<div class="nav-label">SECURITY WORKSPACE</div>
+			<div class="nav-label">MONITORING DASHBOARD</div>
 			<a class="nav active" href="#overview"><span>▦</span> Overview</a
-			><a class="nav" href="#ingestion"><span>↥</span> Log ingestion</a
-			><a class="nav" href="#sessions"><span>≡</span> Session explorer</a>
+			><a class="nav" href="#upload"><span>↥</span> Log Upload</a
+			><a class="nav" href="#sessions"><span>≡</span> Session Explorer</a>
 			<div class="sidebar-bottom">
 				<span class="status-dot"></span> Local environment
 				<p>Offline inference<br />Data stays on this computer.</p>
@@ -31,41 +31,15 @@
 		</aside>
 		<main>
 			<header class="topbar">
-				<span>WORKSPACE <b>/</b> LOG ANOMALY DETECTION</span>
+				<span>MONITORING DASHBOARD <b>/</b> LOG ANOMALY DETECTION</span>
 				<div class="top-actions">
 					<span class="connection"
-						><i class="status-dot"></i> Engine connected</span
-					><button
-						class="icon-button"
-						id="theme-toggle"
-						aria-label="Toggle light or dark theme"
+						><i class="status-dot"></i> Server running</span
 					>
-						◐
-					</button>
 				</div>
 			</header>
 			<section id="overview" class="intro">
-				<div>
-					<div class="eyebrow">INTELLIGENT LOG MONITORING</div>
-					<h1>
-						See the signal.<br /><span
-							>Investigate the anomaly.</span
-						>
-					</h1>
-					<p>
-						Turn distributed system logs into clear session-level
-						findings.
-					</p>
-				</div>
-				<div class="engine-card">
-					<span class="eyebrow">DETECTION ENGINE</span>
-					<div class="engine-icon">◈</div>
-					<strong>{{ready|join(' + ') or 'Setup required'}}</strong
-					><span class="muted"
-						>{{'Models ready for inference' if ready else 'Train a
-						model to begin'}}</span
-					>
-				</div>
+				<h1>LogSentry</h1>
 			</section>
 			{% if datasets %}
 			<section class="panel datasets" id="results" aria-label="Datasets">
@@ -158,7 +132,7 @@
 				</p>
 			</section>
 			{% endif %} {% if comparison %}
-			<section class="insights">
+			<section class="panel-row">
 				<article class="panel mini wide">
 					<details class="collapse">
 					<summary>
@@ -292,12 +266,12 @@
 				</article>
 			</section>
 			{% endif %}
-			<div class="workspace-grid">
-				<section class="panel" id="ingestion">
+			<div class="main-grid">
+				<section class="panel" id="upload">
 					<div class="panel-heading">
 						<div>
-							<span class="eyebrow">01 / INGEST</span>
-							<h2>Bring your logs into focus</h2>
+							<span class="eyebrow">LOG UPLOAD</span>
+							<h2>Upload a log</h2>
 						</div>
 						<span class="tag">UP TO 4 GB</span>
 					</div>
@@ -370,7 +344,7 @@
 								<div id="progress-bar"></div>
 							</div>
 							<p id="progress-description" class="muted">
-								Transferring your file to the local engine.
+								Uploading the file to the local server.
 							</p>
 						</div>
 						<div
@@ -394,9 +368,9 @@
 						page open until the analysis finishes.
 					</p>
 				</section>
-				<section class="panel intel">
+				<section class="panel steps-panel">
 					<span class="eyebrow">ANALYSIS PIPELINE</span>
-					<h2>From raw events<br />to session insights.</h2>
+					<h2>Processing steps</h2>
 					<ol class="pipeline">
 						<li>
 							<span>01</span>
@@ -428,18 +402,14 @@
 						<li>
 							<span>04</span>
 							<div>
-								<strong>Inspect evidence</strong>
+								<strong>Inspect events</strong>
 								<p>
-									Explore flagged sessions and their original
-									events.
+									Open flagged sessions and read their original
+									log lines.
 								</p>
 							</div>
 						</li>
 					</ol>
-					<div class="intel-note">
-						Anomaly scores support investigation. They are not proof
-						of an attack or calibrated security probabilities.
-					</div>
 					{% if not ready %}
 					<div class="alert">
 						Train a model first:<code
@@ -491,7 +461,7 @@
 				</section>
 			</section>
 			{% if total is not none %}
-			<section class="insights">
+			<section class="panel-row">
 				{% if total is not none and spec %}
 				<article class="panel mini">
 					<span class="eyebrow"
@@ -541,7 +511,7 @@
 				{% endif %}
 			</section>
 			{% endif %} {% if clusters %}
-			<section class="insights">
+			<section class="panel-row">
 				<article class="panel mini wide">
 					<span class="eyebrow">ANOMALY CLUSTERS IN THIS LOG</span>{%
 					for c in clusters %}
@@ -561,8 +531,8 @@
 			<section class="panel explorer" id="sessions">
 				<div class="panel-heading">
 					<div>
-						<span class="eyebrow">02 / INVESTIGATE</span>
-						<h2>Session explorer</h2>
+						<span class="eyebrow">INVESTIGATE</span>
+						<h2>Session Explorer</h2>
 					</div>
 					{% if total is not none %}<a
 						class="button secondary"
@@ -711,12 +681,12 @@
 				{% else %}
 				<div class="empty-state">
 					<span>⌕</span>
-					<h3>Your investigation starts here</h3>
+					<h3>No log analysed yet</h3>
 					<p>
-						Upload a log to explore sessions, anomaly scores, and
-						raw evidence.
+						Upload a log to see its sessions, anomaly scores and
+						original events.
 					</p>
-					<a href="#ingestion" class="button secondary"
+					<a href="#upload" class="button secondary"
 						>Upload a log ↥</a
 					>
 				</div>
@@ -726,7 +696,7 @@
 			<section id="detail" class="panel detail">
 				<div class="panel-heading">
 					<div>
-						<span class="eyebrow">03 / DRILL DOWN</span>
+						<span class="eyebrow">DRILL DOWN</span>
 						<h2 class="mono">{{detail.session_id}}</h2>
 					</div>
 					<a class="button secondary" href="/#sessions">Close ×</a>
@@ -755,7 +725,7 @@
 				<p class="note">{{detail.cluster_text}}</p>
 				{% endif %}
 				<div class="events-heading">
-					<h3>Raw event evidence</h3>
+					<h3>Original log events</h3>
 					<button
 						class="button secondary"
 						id="copy-events"
@@ -783,11 +753,6 @@
 				</div>
 			</section>
 			{% endif %}
-			<footer>
-				<span>LogSentry / ML security workspace</span
-				><span>Local inference · Session-level visibility</span>
-			</footer>
 		</main>
-		<div id="toast" role="status" hidden></div>
 	</body>
 </html>

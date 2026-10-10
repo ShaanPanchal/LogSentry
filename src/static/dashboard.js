@@ -1,13 +1,4 @@
 const $ = (s) => document.querySelector(s);
-const theme = $("#theme-toggle");
-document.documentElement.dataset.theme =
-	localStorage.getItem("logsentry-theme") || "dark";
-theme.addEventListener("click", () => {
-	let t =
-		document.documentElement.dataset.theme === "light" ? "dark" : "light";
-	document.documentElement.dataset.theme = t;
-	localStorage.setItem("logsentry-theme", t);
-});
 const input = $("#log-file"),
 	zone = $("#dropzone"),
 	submit = $("#analyse"),
@@ -69,7 +60,7 @@ form.addEventListener("submit", (e) => {
 	bar.style.width = "0%";
 	title.textContent = "Uploading log";
 	percent.textContent = "0%";
-	description.textContent = "Transferring your file to the local engine.";
+	description.textContent = "Uploading the file to the local server.";
 	const data = new FormData();
 	data.append("source", $("#source").value);
 	data.append("log", file);
