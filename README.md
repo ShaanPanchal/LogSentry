@@ -13,7 +13,7 @@ conda activate logsentry
 
 ## 2. Process the data
 
-The prepared datasets are included, so you can skip to step 3. To rebuild them, this downloads the raw Loghub data from Zenodo, verifies its checksum and builds the feature tables. `eda.py` then analyses a prepared dataset.
+The prepared datasets are included, so you can skip to step 3. `setup_data.py` only builds a table that is missing: if `data/processed/<SOURCE>_sessions.csv.gz` already exists, `--process-only` does nothing and downloads nothing. To rebuild a table, first delete (or move) its `.csv.gz` file, then run the command below, which downloads the raw Loghub data from Zenodo, verifies its checksum, sorts the log by time and builds the feature table. `eda.py` then analyses a prepared dataset.
 
 ```bash
 python setup_data.py --source HDFS --process-only

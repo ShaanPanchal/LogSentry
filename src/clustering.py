@@ -26,6 +26,7 @@ from sklearn.preprocessing import StandardScaler
 
 from processing import COLS, ROOT, collect_session_events, normalise, sorted_log_path
 from features import bucket
+from sources import get_source
 
 K_RANGE = range(2, 9)   # all reported in the sweep
 MIN_K = 3               # k=2 only splits the class on one dominant feature; require >=3 groups
@@ -88,27 +89,46 @@ def describe_feature(name, bucket_templates):
             f'more events in bucket {name[-2:]}', f'fewer events in bucket {name[-2:]}')
 
 
-def profile_sentence(cluster_mean, anomaly_mean):
-    """One sentence with key numbers: cluster average compared with the anomaly average."""
+def profile_sentence(cluster_mean, anomaly_mean, write_chain=True):
+    """One sentence with key numbers: cluster average compared with the anomaly average.
+
+    The write-chain statistic only applies to HDFS, so it is left out when write_chain is False (BGL).
+    """
     def pair(feature, fmt):
         j = COLS.index(feature)
         return f'{fmt.format(cluster_mean[j])} (anomaly avg {fmt.format(anomaly_mean[j])})'
-    return (f"Profile: write chain complete in {pair('lifecycle_complete', '{:.0%}')} of sessions; "
-            f"mean events {pair('n_events', '{:.1f}')}; mean duration {pair('duration_s', '{:,.0f}')} s; "
-            f"share of failure-keyword messages {pair('keyword_error_ratio', '{:.1%}')}; "
-            f"mean hosts {pair('n_hosts', '{:.1f}')}.")
+    parts = [f"write chain complete in {pair('lifecycle_complete', '{:.0%}')} of sessions"] if write_chain else []
+    parts += [f"mean events {pair('n_events', '{:.1f}')}", f"mean duration {pair('duration_s', '{:,.0f}')} s",
+              f"share of failure-keyword messages {pair('keyword_error_ratio', '{:.1%}')}",
+              f"mean hosts {pair('n_hosts', '{:.1f}')}"]
+    return 'Profile: ' + '; '.join(parts) + '.'
 
 
 # Builds the plain English description of a cluster from its top features and example events.
 # It only reports what the numbers show (higher or lower than the anomaly average), not a root cause.
+def feature_clause(f):
+    """One clause about one feature: is the cluster above or below the anomaly average, and what that means.
+
+    The direction comes from z, the cluster centre on the signed-log scale that K-means works on. The numbers
+    shown are raw means. For a very skewed feature a few huge values can pull the raw average the other way,
+    so when the two disagree the clause shows the log-scale typical values that match z and says why.
+    """
+    _, high, low = f['_meaning']
+    up = f['z'] > 0
+    direction = 'above' if up else 'below'
+    meaning = high if up else low
+    cm, om = f['cluster_mean'], f['overall_anomaly_mean']
+    if f.get('_typical') is not None and cm != om and (cm > om) != up:
+        ct, ot = f['_typical']
+        return (f"{f['feature']} is {direction} the anomaly average on the log scale used for clustering "
+                f"(typical value {ct:.3g} vs {ot:.3g}; the raw means, {cm:.3g} vs {om:.3g}, point the other way "
+                f"because a few very large values skew the raw average): {meaning}")
+    return f"{f['feature']} is {direction} the anomaly average ({cm:.3g} vs {om:.3g}): {meaning}"
+
+
 def interpret(cluster, feats, share, examples, profile=''):
     """Write a plain English description of a cluster from its statistics."""
-    clauses = []
-    for f in feats:
-        _, high, low = f['_meaning']
-        direction = 'above' if f['z'] > 0 else 'below'
-        clauses.append(f"{f['feature']} is {direction} the anomaly average "
-                       f"({f['cluster_mean']:.3g} vs {f['overall_anomaly_mean']:.3g}): {high if f['z'] > 0 else low}")
+    clauses = [feature_clause(f) for f in feats]
     text = (f"Cluster {cluster} holds {share:.1%} of the clustered anomalies. Compared with the "
             f"overall anomaly population, its members show: " + '; '.join(clauses) + '.')
     if examples and examples[0].get('typical_events'):
@@ -200,10 +220,17 @@ def run(source, df=None, dev=None, te=None, log_path=None):
     # For each cluster, compare its average feature values with the average of all anomalies.
     anomaly_mean = X[ids].mean(0)
     all_mean = X[dev].mean(0)
+    # The same averages on the signed-log scale, converted back to counts. Their direction always agrees
+    # with the cluster centre z, so they can be shown next to the raw means when the two disagree.
+    L_anomaly = L[ids].mean(0)
+
+    def typical(m):
+        return np.sign(m) * np.expm1(np.abs(m))
     clusters = []
     for c in range(km.n_clusters):
         members = ids[km.labels_ == c]
         mean = X[members].mean(0)
+        L_mean = L[members].mean(0)
         # The data was standardised, so each centre value says how far this cluster is from the average anomaly
         # for that feature. The features with the biggest values are what make the cluster different.
         z = km.cluster_centers_[c]                 # standardised log-scale offset vs anomaly mean
@@ -211,7 +238,8 @@ def run(source, df=None, dev=None, te=None, log_path=None):
         feats = [{'feature': COLS[j], 'cluster_mean': float(mean[j]),
                   'overall_anomaly_mean': float(anomaly_mean[j]),
                   'all_sessions_mean': float(all_mean[j]), 'z': float(z[j]),
-                  '_meaning': describe_feature(COLS[j], bucket_templates)} for j in top]
+                  '_meaning': describe_feature(COLS[j], bucket_templates),
+                  '_typical': (float(typical(L_mean[j])), float(typical(L_anomaly[j])))} for j in top]
 
         examples = []
         for i in nearest[c][:N_EXAMPLES]:
@@ -240,9 +268,10 @@ def run(source, df=None, dev=None, te=None, log_path=None):
                             'note': 'Only anomalies were clustered, so this is 100% anomalous by construction.'},
             'test_period_assignment': {'normal': int(test_comp.loc[c].get(0, 0)),
                                        'anomaly': int(test_comp.loc[c].get(1, 0))},
-            'top_features': [{k: v for k, v in f.items() if k != '_meaning'} | {'measures': f['_meaning'][0]}
+            'top_features': [{k: v for k, v in f.items() if not k.startswith('_')} | {'measures': f['_meaning'][0]}
                              for f in feats],
-            'interpretation': interpret(c, feats, len(members) / len(ids), examples, profile_sentence(mean, anomaly_mean)),
+            'interpretation': interpret(c, feats, len(members) / len(ids), examples,
+                                      profile_sentence(mean, anomaly_mean, get_source(source).has_lifecycle)),
             'typical_events': typical,
             'example_sessions': examples,
         })
