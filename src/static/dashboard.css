@@ -142,7 +142,7 @@ button:hover:not(:disabled) {
 main {
 	margin-left: 230px;
 	max-width: 1700px;
-	padding: 0 42px;
+	padding: 0 42px 48px;
 }
 .topbar {
 	height: 84px;
@@ -630,7 +630,7 @@ tr:hover td {
 	}
 	main {
 		margin-left: 190px;
-		padding: 0 24px;
+		padding: 0 24px 48px;
 	}
 	.metrics {
 		gap: 10px;
@@ -670,7 +670,7 @@ tr:hover td {
 	}
 	main {
 		margin-left: 0;
-		padding: 0 18px;
+		padding: 0 18px 48px;
 	}
 	.topbar {
 		height: 60px;
@@ -833,9 +833,8 @@ tr.sel td {
 .folds {
 	margin: 16px 0;
 }
-#summary > .eyebrow {
-	display: block;
-	margin: 0 0 12px;
+#summary {
+	margin-top: 24px;
 }
 .overview {
 	display: grid;
