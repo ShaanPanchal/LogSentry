@@ -40,6 +40,7 @@ python src/predict.py --source BGL  --log data/supporting/sample_BGL.log  --out 
 
 ```bash
 python src/dashboard.py     # open http://127.0.0.1:5050 and upload a sample log
+                            # Note: First-time startup may take a few minutes.
 ```
 
 On macOS you can use `./Start-LogSentry.command` instead (it creates a `.venv` and installs `requirements.txt`).
