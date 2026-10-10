@@ -22,6 +22,17 @@ python src/eda.py --source HDFS
 python src/eda.py --source BGL
 ```
 
+### Optional: raw logs for example events
+
+Training and prediction do not need the raw logs. They are only used to add real example events to the cluster descriptions and the error analysis. To fetch and sort them (even though the processed datasets already exist), run:
+
+```bash
+python setup_data.py --source HDFS --raw-only
+python setup_data.py --source BGL --raw-only
+```
+
+The HDFS download is large (the sorted log is about 1.5 GB) and can take several minutes; BGL is much smaller. If the sorted log already exists the command does nothing. Training still works without raw logs, but on a first run the cluster descriptions will lack example events and a warning is printed. If complete cluster and error-analysis files already exist, training without raw logs keeps them and does not overwrite them.
+
 ## 3. Train the models
 
 ```bash

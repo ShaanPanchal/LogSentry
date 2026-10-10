@@ -149,6 +149,14 @@ def event_templates_for(events_by_session):
     return stats
 
 
+def has_example_events(path):
+    """True if a saved cluster analysis says it was built with example events."""
+    try:
+        return json.loads(path.read_text()).get('example_events_available') is True
+    except (OSError, ValueError, AttributeError):
+        return False
+
+
 def run(source, df=None, dev=None, te=None, log_path=None):
     """Cluster the anomalies from train + validation and save the analysis."""
     from train import load_dataset, split  # local import: train imports this module
@@ -281,6 +289,14 @@ def run(source, df=None, dev=None, te=None, log_path=None):
               'clustered': 'development-period anomalies only', 'n_clustered': int(len(ids)),
               'selected_k': int(km.n_clusters), 'sweep': sweep, 'clusters': clusters,
               'example_events_available': bool(events)}
+    if not events:
+        # Without the raw log the descriptions have no example events. Do not replace complete ones with these.
+        if has_example_events(ROOT / 'results' / f'{source}_cluster_analysis.json'):
+            print(f'Warning: no raw log, so the existing {source} cluster files (which include example events) '
+                  'were kept and not overwritten. Run setup_data.py --raw-only to regenerate them.', flush=True)
+            return result
+        print(f'Warning: no example events for {source}; the cluster descriptions may be incomplete. '
+              'Run setup_data.py --raw-only, then train again.', flush=True)
     (ROOT / 'results' / f'{source}_cluster_analysis.json').write_text(json.dumps(result, indent=2))
     pd.DataFrame({'session_id': df.session_id.iloc[ids].to_numpy(), 'cluster': km.labels_}) \
         .to_csv(ROOT / 'results' / f'{source}_anomaly_clusters.csv', index=False)

@@ -10,7 +10,9 @@ Steps:
 3. Sort the log by time. The sessions and the temporal split both need time order.
 4. Build the session feature table and save it to data/processed/<SOURCE>_sessions.csv.gz.
 5. Train the models, cluster the anomalies and write models/ and results/.
-If the processed file already exists, steps 1 to 4 are skipped.
+If the processed file already exists, steps 1 to 4 are skipped. --raw-only does steps 1 to 3 on their own
+(even when the processed file exists) and does nothing if the sorted raw log is already there. The raw log is
+only needed for the example events in the cluster and error-analysis reports, not for training or prediction.
 """
 import argparse
 import hashlib
@@ -57,8 +59,10 @@ def sort_file(path, out, source):
             flush()
         streams = [p.open(encoding='utf-8') for p in chunk_files]
         try:
-            with out.open('w', encoding='utf-8') as f:
+            part = out.with_name(out.name + '.part')  # only renamed once complete, so prepare_raw can trust the file
+            with part.open('w', encoding='utf-8') as f:
                 f.writelines(heapq.merge(*streams, key=key))
+            part.replace(out)
         finally:
             for s in streams:
                 s.close()
@@ -93,6 +97,10 @@ def prepare_raw(source):
     spec = get_source(source)
     archive, digest, files = spec.archive, spec.md5, spec.files
     dest = RAW_DIR / archive
+    labels = dest / files[1] if len(files) > 1 else None
+    if sorted_log_path(source).exists() and (labels is None or labels.exists()):
+        print(f'Sorted raw log already exists ({sorted_log_path(source)}); nothing to download.', flush=True)
+        return labels
     dest.mkdir(parents=True, exist_ok=True)
     zip_path = download_and_verify(archive, digest)
     with zipfile.ZipFile(zip_path) as z:
@@ -100,7 +108,7 @@ def prepare_raw(source):
             z.extract(name, dest)
     print('Sorting records chronologically...', flush=True)
     sort_file(dest / files[0], sorted_log_path(source), source)
-    return dest / files[1] if len(files) > 1 else None  # separate label file (HDFS only)
+    return labels  # separate label file (HDFS only)
 
 
 def build_processed_dataset(source):

@@ -53,6 +53,15 @@ def examples(rows, df, X, events):
     return out
 
 
+def has_example_events(path):
+    """True if a saved error analysis contains at least one example with its log events."""
+    try:
+        saved = json.loads(path.read_text())
+        return any(ex.get('events') for k in ('false_positives', 'false_negatives') for ex in saved[k]['examples'])
+    except (OSError, ValueError, KeyError, TypeError):
+        return False
+
+
 def run(source, df, tr, va, te):
     """Look at the mistakes the final model made on the test period."""
     pred = pd.read_csv(ROOT / 'results' / f'{source}_test_predictions.csv.gz', dtype={'session_id': str})
@@ -111,7 +120,13 @@ def run(source, df, tr, va, te):
                                + ' ' + describe_group('Missed anomalies', fn_vs_normal, 'normal sessions', int(fn.sum())).replace('Missed anomalies (n=%d) differ' % int(fn.sum()), 'They also differ'),
             'examples': examples(fn_rows, df, X, events)},
     }
-    (ROOT / 'results' / f'{source}_error_analysis.json').write_text(json.dumps(result, indent=2))
+    analysis = ROOT / 'results' / f'{source}_error_analysis.json'
+    if not events and has_example_events(analysis):
+        # Without the raw log the examples would be empty. Do not replace a file that has them.
+        print(f'Warning: no raw log, so the existing {analysis.name} (which includes example events) was kept. '
+              'Run setup_data.py --raw-only to regenerate it.', flush=True)
+    else:
+        analysis.write_text(json.dumps(result, indent=2))
     pred[fp | fn].sort_values('probability', ascending=False) \
         .to_csv(ROOT / 'results' / f'{source}_error_cases.csv', index=False)
     print(f"Error analysis: {int(fp.sum())} false positives, {int(fn.sum())} false negatives", flush=True)
