@@ -130,11 +130,8 @@
 					never mixed. The panels below show results for
 					<b>{{view_source}}</b>.
 				</p>
-			</section>
-			{% endif %} {% if comparison %}
-			<section class="panel-row">
-				<article class="panel mini wide">
-					<details class="collapse">
+				{% if comparison %}
+				<details class="collapse">
 					<summary>
 						<span class="eyebrow"
 							>MODEL COMPARISON · {{view_source}} · FIVE CLASSIFIERS ·
@@ -263,7 +260,7 @@
 					</div>
 					{% endif %}
 					</details>
-				</article>
+				{% endif %}
 			</section>
 			{% endif %}
 			<div class="main-grid">

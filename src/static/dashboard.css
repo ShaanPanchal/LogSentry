@@ -809,6 +809,11 @@ tr:hover td {
 .datasets {
 	margin-bottom: 24px;
 }
+.datasets .collapse {
+	margin-top: 18px;
+	border-top: 1px solid var(--border);
+	padding-top: 14px;
+}
 .tabs {
 	display: flex;
 	gap: 8px;
