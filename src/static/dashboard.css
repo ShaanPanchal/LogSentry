@@ -96,7 +96,6 @@ button:disabled {
 	display: flex;
 	gap: 14px;
 	padding: 14px;
-	border-radius: 8px;
 	color: var(--muted);
 	margin: 6px 0;
 }
@@ -174,7 +173,6 @@ h1 {
 .metrics article {
 	background: var(--panel);
 	border: 1px solid var(--border);
-	border-radius: 12px;
 	padding: 22px;
 }
 .metrics strong {
@@ -199,7 +197,6 @@ h1 {
 .panel {
 	border: 1px solid var(--border);
 	background: var(--panel);
-	border-radius: 14px;
 	padding: 26px;
 }
 .panel-heading {
@@ -224,7 +221,6 @@ h3 {
 	letter-spacing: 1px;
 	border: 1px solid var(--border);
 	padding: 7px 9px;
-	border-radius: 5px;
 	color: var(--muted);
 	white-space: nowrap;
 }
@@ -244,7 +240,6 @@ input {
 	background: var(--panel2);
 	border: 1px solid var(--border);
 	color: var(--text);
-	border-radius: 7px;
 	padding: 10px 12px;
 }
 select {
@@ -263,7 +258,6 @@ select {
 	gap: 12px;
 	border: 1px dashed var(--border);
 	background: var(--bg);
-	border-radius: 10px;
 	padding: 26px 20px;
 	cursor: pointer;
 }
@@ -295,7 +289,6 @@ select {
 	background: var(--panel2);
 	width: 44px;
 	height: 44px;
-	border-radius: 10px;
 	font-size: 30px;
 }
 .upload-actions {
@@ -311,7 +304,6 @@ select {
 	gap: 14px;
 	border: 1px solid var(--border);
 	padding: 10px 15px;
-	border-radius: 7px;
 	font-size: 12px;
 	white-space: nowrap;
 }
@@ -357,7 +349,6 @@ select {
 	font-size: 10px;
 	color: var(--accent);
 	border: 1px solid var(--border);
-	border-radius: 8px;
 	min-width: 32px;
 	height: 32px;
 	display: grid;
@@ -390,7 +381,6 @@ select {
 	align-items: center;
 	background: var(--panel2);
 	border: 1px solid var(--border);
-	border-radius: 7px;
 	min-width: 190px;
 }
 .search span {
@@ -453,7 +443,6 @@ tr:hover td {
 .score-track {
 	width: 70px;
 	height: 4px;
-	border-radius: 5px;
 	background: var(--border);
 	overflow: hidden;
 }
@@ -464,7 +453,6 @@ tr:hover td {
 }
 .badge {
 	display: inline-block;
-	border-radius: 5px;
 	padding: 5px 8px;
 	font-size: 10px;
 }
@@ -534,7 +522,6 @@ tr:hover td {
 	overflow: auto;
 	background: var(--bg);
 	border: 1px solid var(--border);
-	border-radius: 8px;
 	margin-top: 18px;
 }
 .event {
@@ -564,7 +551,6 @@ tr:hover td {
 	border: 1px solid #f0c2c8;
 	color: var(--danger);
 	padding: 14px;
-	border-radius: 8px;
 	margin-top: 16px;
 	font-size: 12px;
 	overflow-wrap: anywhere;
@@ -578,7 +564,6 @@ tr:hover td {
 	padding: 16px;
 	background: var(--bg);
 	border: 1px solid var(--border);
-	border-radius: 8px;
 }
 .progress-heading {
 	display: flex;
@@ -590,7 +575,6 @@ tr:hover td {
 }
 .progress-track {
 	height: 5px;
-	border-radius: 8px;
 	background: var(--border);
 	overflow: hidden;
 	margin-top: 14px;
@@ -750,7 +734,6 @@ tr:hover td {
 	display: block;
 	width: 100%;
 	background: var(--accent);
-	border-radius: 3px 3px 0 0;
 	min-height: 1px;
 }
 .cluster {
@@ -811,7 +794,6 @@ tr:hover td {
 	border: 1px solid var(--border);
 	background: var(--panel2);
 	padding: 8px 16px;
-	border-radius: 7px;
 	font-size: 12px;
 	color: var(--muted);
 }
@@ -839,7 +821,6 @@ tr.sel td {
 .overview > div {
 	background: var(--panel2);
 	border: 1px solid var(--border);
-	border-radius: 8px;
 	padding: 14px 18px;
 }
 .overview strong {
