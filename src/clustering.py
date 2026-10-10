@@ -224,7 +224,7 @@ def run(source, df=None, dev=None, te=None, log_path=None):
     # with the cluster centre z, so they can be shown next to the raw means when the two disagree.
     L_anomaly = L[ids].mean(0)
 
-    def typical(m):
+    def inverse_signed_log(m):
         return np.sign(m) * np.expm1(np.abs(m))
     clusters = []
     for c in range(km.n_clusters):
@@ -239,7 +239,8 @@ def run(source, df=None, dev=None, te=None, log_path=None):
                   'overall_anomaly_mean': float(anomaly_mean[j]),
                   'all_sessions_mean': float(all_mean[j]), 'z': float(z[j]),
                   '_meaning': describe_feature(COLS[j], bucket_templates),
-                  '_typical': (float(typical(L_mean[j])), float(typical(L_anomaly[j])))} for j in top]
+                  '_typical': (float(inverse_signed_log(L_mean[j])),
+                               float(inverse_signed_log(L_anomaly[j])))} for j in top]
 
         examples = []
         for i in nearest[c][:N_EXAMPLES]:
