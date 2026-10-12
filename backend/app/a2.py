@@ -1,0 +1,17 @@
+"""The one place that imports the Assignment 2 pipeline from src/.
+
+The A2 modules use flat imports (`from features import ...`), so src/ goes on sys.path. Nothing in
+src/ is copied or changed. `mkl_setup` has to be imported before numpy (it is a no-op off Windows/conda).
+"""
+import sys
+
+from .config import A2_SRC
+
+if str(A2_SRC) not in sys.path:
+    sys.path.insert(0, str(A2_SRC))
+
+import mkl_setup  # noqa: F401,E402  (must come before numpy)
+from clustering import signed_log  # noqa: E402  (feature transform the cluster scaler was fitted on)
+from processing import process  # noqa: E402  (parse -> sessions -> 52 features, same code as training)
+
+__all__ = ['process', 'signed_log']

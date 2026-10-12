@@ -1,0 +1,13 @@
+# Runtime dependencies for the LogSentry API (Python 3.12).
+# numpy / pandas / scikit-learn / joblib match the versions the A2 models were trained and checked with.
+# scikit-learn must stay at 1.9.1: the saved models are pickles and are only safe to load with that version.
+fastapi==0.143.0
+starlette==1.7.0
+pydantic==2.14.1
+uvicorn==0.46.0
+python-multipart==0.0.31
+numpy==2.5.3
+pandas==3.0.6
+scikit-learn==1.9.1
+scipy==1.18.1
+joblib==1.6.0
