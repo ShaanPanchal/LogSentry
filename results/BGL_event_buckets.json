@@ -1,0 +1,866 @@
+{
+  "event_hash_00": [
+    {
+      "template": "",
+      "count": 34470,
+      "share": 0.6700489853044087
+    },
+    {
+      "template": "iar <N>a<N> dear <N>",
+      "count": 5513,
+      "share": 0.1071650727004121
+    },
+    {
+      "template": "iar <N>a<N> dear <N>c<N>",
+      "count": 2375,
+      "share": 0.046166705543892385
+    },
+    {
+      "template": "<N> torus receiver z+ input pipe error(s) (dcr <HEX>) detected and corrected",
+      "count": 1469,
+      "share": 0.02855532229220123
+    },
+    {
+      "template": "iar <N> dear <N>f<N>f<N>c",
+      "count": 770,
+      "share": 0.014967731902651427
+    }
+  ],
+  "event_hash_01": [
+    {
+      "template": "generating core.<N>",
+      "count": 1706751,
+      "share": 0.9772849730964068
+    },
+    {
+      "template": "program interrupt: trap instruction.........<N>",
+      "count": 9824,
+      "share": 0.005625218661479678
+    },
+    {
+      "template": "floating point instr. enabled.....<N>",
+      "count": 6541,
+      "share": 0.003745374110824366
+    },
+    {
+      "template": "iar <N> dear <N>fee<N>c<N>c",
+      "count": 4094,
+      "share": 0.002344222842029499
+    },
+    {
+      "template": "iar <N>b<N> dear <N>ac",
+      "count": 3111,
+      "share": 0.0017813574161098613
+    }
+  ],
+  "event_hash_02": [
+    {
+      "template": "ciod: Message code <N> is not <N> or <N>",
+      "count": 2278,
+      "share": 0.2162726668565461
+    },
+    {
+      "template": "iar <N> dear <N>a<N>bc",
+      "count": 667,
+      "share": 0.06332478875913795
+    },
+    {
+      "template": "iar <N>d<N> dear <N>ccfc",
+      "count": 629,
+      "share": 0.05971707965441944
+    },
+    {
+      "template": "iar <N>a<N>c dear <N>c<N>",
+      "count": 513,
+      "share": 0.0487040729136998
+    },
+    {
+      "template": "ciod: duplicate canonical-rank <N> to logical-rank <N> mapping at line <N> of node map file <PATH>",
+      "count": 512,
+      "share": 0.04860913320041774
+    }
+  ],
+  "event_hash_03": [
+    {
+      "template": "Node card is not fully functional",
+      "count": 17364,
+      "share": 0.26289572892852275
+    },
+    {
+      "template": "store operation.............................<N>",
+      "count": 9824,
+      "share": 0.1487380581083741
+    },
+    {
+      "template": "suppressing further interrupts of same type",
+      "count": 7694,
+      "share": 0.11648927311541431
+    },
+    {
+      "template": "wait state enable.................<N>",
+      "count": 6745,
+      "share": 0.10212115247770595
+    },
+    {
+      "template": "Found invalid node ecid in processor card slot J<N>, ecid <N>",
+      "count": 5558,
+      "share": 0.08414964647458704
+    }
+  ],
+  "event_hash_04": [
+    {
+      "template": "<N> double-hummer alignment exceptions",
+      "count": 295764,
+      "share": 0.8393158657952762
+    },
+    {
+      "template": "program interrupt: illegal instruction......<N>",
+      "count": 13920,
+      "share": 0.039502024762547994
+    },
+    {
+      "template": "<N> ddr error(s) detected and corrected on rank <N>, symbol <N> over <N> seconds",
+      "count": 10436,
+      "share": 0.029615167415370035
+    },
+    {
+      "template": "critical input interrupt enable...<N>",
+      "count": 6559,
+      "share": 0.018613058938042548
+    },
+    {
+      "template": "iar <N> dear <N>db<N>c",
+      "count": 6321,
+      "share": 0.017937665123855306
+    }
+  ],
+  "event_hash_05": [
+    {
+      "template": "data cache search parity error detected. attempting to correct",
+      "count": 13941,
+      "share": 0.40189690959409596
+    },
+    {
+      "template": "debug interrupt enable............<N>",
+      "count": 6521,
+      "share": 0.18799008302583026
+    },
+    {
+      "template": "iar <N>a<N> dear <N>b<N>",
+      "count": 4869,
+      "share": 0.14036554428044282
+    },
+    {
+      "template": "iar <N>b<N> dear <N>de<N>c",
+      "count": 870,
+      "share": 0.025080719557195572
+    },
+    {
+      "template": "critical input interrupt (unit=<HEX> bit=<HEX>): warning for torus x- wire",
+      "count": 851,
+      "share": 0.024532979704797047
+    }
+  ],
+  "event_hash_06": [
+    {
+      "template": "instruction address: <HEX>",
+      "count": 51227,
+      "share": 0.7061507498897222
+    },
+    {
+      "template": "instruction address space.........<N>",
+      "count": 6506,
+      "share": 0.08968350242611381
+    },
+    {
+      "template": "icache prefetch depth....................<N>",
+      "count": 2389,
+      "share": 0.032931737979708865
+    },
+    {
+      "template": "Error receiving packet on tree network, expecting type <N> instead of type <N> (softheader=<N>d<N> <N>bfa<N> <N> <N>) PSR<N>=<N>f<N> PSR<N>=<N> PRXF=<N> PIXF=<N>",
+      "count": 2048,
+      "share": 0.0282311424790472
+    },
+    {
+      "template": "<N>:<N> <N>:<N>e<N> <N>:<N>ed<N>bd<N> <N>:<N>b<N>bf<N>",
+      "count": 2047,
+      "share": 0.028217357741508603
+    }
+  ],
+  "event_hash_07": [
+    {
+      "template": "CE sym <N>, at <HEX>, mask <HEX>",
+      "count": 201206,
+      "share": 0.818979237134635
+    },
+    {
+      "template": "ciod: Error reading message prefix on CioStream socket to <IP>, Link has been severed",
+      "count": 26546,
+      "share": 0.10805156321867151
+    },
+    {
+      "template": "iar <N>ac dear <N>c",
+      "count": 4480,
+      "share": 0.018235176795737527
+    },
+    {
+      "template": "<N>:<N> <N>:<N> <N>:<N> <N>:<N>",
+      "count": 1649,
+      "share": 0.006712010387538211
+    },
+    {
+      "template": "iar <N>ea<N> dear <N>f<N>c",
+      "count": 1024,
+      "share": 0.004168040410454292
+    }
+  ],
+  "event_hash_08": [
+    {
+      "template": "<N> microseconds spent in the rbs signal handler during <N> calls. <N> microseconds was the maximum time for a single instance of a correctable ddr.",
+      "count": 135092,
+      "share": 0.5302612211253508
+    },
+    {
+      "template": "instruction cache parity error corrected",
+      "count": 105924,
+      "share": 0.41577139716994094
+    },
+    {
+      "template": "iar <N> dear <N>bbc",
+      "count": 3849,
+      "share": 0.01510804074343022
+    },
+    {
+      "template": "<N> torus receiver x+ input pipe error(s) (dcr <HEX>) detected and corrected",
+      "count": 2400,
+      "share": 0.00942044629364316
+    },
+    {
+      "template": "<N>:<N>c<N> <N>:<N> <N>:<N> <N>:<N>",
+      "count": 513,
+      "share": 0.002013620395266226
+    }
+  ],
+  "event_hash_09": [
+    {
+      "template": "iar <N> dear <N>c<N>c",
+      "count": 54790,
+      "share": 0.401247903682927
+    },
+    {
+      "template": "iar <N> dear <N>e<N>c",
+      "count": 18233,
+      "share": 0.13352715874887403
+    },
+    {
+      "template": "iar <N> dear <N>c",
+      "count": 15440,
+      "share": 0.11307296281920776
+    },
+    {
+      "template": "MACHINE CHECK DCR read timeout (mc=e<N>x iar <HEX> lr <HEX>)",
+      "count": 14481,
+      "share": 0.10604984291353287
+    },
+    {
+      "template": "iar <N> dear <N>a<N>c",
+      "count": 11840,
+      "share": 0.08670880050384844
+    }
+  ],
+  "event_hash_10": [
+    {
+      "template": "idoproxydb hit ASSERT condition: ASSERT expression=<N> Source file=idotransportmgr.cpp Source line=<N> Function=int IdoTransportMgr::SendPacket(IdoUdpMgr*, BglCtlPavTrace*)",
+      "count": 84168,
+      "share": 0.5457976408946185
+    },
+    {
+      "template": "ciod: generated <N> core files for program <PATH>",
+      "count": 57310,
+      "share": 0.3716336707498168
+    },
+    {
+      "template": "ciod: Error reading message prefix after LOGIN_MESSAGE on CioStream socket to <IP>: Link has been severed",
+      "count": 5683,
+      "share": 0.036852105232441264
+    },
+    {
+      "template": "iar <N> dear <N>dadc",
+      "count": 499,
+      "share": 0.0032358262380764017
+    },
+    {
+      "template": "iar <N>a<N>a<N> dear <N>d<N>",
+      "count": 450,
+      "share": 0.0029180797738163943
+    }
+  ],
+  "event_hash_11": [
+    {
+      "template": "floating pt ex mode <N> enable......<N>",
+      "count": 13044,
+      "share": 0.20716928990041772
+    },
+    {
+      "template": "total of <N> ddr error(s) detected and corrected over <N> seconds",
+      "count": 10415,
+      "share": 0.16541460857964202
+    },
+    {
+      "template": "program interrupt: privileged instruction...<N>",
+      "count": 9824,
+      "share": 0.15602814351285677
+    },
+    {
+      "template": "floating point operation....................<N>",
+      "count": 9824,
+      "share": 0.15602814351285677
+    },
+    {
+      "template": "program interrupt: fp cr update.............<N>",
+      "count": 8102,
+      "share": 0.12867874783603067
+    }
+  ],
+  "event_hash_12": [
+    {
+      "template": "ciod: Error loading <PATH>: invalid or missing program image, No such file or directory",
+      "count": 43480,
+      "share": 0.6258456400955753
+    },
+    {
+      "template": "core configuration register: <HEX>",
+      "count": 6431,
+      "share": 0.0925670034833175
+    },
+    {
+      "template": "iar <N> dear <N>bfc",
+      "count": 3854,
+      "share": 0.055473990269741195
+    },
+    {
+      "template": "<N> torus receiver y+ input pipe error(s) (dcr <HEX>) detected and corrected",
+      "count": 1905,
+      "share": 0.02742032990759133
+    },
+    {
+      "template": "iar <N>b<N>c dear <N>f<N>c",
+      "count": 1408,
+      "share": 0.020266574545873276
+    }
+  ],
+  "event_hash_13": [
+    {
+      "template": "machine check: i-fetch......................<N>",
+      "count": 18017,
+      "share": 0.3730304975258287
+    },
+    {
+      "template": "auxiliary processor.........................<N>",
+      "count": 8419,
+      "share": 0.17431002712271476
+    },
+    {
+      "template": "iar <N>c dear <N>a<N>c",
+      "count": 2272,
+      "share": 0.04704031139361063
+    },
+    {
+      "template": "iar <N>e<N> dear <N>c<N>c",
+      "count": 2158,
+      "share": 0.04468001407896644
+    },
+    {
+      "template": "ciod: LOGIN chdir(pwd) failed: No such file or directory",
+      "count": 2056,
+      "share": 0.042568169113232156
+    }
+  ],
+  "event_hash_14": [
+    {
+      "template": "<N> ddr errors(s) detected and corrected on rank <N>, symbol <N>, bit <N>",
+      "count": 33939,
+      "share": 0.5604656923458013
+    },
+    {
+      "template": "debug wait enable.................<N>",
+      "count": 6524,
+      "share": 0.10773676822723144
+    },
+    {
+      "template": "iar <N> dear <N>c<N>ec",
+      "count": 6021,
+      "share": 0.09943027000247709
+    },
+    {
+      "template": "<N>:<N>ce <N>:<N> <N>:<N>eeeeeee <N>:<N>feaa<N>",
+      "count": 2048,
+      "share": 0.033820493765997856
+    },
+    {
+      "template": "iar <N>ba<N> dear <N>dd<N>c",
+      "count": 1135,
+      "share": 0.018743291222855257
+    }
+  ],
+  "event_hash_15": [
+    {
+      "template": "program interrupt: imprecise exception......<N>",
+      "count": 8102,
+      "share": 0.24180022084937475
+    },
+    {
+      "template": "iar <N> dear <N>c<N>dc",
+      "count": 6208,
+      "share": 0.18527471871549228
+    },
+    {
+      "template": "Ido packet timeout",
+      "count": 4276,
+      "share": 0.1276151251977199
+    },
+    {
+      "template": "iar <N> dear <N>bec",
+      "count": 3854,
+      "share": 0.11502074193452115
+    },
+    {
+      "template": "NFS Mount failed on bglio<N>, slept <N> seconds, retrying (<N>)",
+      "count": 2670,
+      "share": 0.079684841973319
+    }
+  ],
+  "event_hash_16": [
+    {
+      "template": "<N> L<N> EDRAM error(s) (dcr <HEX>) detected and corrected",
+      "count": 4534,
+      "share": 0.23394045714875394
+    },
+    {
+      "template": "ciod: cpu <N> at treeaddr <N> sent unrecognized message <HEX>",
+      "count": 2569,
+      "share": 0.1325524998710077
+    },
+    {
+      "template": "ciod: Y coordinate <N> exceeds physical dimension <N> at line <N> of node map file <PATH>",
+      "count": 1272,
+      "share": 0.06563128837521284
+    },
+    {
+      "template": "iar <N> dear <N>f<N>c<N>c",
+      "count": 1206,
+      "share": 0.062225891336876324
+    },
+    {
+      "template": "iar <N> dear <N>f<N>a<N>c",
+      "count": 918,
+      "share": 0.04736597698777153
+    }
+  ],
+  "event_hash_17": [
+    {
+      "template": "iar <N> dear <N>fee<N>d<N>c",
+      "count": 4092,
+      "share": 0.16544028462844668
+    },
+    {
+      "template": "disable trace broadcast..................<N>",
+      "count": 2393,
+      "share": 0.09674941376243228
+    },
+    {
+      "template": "special purpose registers:",
+      "count": 2316,
+      "share": 0.09363629012695075
+    },
+    {
+      "template": "<N>:<N>feaa<N>a<N> <N>:<N> <N>:<N> <N>:<N>",
+      "count": 2051,
+      "share": 0.08292229319964421
+    },
+    {
+      "template": "iar <N> dear <N>ac",
+      "count": 1422,
+      "share": 0.05749171181369774
+    }
+  ],
+  "event_hash_18": [
+    {
+      "template": "data TLB error interrupt",
+      "count": 152734,
+      "share": 0.624781150290436
+    },
+    {
+      "template": "total of <N> ddr error(s) detected and corrected",
+      "count": 28485,
+      "share": 0.116522130409883
+    },
+    {
+      "template": "ciod: Error loading <PATH>: invalid or missing program image, Exec format error",
+      "count": 22024,
+      "share": 0.09009244866235785
+    },
+    {
+      "template": "data address: <HEX>",
+      "count": 14499,
+      "share": 0.05931031661621533
+    },
+    {
+      "template": "machine state register: <HEX>",
+      "count": 8454,
+      "share": 0.03458234475987892
+    }
+  ],
+  "event_hash_19": [
+    {
+      "template": "Lustre mount FAILED : bglio<N> : point <PATH>",
+      "count": 26426,
+      "share": 0.45568354255759413
+    },
+    {
+      "template": "data store interrupt caused by dcbf.........<N>",
+      "count": 9823,
+      "share": 0.16938543247344462
+    },
+    {
+      "template": "problem state (<N>=sup,<N>=usr).......<N>",
+      "count": 6546,
+      "share": 0.11287763829493723
+    },
+    {
+      "template": "program interrupt",
+      "count": 3667,
+      "share": 0.06323285970478687
+    },
+    {
+      "template": "iar <N> dear <N>cc",
+      "count": 2916,
+      "share": 0.05028279762725893
+    }
+  ],
+  "event_hash_20": [
+    {
+      "template": "ciod: Error loading <PATH>: invalid or missing program image, Permission denied",
+      "count": 42528,
+      "share": 0.5550509005481598
+    },
+    {
+      "template": "byte ordering exception.....................<N>",
+      "count": 8102,
+      "share": 0.10574262594622814
+    },
+    {
+      "template": "ciod: failed to read message prefix on control stream (CioStream socket to <IP>",
+      "count": 5983,
+      "share": 0.07808666144609762
+    },
+    {
+      "template": "Lustre mount FAILED : bglio<N> : block_id : location",
+      "count": 5105,
+      "share": 0.06662751239885148
+    },
+    {
+      "template": "iar <N>e<N> dear <N>f<N>c<N>c",
+      "count": 1898,
+      "share": 0.02477160010441138
+    }
+  ],
+  "event_hash_21": [
+    {
+      "template": "iar <N>e<N> dear <N>c",
+      "count": 9000,
+      "share": 0.4116167390807226
+    },
+    {
+      "template": "icache prefetch threshold................<N>",
+      "count": 2388,
+      "share": 0.10921564143608507
+    },
+    {
+      "template": "iar <N>b<N> dear <N>c",
+      "count": 2134,
+      "share": 0.09759890235536245
+    },
+    {
+      "template": "iar <N>b<N> dear <N>dd<N>c",
+      "count": 1004,
+      "share": 0.045918134004116165
+    },
+    {
+      "template": "iar <N> dear <N>ec",
+      "count": 843,
+      "share": 0.03855476789389435
+    }
+  ],
+  "event_hash_22": [
+    {
+      "template": "disable apu instruction broadcast........<N>",
+      "count": 2396,
+      "share": 0.20269012773877
+    },
+    {
+      "template": "ciod: Error creating node map from file <PATH>: Bad address",
+      "count": 1024,
+      "share": 0.08662549699686997
+    },
+    {
+      "template": "Error receiving packet on tree network, expecting type <N> instead of type <N> (softheader=<N>e <N>aff<N> <N> <N>) PSR<N>=<N>f<N> PSR<N>=<N> PRXF=<N> PIXF=<N>",
+      "count": 1024,
+      "share": 0.08662549699686997
+    },
+    {
+      "template": "ciod: generated <N> core files for program IMB-MPI<N>B_perf",
+      "count": 512,
+      "share": 0.043312748498434986
+    },
+    {
+      "template": "iar <N>a<N>a<N> dear <N>b<N>",
+      "count": 473,
+      "share": 0.04001353523390576
+    }
+  ],
+  "event_hash_23": [
+    {
+      "template": "program interrupt: fp cr field .............<N>",
+      "count": 8102,
+      "share": 0.2554788257181597
+    },
+    {
+      "template": "data address space................<N>",
+      "count": 6503,
+      "share": 0.20505786270614573
+    },
+    {
+      "template": "rts panic! - stopping execution",
+      "count": 3983,
+      "share": 0.125595181786649
+    },
+    {
+      "template": "iar <N>ea<N> dear <N>c<N>c",
+      "count": 1173,
+      "share": 0.03698798599943241
+    },
+    {
+      "template": "rts: kernel terminated for reason <N>rts: bad message header: expecting type <N>, type=<N>, cpu=<N>, index=<N>, total=<N>",
+      "count": 1139,
+      "share": 0.035915870463216974
+    }
+  ],
+  "event_hash_24": [
+    {
+      "template": "data storage interrupt",
+      "count": 63493,
+      "share": 0.6060921361614388
+    },
+    {
+      "template": "Node card status: no ALERTs are active. Clock Mode is Low. Clock Select is Midplane. Phy JTAG Reset is asserted. ASIC JTAG Reset is asserted. Temperature Mask is not active. No temperature error. Temperature Limit Error Latch is clear. PGOOD IS NOT ASSERTED. PGOOD ERROR LATCH IS ACTIVE. MPGOOD IS NOT OK. MPGOOD ERROR LATCH IS ACTIVE. The <N> volt rail is OK. The <N> volt rail is OK.",
+      "count": 16896,
+      "share": 0.16128601156952213
+    },
+    {
+      "template": "program interrupt: fp compare...............<N>",
+      "count": 8102,
+      "share": 0.0773401554057924
+    },
+    {
+      "template": "ciod: Error reading message prefix after VERSION_MESSAGE on CioStream socket to <IP>: Link has been severed",
+      "count": 2048,
+      "share": 0.019549819584184502
+    },
+    {
+      "template": "iar <N>e<N> dear <N>bc",
+      "count": 1943,
+      "share": 0.01854750949808129
+    }
+  ],
+  "event_hash_25": [
+    {
+      "template": "rts: kernel terminated for reason <N>",
+      "count": 18587,
+      "share": 0.2305793325890088
+    },
+    {
+      "template": "Can not get assembly information for node card",
+      "count": 17305,
+      "share": 0.2146755985609726
+    },
+    {
+      "template": "ciod: Error reading message prefix after LOAD_MESSAGE on CioStream socket to <IP>: Link has been severed",
+      "count": 15273,
+      "share": 0.18946780796427243
+    },
+    {
+      "template": "<N> tree receiver <N> in re-synch state event(s) (dcr <HEX>) detected",
+      "count": 7847,
+      "share": 0.09734524252574123
+    },
+    {
+      "template": "iar <N> dear <N>b<N>c",
+      "count": 4733,
+      "share": 0.05871479965264855
+    }
+  ],
+  "event_hash_26": [
+    {
+      "template": "<N> floating point alignment exceptions",
+      "count": 267725,
+      "share": 0.7368503620605663
+    },
+    {
+      "template": "ciod: LOGIN chdir(<PATH> failed: No such file or directory",
+      "count": 39669,
+      "share": 0.1091796321321528
+    },
+    {
+      "template": "ciod: Received signal <N>, code=<N>, errno=<N>, address=<HEX>",
+      "count": 39457,
+      "share": 0.10859615178195449
+    },
+    {
+      "template": "external input interrupt enable...<N>",
+      "count": 6556,
+      "share": 0.01804385460330217
+    },
+    {
+      "template": "<N> torus receiver x- input pipe error(s) (dcr <HEX>) detected and corrected",
+      "count": 1447,
+      "share": 0.003982528616683685
+    }
+  ],
+  "event_hash_27": [
+    {
+      "template": "ciod: generated <N> core files for program IMB-MPI<N>KB_perf",
+      "count": 2912,
+      "share": 0.24526235997641707
+    },
+    {
+      "template": "iar <N>c dear <N>f<N>ec",
+      "count": 1737,
+      "share": 0.14629832392824055
+    },
+    {
+      "template": "iar <N>a<N> dear <N>f<N>c",
+      "count": 752,
+      "share": 0.06333698307083298
+    },
+    {
+      "template": "iar <N>cc dear <N>f<N>c",
+      "count": 546,
+      "share": 0.045986692495578206
+    },
+    {
+      "template": "CHECK_INITIAL_GLOBAL_INTERRUPT_VALUES",
+      "count": 544,
+      "share": 0.04581824307251748
+    }
+  ],
+  "event_hash_28": [
+    {
+      "template": "Kernel detected <N> integer alignment exceptions (<N>) iar <HEX>, dear <HEX> (<N>) iar <HEX>, dear <HEX> (<N>) iar <HEX>, dear <HEX> (<N>) iar <HEX>, dear <HEX> (<N>) iar <HEX>, dear <HEX> (<N>) iar <HEX>, dear <HEX> (<N>) iar <HEX>, dear <HEX> (<N>) iar <HEX>, dear <HEX>",
+      "count": 22175,
+      "share": 0.3653513468984266
+    },
+    {
+      "template": "exception syndrome register: <HEX>",
+      "count": 18013,
+      "share": 0.2967789768514705
+    },
+    {
+      "template": "iar <N>a<N> dear <N>e<N>",
+      "count": 4527,
+      "share": 0.07458604497899332
+    },
+    {
+      "template": "iar <N> dear <N>b<N>c<N>c",
+      "count": 1790,
+      "share": 0.029491720899579868
+    },
+    {
+      "template": "ciod: Error opening node map file <PATH>, No such file or directory",
+      "count": 1544,
+      "share": 0.025438668753604086
+    }
+  ],
+  "event_hash_29": [
+    {
+      "template": "machine check enable..............<N>",
+      "count": 6538,
+      "share": 0.21917532685216226
+    },
+    {
+      "template": "iar <N>c dear <N>f<N>c",
+      "count": 4059,
+      "share": 0.1360710693932283
+    },
+    {
+      "template": "iar <N>c dear <N>b<N>c",
+      "count": 3896,
+      "share": 0.13060677170633592
+    },
+    {
+      "template": "iar <N>e<N> dear <N>f<N>c",
+      "count": 2520,
+      "share": 0.08447871270533021
+    },
+    {
+      "template": "force load<PATH> alignment...............<N>",
+      "count": 2389,
+      "share": 0.08008716057660074
+    }
+  ],
+  "event_hash_30": [
+    {
+      "template": "<N> total interrupts. <N> critical input interrupts. <N> microseconds total spent on critical input interrupts, <N> microseconds max time in a critical input interrupt.",
+      "count": 135092,
+      "share": 0.7931611486545993
+    },
+    {
+      "template": "iar <N>dc dear <N>c<N>c",
+      "count": 16790,
+      "share": 0.09857856635411957
+    },
+    {
+      "template": "L<N> DCACHE summary averages: #ofDirtyLines: <N> out of <N> #ofDirtyDblWord: <N> out of <N>",
+      "count": 3149,
+      "share": 0.018488618549679724
+    },
+    {
+      "template": "ciod: Error creating node map from file <PATH>: Resource temporarily unavailable",
+      "count": 2048,
+      "share": 0.012024354013891417
+    },
+    {
+      "template": "iar <N>ba<N> dear <N>de<N>c",
+      "count": 1298,
+      "share": 0.007620904057632353
+    }
+  ],
+  "event_hash_31": [
+    {
+      "template": "data store interrupt caused by icbi.........<N>",
+      "count": 9823,
+      "share": 0.2592846773129207
+    },
+    {
+      "template": "disable store gathering..................<N>",
+      "count": 6495,
+      "share": 0.17143988385904713
+    },
+    {
+      "template": "ciod: pollControlDescriptors: Detected the debugger died.",
+      "count": 6443,
+      "share": 0.17006730896133035
+    },
+    {
+      "template": "<N> tree receiver <N> in re-synch state event(s) (dcr <HEX>) detected over <N> seconds",
+      "count": 3148,
+      "share": 0.08309357265408474
+    },
+    {
+      "template": "ciod: Error creating node map from file <PATH>: Bad file descriptor",
+      "count": 1544,
+      "share": 0.040754916193744224
+    }
+  ]
+}
