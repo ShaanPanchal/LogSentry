@@ -12,6 +12,7 @@ if str(A2_SRC) not in sys.path:
 
 import mkl_setup  # noqa: F401,E402  (must come before numpy)
 from clustering import signed_log  # noqa: E402  (feature transform the cluster scaler was fitted on)
+from features import STRUCTURAL_COLS  # noqa: E402  (the 20 non-bucket feature names)
 from processing import process  # noqa: E402  (parse -> sessions -> 52 features, same code as training)
 
-__all__ = ['process', 'signed_log']
+__all__ = ['process', 'signed_log', 'STRUCTURAL_COLS']

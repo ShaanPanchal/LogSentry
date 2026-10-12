@@ -1,11 +1,14 @@
 """FastAPI application: models load once at startup; a basic request-size limit guards uploads."""
+import json
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
 from .config import MAX_UPLOAD_BYTES
+from .errors import EXAMPLES, error_body, register_error_handlers
 from .model_service import ModelService
 from .routes import router
+from .store import AnalysisStore
 
 
 class _TooLarge(Exception):
@@ -57,7 +60,7 @@ class BodyLimitMiddleware:
                 await self._reject(send)
 
     async def _reject(self, send):
-        body = b'{"detail":"Request body is too large."}'
+        body = json.dumps(error_body(413, EXAMPLES[413])).encode()    # same JSON shape as every other error
         await send({'type': 'http.response.start', 'status': 413,
                     'headers': [(b'content-type', b'application/json'), (b'content-length', str(len(body)).encode())]})
         await send({'type': 'http.response.body', 'body': body})
@@ -66,9 +69,19 @@ class BodyLimitMiddleware:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.model_service = ModelService()   # once per server start, not per request
+    app.state.store = AnalysisStore()          # temporary: empty again after every restart
     yield
 
 
-app = FastAPI(title='LogSentry API', lifespan=lifespan)
+DESCRIPTION = (
+    'Log anomaly detection for HDFS and BGL logs. Upload a log, get an anomaly score for every session, '
+    'then look at one session in detail.\n\n'
+    'Scores are on the trained model\'s 0-1 scale and are **not probabilities**. A session is *flagged* when '
+    'its score reaches the model\'s saved threshold.\n\n'
+    'Analyses are stored **in memory only**: they are temporary and are lost when the server restarts. '
+    'Every error uses the same JSON shape: `{"error": "<code>", "detail": "<message>"}`.')
+
+app = FastAPI(title='LogSentry API', description=DESCRIPTION, lifespan=lifespan)
 app.add_middleware(BodyLimitMiddleware, max_bytes=MAX_UPLOAD_BYTES)
+register_error_handlers(app)
 app.include_router(router)

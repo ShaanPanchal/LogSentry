@@ -10,6 +10,9 @@ MODELS_DIR = REPO_ROOT / 'models'
 SOURCES = ('HDFS', 'BGL')
 ALLOWED_EXTENSIONS = ('.log', '.txt')
 
+# The session detail view returns at most this many log lines per session (the rest are counted, not sent).
+MAX_EVENTS_PER_SESSION = 200
+
 # Basic request-size limit for the first version of the endpoint. 5 MiB is about 12x the supplied
 # sample logs (~0.4 MB). Detailed upload and cost limits are a later stage.
 MAX_UPLOAD_BYTES = int(os.environ.get('LOGSENTRY_MAX_UPLOAD_BYTES', 5 * 1024 * 1024))
