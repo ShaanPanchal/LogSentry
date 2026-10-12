@@ -25,7 +25,7 @@ export default function ScoreHistogram({ sessions, threshold }) {
   const thresholdLeft = `calc(${(threshold * 100).toFixed(2)}% + ${(GAP * k - GAP * (BINS - 1) * threshold).toFixed(2)}px)`;
 
   return (
-    <article className="panel mini">
+    <article className="panel mini" aria-label="Anomaly score distribution">
       <span className="eyebrow">ANOMALY SCORE DISTRIBUTION</span>
       <div className="chart" ref={box}>
         <div className="hist" role="group" aria-label="Bar chart: number of sessions in each anomaly score range">
@@ -41,7 +41,8 @@ export default function ScoreHistogram({ sessions, threshold }) {
         <ChartTip tip={tip} />
       </div>
       <p className="muted">
-        Sessions per score bin (bar height is square-root scaled).<br />
+        Number of sessions in each anomaly score bin, from 0.0 to 1.0 (each bin is labelled by its lower edge). Bar
+        height is square-root scaled.<br />
         <span className="swatch" aria-hidden="true" />Dashed line: decision threshold {formatThreshold(threshold)}.
       </p>
     </article>

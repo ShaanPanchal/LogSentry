@@ -4,7 +4,7 @@ import { formatBytes } from './format.js';
 import Progress from './Progress.jsx';
 
 // Checks the chosen file before anything is sent. This is for convenience only: the back end checks everything again.
-function validate(file) {
+export function validate(file) {
   if (!file) return 'Choose a .log or .txt file.';
   if (!/\.(log|txt)$/i.test(file.name)) return 'Only .log and .txt files are accepted.';
   if (file.size === 0) return 'This file is empty.';

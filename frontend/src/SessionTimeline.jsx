@@ -48,7 +48,7 @@ export default function SessionTimeline({ sessions, threshold, onSelect }) {
   const ticks = width < 520 ? [tMin, tMax] : [tMin, (tMin + tMax) / 2, tMax];
 
   return (
-    <article className="panel mini wide">
+    <article className="panel mini wide" aria-label="Sessions over time">
       <span className="eyebrow">SESSIONS OVER TIME</span>
       <div className="chart timeline" ref={box}>
         <svg width={width} height={H} viewBox={`0 0 ${width} ${H}`} role="group"

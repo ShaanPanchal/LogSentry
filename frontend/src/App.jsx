@@ -35,7 +35,7 @@ export default function App() {
 function Home() {
   const [analysis, setAnalysis] = useState(null);     // the AnalysisResponse from the API
   const [selected, setSelected] = useState(null);     // session id whose detail panel is open
-  const [notice, setNotice] = useState(null);         // { kind: 'error' | 'info', text }, shown above the summary boxes
+  const [notice, setNotice] = useState(null);         // { kind: 'error' | 'success' | 'info', text }, shown above the summary boxes
   const [uploadError, setUploadError] = useState(null);   // a failed upload, shown under the file field
   const [busy, setBusy] = useState(false);            // an upload is being analysed
   const [deleting, setDeleting] = useState(false);
@@ -85,6 +85,8 @@ function Home() {
       setView(result.summary.source);
       setSelected(null);
       saveId(result.analysis_id);
+      const { total_sessions: total, flagged_sessions: flagged } = result.summary;
+      setNotice({ kind: 'success', text: `Analysis complete: ${total.toLocaleString('en-US')} sessions analysed, ${flagged.toLocaleString('en-US')} flagged as anomalous.` });
       // Replacing a result: free the old one on the server (best effort, the user is not told if it fails).
       if (previous) deleteAnalysis(previous.analysis_id).catch(() => {});
     } catch (error) {
