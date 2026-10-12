@@ -10,6 +10,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from .config import FRONTEND_ORIGIN
 from .schemas import ErrorResponse
 
 logger = logging.getLogger('logsentry')
@@ -59,4 +60,7 @@ def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def unexpected(request: Request, exc: Exception):
         logger.error('Unexpected error on %s %s', request.method, request.url.path, exc_info=exc)
-        return error_response(500, EXAMPLES[500])
+        # Unexpected errors are answered outside the CORS middleware, so add its header here for the front end's
+        # origin only. Without it the browser would hide this response and show a network error instead.
+        allowed = request.headers.get('origin') == FRONTEND_ORIGIN
+        return error_response(500, EXAMPLES[500], {'access-control-allow-origin': FRONTEND_ORIGIN, 'vary': 'Origin'} if allowed else None)

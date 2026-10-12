@@ -1,0 +1,21 @@
+{
+  "name": "logsentry-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "React front end for LogSentry (log anomaly detection).",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node build.mjs serve",
+    "build": "node build.mjs build"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

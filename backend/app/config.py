@@ -10,6 +10,9 @@ MODELS_DIR = REPO_ROOT / 'models'
 SOURCES = ('HDFS', 'BGL')
 ALLOWED_EXTENSIONS = ('.log', '.txt')
 
+# The one origin (scheme + host + port) of the React front end that may read API responses. Never "*".
+FRONTEND_ORIGIN = os.environ.get('LOGSENTRY_FRONTEND_ORIGIN', 'http://localhost:5173')
+
 # The session detail view returns at most this many log lines per session (the rest are counted, not sent).
 MAX_EVENTS_PER_SESSION = 200
 
