@@ -4,8 +4,6 @@ Finished analyses are kept in memory only (see store.py): they are temporary and
 server restarts.
 """
 import os
-import shutil
-import tempfile
 import uuid
 from typing import Annotated
 from uuid import UUID
@@ -19,6 +17,7 @@ from .model_service import Analysis, LogRejected, ModelService
 from .schemas import (AnalysisForm, AnalysisResponse, EventLine, ParseAudit, SessionDetail, SessionResult,
                       Summary)
 from .store import StoredAnalysis
+from .upload_safety import UploadRejected, check_content, check_filename, save_upload
 
 router = APIRouter(prefix='/api', tags=['analyses'])
 
@@ -64,28 +63,34 @@ def _build(analysis: Analysis, source: str, analysis_id: str, service: ModelServ
 @router.post('/analyses', response_model=AnalysisResponse, status_code=201, summary='Submit a log for analysis',
              description=(
                  'Upload a **.log** or **.txt** file in time order, with `source` set to `HDFS` or `BGL`. '
+                 'The file name must be a plain name (no path), and the file must be UTF-8 text in the selected '
+                 "source's log format; anything else"
+                 ' is refused (400 bad name, 413 too large, 415 not text, 422 not '
+                 'a usable log). '
                  'The log is split into sessions and each session is scored by the trained model.\n\n'
                  'Example: `curl -F source=HDFS -F file=@sample_HDFS.log http://127.0.0.1:8000/api/analyses`\n\n'
                  'The result is stored **in memory only**, under the returned `analysis_id`. It is temporary and '
                  'is lost when the server restarts.'),
-             responses=error_docs(413, 415, 422, 500))
+             responses=error_docs(400, 413, 415, 422, 500))
 def create_analysis(request: Request, form: Annotated[AnalysisForm, Form()]):
     # A plain `def` endpoint: FastAPI runs it in a worker thread, so scoring does not block other requests.
     upload, source = form.file, form.source
-    if not (upload.filename or '').lower().endswith(config.ALLOWED_EXTENSIONS):
-        raise HTTPException(415, 'Upload a .log or .txt file.')
-
-    # The submitted filename is only checked above. The file is stored under a name the server generates.
-    fd, path = tempfile.mkstemp(prefix='logsentry-', suffix='.log')
+    service = request.app.state.model_service
+    path = None
     try:
-        with os.fdopen(fd, 'wb') as out:
-            shutil.copyfileobj(upload.file, out)
-        service = request.app.state.model_service
+        # Unsafe-file-upload defence (upload_safety.py): the name is checked but never used as a path; the file is
+        # saved under a generated name in the app's private upload folder, size-capped, and its content checked.
+        check_filename(upload.filename or '')
+        path = save_upload(upload.file, request.app.state.upload_dir)
+        check_content(path, source)
         analysis = service.analyse(path, source)
+    except UploadRejected as e:
+        raise HTTPException(e.status, e.message) from e
     except LogRejected as e:
         raise HTTPException(422, str(e)) from e
     finally:
-        os.remove(path)
+        if path:
+            os.remove(path)     # also after a refusal or an unexpected error
 
     analysis_id = str(uuid.uuid4())
     item = _build(analysis, source, analysis_id, service)

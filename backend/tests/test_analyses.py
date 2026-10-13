@@ -59,10 +59,15 @@ def test_submitted_filename_is_never_used_as_a_storage_path(client, monkeypatch)
         return real(path, source)
     monkeypatch.setattr(client.app.state.model_service, 'analyse', spy)
 
-    response = post_log(client, 'HDFS', SAMPLES['HDFS'].read_bytes(), filename='../../evil.log')
+    # A crafted name is refused outright and nothing reaches the pipeline (more cases in test_upload_defence.py).
+    assert post_log(client, 'HDFS', SAMPLES['HDFS'].read_bytes(), filename='../../evil.log').status_code == 400
+    assert seen == []
+    # A legitimate name is only checked: the file is stored under a generated name in the private upload folder.
+    response = post_log(client, 'HDFS', SAMPLES['HDFS'].read_bytes(), filename='my_upload.log')
     assert response.status_code == 201
     path, existed = seen[0]
-    assert existed and 'evil' not in path and os.path.basename(path).startswith('logsentry-')
+    assert existed and 'my_upload' not in path and os.path.basename(path).startswith('upload-')
+    assert os.path.dirname(path) == client.app.state.upload_dir
     assert not os.path.exists(path)         # temporary file is removed afterwards
 
 

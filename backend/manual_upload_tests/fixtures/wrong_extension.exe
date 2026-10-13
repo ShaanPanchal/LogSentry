@@ -1,0 +1,2 @@
+This is a harmless plain-text file with an .exe extension.
+It is used to check that LogSentry refuses non-.log/.txt uploads.

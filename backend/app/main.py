@@ -1,11 +1,13 @@
 """FastAPI application: models load once at startup; a basic request-size limit guards uploads."""
 import json
+import shutil
+import tempfile
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .config import FRONTEND_ORIGIN, MAX_UPLOAD_BYTES
+from .config import FRONTEND_ORIGIN, MAX_REQUEST_BYTES
 from .errors import EXAMPLES, error_body, register_error_handlers
 from .model_service import ModelService
 from .routes import router
@@ -26,9 +28,12 @@ class BodyLimitMiddleware:
         if scope['type'] != 'http':
             return await self.app(scope, receive, send)
 
-        declared = dict(scope['headers']).get(b'content-length', b'')
-        if declared.isdigit() and int(declared) > self.max_bytes:
-            return await self._reject(send)
+        declared = dict(scope['headers']).get(b'content-length')
+        if declared is not None and not declared.isdigit():
+            return await self._reject(send, 400, 'The Content-Length header is not a valid number.')
+        if declared is not None and int(declared) > self.max_bytes:
+            return await self._reject(send)      # refused before a single body byte is read
+        # A missing or understated Content-Length is no help to an attacker: the bytes actually received are counted.
 
         received, started, exceeded = 0, False, False
 
@@ -60,9 +65,9 @@ class BodyLimitMiddleware:
             if not started:
                 await self._reject(send)
 
-    async def _reject(self, send):
-        body = json.dumps(error_body(413, EXAMPLES[413])).encode()    # same JSON shape as every other error
-        await send({'type': 'http.response.start', 'status': 413,
+    async def _reject(self, send, status=413, detail=EXAMPLES[413]):
+        body = json.dumps(error_body(status, detail)).encode()    # same JSON shape as every other error
+        await send({'type': 'http.response.start', 'status': status,
                     'headers': [(b'content-type', b'application/json'), (b'content-length', str(len(body)).encode())]})
         await send({'type': 'http.response.body', 'body': body})
 
@@ -71,7 +76,12 @@ class BodyLimitMiddleware:
 async def lifespan(app: FastAPI):
     app.state.model_service = ModelService()   # once per server start, not per request
     app.state.store = AnalysisStore()          # temporary: empty again after every restart
-    yield
+    # Private folder for uploads while they are checked and scored (created readable by this user only).
+    app.state.upload_dir = tempfile.mkdtemp(prefix='logsentry-uploads-')
+    try:
+        yield
+    finally:
+        shutil.rmtree(app.state.upload_dir, ignore_errors=True)
 
 
 DESCRIPTION = (
@@ -83,7 +93,7 @@ DESCRIPTION = (
     'Every error uses the same JSON shape: `{"error": "<code>", "detail": "<message>"}`.')
 
 app = FastAPI(title='LogSentry API', description=DESCRIPTION, lifespan=lifespan)
-app.add_middleware(BodyLimitMiddleware, max_bytes=MAX_UPLOAD_BYTES)
+app.add_middleware(BodyLimitMiddleware, max_bytes=MAX_REQUEST_BYTES)
 # Added last, so it is outermost and its headers are also on 413 responses from the size limit.
 app.add_middleware(CORSMiddleware, allow_origins=[FRONTEND_ORIGIN], allow_methods=['GET', 'POST', 'DELETE'],
                    allow_headers=['Content-Type'])

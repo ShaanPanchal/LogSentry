@@ -16,6 +16,16 @@ FRONTEND_ORIGIN = os.environ.get('LOGSENTRY_FRONTEND_ORIGIN', 'http://localhost:
 # The session detail view returns at most this many log lines per session (the rest are counted, not sent).
 MAX_EVENTS_PER_SESSION = 200
 
-# Basic request-size limit for the first version of the endpoint. 5 MiB is about 12x the supplied
-# sample logs (~0.4 MB). Detailed upload and cost limits are a later stage.
+# ---- Upload limits (the unsafe-file-upload defence, Section 2.7). All upload limits live here. ----
+# Largest log file accepted. 5 MiB is about 12x the supplied sample logs (~0.4 MB). Provisional.
 MAX_UPLOAD_BYTES = int(os.environ.get('LOGSENTRY_MAX_UPLOAD_BYTES', 5 * 1024 * 1024))
+# A multipart request is larger than the file inside it (boundaries, part headers, the `source` field). The whole
+# request may exceed the file limit by this much; the file itself is then checked against MAX_UPLOAD_BYTES exactly.
+MULTIPART_OVERHEAD_BYTES = 64 * 1024
+MAX_REQUEST_BYTES = MAX_UPLOAD_BYTES + MULTIPART_OVERHEAD_BYTES
+# Longest filename accepted (characters).
+MAX_FILENAME_LENGTH = 100
+# Share of non-blank lines that must have the selected source's line format. In the full A2 datasets every line
+# parsed (HDFS 11,175,629 of 11,175,629; BGL 4,747,963 of 4,747,963; results/*_parse_audit.json), but the format
+# patterns in upload_safety.py are stricter than the A2 parser and have only been checked against the sample logs.
+MIN_VALID_LINE_SHARE = 0.9

@@ -113,9 +113,9 @@ def test_invalid_ids_in_the_url_are_422(client):
 
 
 @pytest.mark.parametrize('content, source, expected', [
-    (b'', 'HDFS', 'No sessions'),                                                 # empty file
-    (b'just some text\nthat is not a log\n', 'HDFS', 'No sessions'),
-    (SAMPLES['BGL'].read_bytes(), 'HDFS', 'No sessions'),                         # a BGL log sent as HDFS
+    (b'', 'HDFS', 'empty'),                                                       # empty file
+    (b'just some text\nthat is not a log\n', 'HDFS', 'does not look like a HDFS log'),
+    (SAMPLES['BGL'].read_bytes(), 'HDFS', 'does not look like a HDFS log'),       # a BGL log sent as HDFS
     (b''.join(reversed(SAMPLES['HDFS'].read_bytes().splitlines(keepends=True))), 'HDFS', 'time order'),
 ], ids=['empty-file', 'not-a-log', 'bgl-as-hdfs', 'out-of-order'])
 def test_logs_that_cannot_be_analysed_are_422(client, content, source, expected):
