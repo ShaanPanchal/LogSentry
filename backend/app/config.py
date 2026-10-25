@@ -16,6 +16,19 @@ FRONTEND_ORIGIN = os.environ.get('LOGSENTRY_FRONTEND_ORIGIN', 'http://localhost:
 # The session detail view returns at most this many log lines per session (the rest are counted, not sent).
 MAX_EVENTS_PER_SESSION = 200
 
+# ---- Denial-of-service defence (Section 2.7). ----
+# Analyses allowed to run at the same time; any more are refused at once with 503 instead of queueing. Scoring is
+# CPU-bound, so a small number keeps the GET endpoints (and the analyses already running) fast on a laptop.
+MAX_CONCURRENT_ANALYSES = int(os.environ.get('LOGSENTRY_MAX_CONCURRENT_ANALYSES', 2))
+
+# ---- Response-size side-channel defence (Section 2.8). ----
+# On: responses are padded with trailing spaces so their size does not depend on the decision. An analysis is padded
+# to a size fixed by its session count; a session detail to the size of its longest possible outcome.
+# Off only to measure the attack (backend/attacks/size_attack.py).
+UNIFORM_SIZE = os.environ.get('LOGSENTRY_UNIFORM_SIZE', '1') != '0'
+SIZE_PAD_BASE_BYTES = 2048          # room for the summary and parse audit
+SIZE_PAD_PER_SESSION_BYTES = 256    # room for one session in the list (a real one is about 150)
+
 # ---- Upload limits (the unsafe-file-upload defence, Section 2.7). All upload limits live here. ----
 # Largest log file accepted. 5 MiB is about 12x the supplied sample logs (~0.4 MB). Provisional.
 MAX_UPLOAD_BYTES = int(os.environ.get('LOGSENTRY_MAX_UPLOAD_BYTES', 5 * 1024 * 1024))

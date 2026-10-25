@@ -16,7 +16,7 @@ from .schemas import ErrorResponse
 logger = logging.getLogger('logsentry')
 
 CODES = {400: 'bad_request', 404: 'not_found', 405: 'method_not_allowed', 413: 'payload_too_large',
-         415: 'unsupported_media_type', 422: 'invalid_input', 500: 'internal_error'}
+         415: 'unsupported_media_type', 422: 'invalid_input', 500: 'internal_error', 503: 'service_unavailable'}
 EXAMPLES = {
     400: 'The request could not be read.',
     404: 'Analysis not found. It may have been deleted, or the server may have restarted.',
@@ -25,6 +25,7 @@ EXAMPLES = {
     415: 'Upload a .log or .txt file.',
     422: 'source: Input should be \'HDFS\' or \'BGL\'',
     500: 'Something went wrong on the server. Please try again later.',
+    503: 'The server is busy analysing other logs. Please try again in a few seconds.',
 }
 
 

@@ -4,6 +4,7 @@
 cluster assignment); the only difference is that the joblib files are read once at startup instead
 of on every call. No scoring logic is new.
 """
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -42,6 +43,10 @@ class ModelService:
         # Fails at startup (not on the first request) if a file is missing.
         self.bundles = {s: joblib.load(models_dir / f'{s}_final.joblib') for s in SOURCES}
         self.clusters = {s: joblib.load(models_dir / f'{s}_clusters.joblib') for s in SOURCES}
+        # Longest cluster description per source, by its JSON length: the size every session detail is padded to.
+        self.longest_description = {s: max((v.get('interpretation') or '' for v in c.get('summaries', {}).values()),
+                                           key=lambda d: len(json.dumps(d)), default='')
+                                    for s, c in self.clusters.items()}
 
     def analyse(self, path: Path, source: str) -> Analysis:
         """Parse the log at `path`, build session features, then score every session.

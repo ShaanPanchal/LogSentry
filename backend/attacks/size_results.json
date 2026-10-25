@@ -1,0 +1,46 @@
+[
+  {
+    "label": "before",
+    "reps_per_outcome": 100,
+    "normal_bytes": [
+      3362
+    ],
+    "flagged_bytes": [
+      3356
+    ],
+    "attack_accuracy": 1.0
+  },
+  {
+    "label": "after",
+    "reps_per_outcome": 100,
+    "normal_bytes": [
+      7168
+    ],
+    "flagged_bytes": [
+      7168
+    ],
+    "attack_accuracy": 0.5
+  },
+  {
+    "label": "before",
+    "reps_per_outcome": 100,
+    "normal_bytes": [
+      3362
+    ],
+    "flagged_bytes": [
+      3356
+    ],
+    "attack_accuracy": 1.0
+  },
+  {
+    "label": "after",
+    "reps_per_outcome": 100,
+    "normal_bytes": [
+      7168
+    ],
+    "flagged_bytes": [
+      7168
+    ],
+    "attack_accuracy": 0.5
+  }
+]
