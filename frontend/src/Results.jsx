@@ -52,14 +52,14 @@ function Clusters({ analysisId, sessions }) {
 }
 
 // The panels that describe one analysis, in the A2 order, with the A3 timeline after the score distribution.
-export default function Results({ analysis, onSelect }) {
+export default function Results({ analysis, onSelect, scoreRange, onScoreRange }) {
   const { summary, sessions } = analysis;
   const dataset = DATASETS.find((d) => d.name === summary.source);
   return (
     <>
       <section className="panel-row">
         <AnalysisDetails summary={summary} dataset={dataset} />
-        <ScoreHistogram sessions={sessions} threshold={summary.threshold} />
+        <ScoreHistogram sessions={sessions} threshold={summary.threshold} selected={scoreRange} onSelect={onScoreRange} />
       </section>
       <section className="panel-row">
         <SessionTimeline sessions={sessions} threshold={summary.threshold} onSelect={onSelect} />

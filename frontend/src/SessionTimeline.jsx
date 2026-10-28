@@ -34,8 +34,17 @@ export default function SessionTimeline({ sessions, threshold, onSelect }) {
       const cx = xOf(s.t_start), cy = yOf(s.score);
       const text = `${s.session_id}\nScore ${formatScore(s.score)}, ${s.flagged ? 'flagged' : 'normal'}\nStarts ${formatTime(s.t_start)}`;
       return (
-        <g key={s.session_id} className="point" onClick={() => onSelect(s.session_id)}
-           onMouseEnter={(e) => showRef.current(e, text)} onMouseLeave={hide}>
+        <g key={s.session_id} className="point" tabIndex={0} role="button"
+           aria-label={`${text.replaceAll('\n', ', ')}. Press Enter or Space to open this session.`}
+           onClick={() => onSelect(s.session_id)}
+           onKeyDown={(e) => {
+             if (e.key === 'Enter' || e.key === ' ') {
+               e.preventDefault();
+               if (!e.repeat) onSelect(s.session_id);
+             }
+           }}
+           onMouseEnter={(e) => showRef.current(e, text)} onMouseLeave={hide}
+           onFocus={(e) => showRef.current(e, text)} onBlur={hide}>
           {s.flagged
             ? <path className="mark-flagged" d={`M${cx} ${cy - 5}L${cx + 5} ${cy}L${cx} ${cy + 5}L${cx - 5} ${cy}Z`} />
             : <circle className="mark-ok" cx={cx} cy={cy} r={3} />}
@@ -78,7 +87,7 @@ export default function SessionTimeline({ sessions, threshold, onSelect }) {
       <p className="muted legend-list">
         <span><svg width="12" height="12" viewBox="-6 -6 12 12" aria-hidden="true"><path className="mark-flagged" d="M0 -5L5 0L0 5L-5 0Z" /></svg> Flagged</span>
         <span><svg width="12" height="12" viewBox="-6 -6 12 12" aria-hidden="true"><circle className="mark-ok" r="3" /></svg> Normal</span>
-        <span>Hover a point for details and click it to open the session. With a keyboard, open sessions from the Session Explorer.</span>
+        <span>Hover a point for details and click it to open the session. With a keyboard, press Tab to move between points and Enter or Space to open one. For long logs, use the Session Explorer to search directly.</span>
       </p>
     </article>
   );

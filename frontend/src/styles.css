@@ -791,6 +791,28 @@ td.mono {
   font-size: 9px;
   color: var(--muted);
 }
+button.bar {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.bar.on i {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+.bar.on span {
+  color: var(--text);
+  font-weight: 700;
+}
+.score-filter {
+  line-height: 1.7;
+}
+.score-filter .reset {
+  padding: 6px 8px;
+  text-decoration: underline;
+}
 .bar i {
   display: block;
   width: 100%;
@@ -868,8 +890,14 @@ td.mono {
   stroke-width: 2;
 }
 .chart .point:hover .mark-flagged,
-.chart .point:hover .mark-ok {
+.chart .point:hover .mark-ok,
+.chart .point:focus-visible .mark-flagged,
+.chart .point:focus-visible .mark-ok {
   stroke-width: 3.5;
+}
+.chart .point:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
 }
 .chart-tip {
   position: absolute;

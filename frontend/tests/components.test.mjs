@@ -102,13 +102,60 @@ test('score distribution chart: title, 10 named bars with their counts, axis wor
   assert.match(out, /aria-label="Anomaly score distribution"/);
   assert.match(out, />ANOMALY SCORE DISTRIBUTION</);
   assert.equal((out.match(/class="bar"/g) || []).length, 10);
-  assert.match(out, /aria-label="Scores 0\.0 to 0\.1: 1 session"/);
-  assert.match(out, /aria-label="Scores 0\.9 to 1\.0: 1 session"/);
-  assert.match(out, /aria-label="Scores 0\.5 to 0\.6: 1 session"/);
-  assert.match(out, /tabindex="0"/);                                   // bars can be focused to show their tooltip
+  assert.match(out, /aria-label="Scores 0\.0 to 0\.1: 1 session\. Filter/);
+  assert.match(out, /aria-label="Scores 0\.9 to 1\.0: 1 session\. Filter/);
+  assert.match(out, /aria-label="Scores 0\.5 to 0\.6: 1 session\. Filter/);
+  assert.equal((out.match(/<button[^>]*class="bar"/g) || []).length, 10); // native buttons support focus, Enter and Space
   assert.match(out, /labelled by its lower edge/);
   assert.match(out, /square-root scaled/);
   assert.match(out, /Dashed line: decision threshold 0\.95/);
+});
+
+test('histogram: only the selected range is pressed and all bars target the explorer', () => {
+  const out = html(c.createElement(c.ScoreHistogram, { sessions: SESSIONS, threshold: 0.5, selected: [0.9, 1], onSelect() {} }));
+  assert.equal((out.match(/<button[^>]*class="bar/g) || []).length, 10);
+  assert.equal((out.match(/aria-pressed="true"/g) || []).length, 1);
+  assert.equal((out.match(/aria-controls="sessions"/g) || []).length, 10);
+  assert.match(out, /class="bar on"[^>]*aria-pressed="true"[^>]*aria-label="Scores 0\.9 to 1\.0/);
+});
+
+test('session table: score filtering excludes other sessions and offers a clear control', () => {
+  const out = html(c.createElement(c.SessionTable, { sessions: SESSIONS, scoreRange: [0.9, 1], onClearScoreRange() {} }));
+  assert.match(out, /Showing scores 0\.9 to 1\.0/);
+  assert.match(out, /aria-label="Clear score range filter"/);
+  assert.match(out, /aria-label="Inspect blk_1"/);
+  assert.doesNotMatch(out, /aria-label="Inspect blk_[23]"/);
+  assert.match(out, /1 matching sessions · page 1 of 1/);
+});
+
+test('score bin boundaries: each exact edge belongs to one bin, including 0 and 1', () => {
+  const sessions = Array.from({ length: 11 }, (_, i) => ({ ...SESSIONS[0], session_id: `edge_${i}`, score: i / 10 }));
+  for (let i = 0; i < 10; i += 1) {
+    const out = html(c.createElement(c.SessionTable, { sessions, scoreRange: [i / 10, (i + 1) / 10] }));
+    const ids = [...out.matchAll(/aria-label="Inspect (edge_\d+)"/g)].map((match) => match[1]).sort();
+    assert.deepEqual(ids, (i === 9 ? ['edge_9', 'edge_10'] : [`edge_${i}`]).sort());
+  }
+  const chart = html(c.createElement(c.ScoreHistogram, { sessions, threshold: 0.5 }));
+  assert.match(chart, /Scores 0\.0 to 0\.1: 1 session/);
+  assert.match(chart, /Scores 0\.9 to 1\.0: 2 sessions/);
+});
+
+test('session table: an empty score bin retains its clear control and shows no matches', () => {
+  const out = html(c.createElement(c.SessionTable, { sessions: SESSIONS, scoreRange: [0.2, 0.3] }));
+  assert.match(out, /No sessions match these filters/);
+  assert.match(out, /0 matching sessions · page 1 of 1/);
+  assert.match(out, /aria-label="Clear score range filter"/);
+});
+
+test('timeline: every session is a named keyboard button, with axes and legend retained', () => {
+  const out = html(c.createElement(c.SessionTimeline, { sessions: SESSIONS, threshold: 0.5, onSelect() {} }));
+  assert.equal((out.match(/class="point" tabindex="0" role="button"/g) || []).length, SESSIONS.length);
+  for (const session of SESSIONS) assert.ok(out.includes(`aria-label="${session.session_id}, Score`));
+  assert.match(out, /Press Enter or Space to open this session/);
+  assert.match(out, /Session start time \(UTC\)/);
+  assert.match(out, /Threshold 0\.5/);
+  assert.match(out, /> Flagged</);
+  assert.match(out, /> Normal</);
 });
 
 // ---- 10. not-found page and crash fallback

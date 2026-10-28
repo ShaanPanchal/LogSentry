@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { formatScore } from './format.js';
 
 const PAGE_SIZE = 50;    // as in A2
@@ -21,7 +21,7 @@ function backToTop() {
 
 // The A2 "Session Explorer" panel. `sessions` is null before any log has been analysed.
 // As in A2, the filter fields take effect when "Apply" is pressed, and the table is shown 50 rows per page.
-export default function SessionTable({ sessions, onSelect, onDelete, deleting }) {
+export default function SessionTable({ sessions, onSelect, onDelete, deleting, scoreRange, onClearScoreRange }) {
   const [draft, setDraft] = useState(NO_FILTERS);       // what is typed or chosen in the filter fields
   const [filters, setFilters] = useState(NO_FILTERS);   // what the table currently shows
   const [page, setPage] = useState(1);
@@ -30,9 +30,14 @@ export default function SessionTable({ sessions, onSelect, onDelete, deleting })
     if (!sessions) return [];
     const q = filters.query.trim().toLowerCase();
     return sessions
-      .filter((s) => (!filters.flaggedOnly || s.flagged) && (!q || s.session_id.toLowerCase().includes(q)))
+      .filter((s) => (!filters.flaggedOnly || s.flagged) && (!q || s.session_id.toLowerCase().includes(q))
+        // Bins include their lower edge; only the final bin includes its upper edge (1.0).
+        && (!scoreRange || (s.score >= scoreRange[0]
+          && (s.score < scoreRange[1] || (scoreRange[1] === 1 && s.score === 1)))))
       .sort(SORTS[filters.sort]);
-  }, [sessions, filters]);
+  }, [sessions, filters, scoreRange]);
+
+  useEffect(() => setPage(1), [scoreRange]);
 
   const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const shown = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -46,6 +51,7 @@ export default function SessionTable({ sessions, onSelect, onDelete, deleting })
     setDraft(NO_FILTERS);
     setFilters(NO_FILTERS);
     setPage(1);
+    onClearScoreRange?.();
   }
   function goTo(n) {
     setPage(n);
@@ -88,6 +94,14 @@ export default function SessionTable({ sessions, onSelect, onDelete, deleting })
             <button className="button secondary" type="submit">Apply</button>
             <button type="button" className="reset" onClick={reset}>Reset</button>
           </form>
+
+          {scoreRange && (
+            <p className="muted score-filter" role="status">
+              Showing scores {scoreRange[0].toFixed(1)} to {scoreRange[1].toFixed(1)} from the histogram
+              {' '}({scoreRange[1] === 1 ? 'including 1.0' : 'upper edge excluded'}).{' '}
+              <button type="button" className="reset" onClick={onClearScoreRange} aria-label="Clear score range filter">Clear</button>
+            </p>
+          )}
 
           <div className="table-wrap" role="region" aria-label="Session results" tabIndex={0}>
             <table>
