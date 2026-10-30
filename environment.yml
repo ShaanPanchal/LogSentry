@@ -7,6 +7,5 @@ dependencies:
   - pandas>=2.2
   - scikit-learn=1.9.1
   - joblib
-  - flask>=3.0
   - matplotlib>=3.8
   - xgboost>=2.0

@@ -146,7 +146,7 @@ def setup(source, process_only=False, raw_only=False):
         return
     from train import train
     train(source)
-    print('Ready. Start the dashboard with: python src/dashboard.py', flush=True)
+    print('Ready. Start the app as described in README.md.', flush=True)
 
 
 if __name__ == '__main__':
