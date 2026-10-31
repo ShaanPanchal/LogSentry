@@ -19,3 +19,4 @@ predictions*.csv
 node_modules/
 frontend/dist/
 Markdown/
+.pytest_cache/
