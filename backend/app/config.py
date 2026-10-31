@@ -39,6 +39,6 @@ MAX_REQUEST_BYTES = MAX_UPLOAD_BYTES + MULTIPART_OVERHEAD_BYTES
 # Longest filename accepted (characters).
 MAX_FILENAME_LENGTH = 100
 # Share of non-blank lines that must have the selected source's line format. In the full A2 datasets every line
-# parsed (HDFS 11,175,629 of 11,175,629; BGL 4,747,963 of 4,747,963; results/*_parse_audit.json), but the format
+# parsed (HDFS 11,175,629 of 11,175,629; BGL 4,747,963 of 4,747,963; A2 parse audit), but the format
 # patterns in upload_safety.py are stricter than the A2 parser and have only been checked against the sample logs.
 MIN_VALID_LINE_SHARE = 0.9

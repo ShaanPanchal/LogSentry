@@ -1,8 +1,8 @@
 """Turns the events of a session into one row of 52 features (the feature schema).
 
 A `Session` collects the events of one session (an HDFS block, or a BGL five minute window).
-`Session.row()` then gives the feature values. Training, the dashboard and the command line
-all use this code, so the model always sees the same features it was trained on.
+`Session.row()` then gives the feature values. A2 training and the A3 back end both use this
+code, so the model always sees the same features it was trained on.
 
 Feature groups:
 G1  Event counts (32 hash buckets). Counting event types is a standard approach in log
@@ -42,7 +42,7 @@ HEX = re.compile(r'\b0x[0-9a-fA-F]+\b')
 ERROR_WORDS = re.compile(r'error|exception|fail|timed? out|timeout|fatal|panic|corrupt', re.I)
 
 # Every message kind is hashed into one of 32 buckets, so the number of columns is always the same.
-# Two different kinds can land in the same bucket. results/*_event_buckets.json shows what is in each one.
+# Two different kinds can land in the same bucket.
 N_BUCKETS = 32
 WARN_LEVELS = ('WARN', 'WARNING')
 ERROR_LEVELS = ('ERROR', 'FATAL', 'SEVERE', 'FAILURE')

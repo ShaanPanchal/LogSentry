@@ -1,12 +1,8 @@
 """Scores a raw log: parse, build session features, then give a score, decision and cluster.
 
-It uses the same processing code that built the training data and then applies the saved
-final model. Flagged sessions are also given the nearest anomaly cluster.
-
-    python src/predict.py --source HDFS --log data/raw/HDFS_v1/HDFS.sorted.log --out predictions.csv
+This is the A2 scoring code. It loads the saved models on every call, so the back end does not use it;
+backend/tests/test_analyses.py uses it as the reference that the back end must match exactly.
 """
-import argparse
-
 import mkl_setup  # noqa: F401  (Windows MKL fix, must come before numpy)
 import joblib
 import numpy as np
@@ -29,10 +25,7 @@ def assign_clusters(df, flagged, source):
 
 def predict(path, source, keep=False):
     """Score a log file. Returns (session table, parse audit, events by session)."""
-    model_path = ROOT / 'models' / f'{source}_final.joblib'
-    if not model_path.exists():
-        raise ValueError(f'{source} model has not been trained. Run python setup_data.py --source {source} first.')
-    bundle = joblib.load(model_path)
+    bundle = joblib.load(ROOT / 'models' / f'{source}_final.joblib')
     # The uploaded log goes through the same processing code that built the training data.
     df, audit, events = process(path, source, keep=keep)
 
@@ -47,15 +40,3 @@ def predict(path, source, keep=False):
     df['decision'] = np.where(flagged, 'ANOMALY', 'NORMAL')
     df['cluster'] = assign_clusters(df, flagged, source)
     return df, audit, events
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Score a log file with the trained final model.')
-    parser.add_argument('--log', required=True, help='chronologically sorted raw log')
-    parser.add_argument('--source', choices=['HDFS', 'BGL'], default='HDFS')
-    parser.add_argument('--out', default='predictions.csv')
-    args = parser.parse_args()
-    result, audit, _ = predict(args.log, args.source)
-    result.to_csv(args.out, index=False)
-    print(audit)
-    print(f"{(result.decision == 'ANOMALY').sum():,} of {len(result):,} sessions flagged -> {args.out}")

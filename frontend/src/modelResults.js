@@ -1,6 +1,6 @@
 // Model comparison and temporal-robustness results shown in the "Choose a dataset to inspect" panel.
-// load_model_info -> comparison_rows, folds_summary): results/{HDFS,BGL}_model_comparison.json and
-// results/BGL_temporal_folds.json (HDFS has no temporal-folds file, so it has no robustness table, as in A2).
+// Copied from the A2 model-comparison and BGL temporal-folds result files on the a2-backup branch
+// (HDFS has no temporal-folds file, so it has no robustness table, as in A2).
 // These are historical training/test results, not results for an uploaded log. The A3 API does not serve them.
 export const MODEL_RESULTS = {
   "HDFS": {

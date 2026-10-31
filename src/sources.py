@@ -43,19 +43,6 @@ def parse_hdfs(line):
     return session_ids, stamp(parts[0], parts[1]), parts[2], parts[3], msg, hosts, 0
 
 
-def hdfs_session_ids(line):
-    return set(BLOCK.findall(line))
-
-
-# The sort keys are used by setup_data.py to put the raw log in time order (-1 for lines that cannot be read).
-def hdfs_sort_key(line):
-    parts = line.split(None, 2)
-    try:
-        return int(parts[0] + parts[1])
-    except (ValueError, IndexError):
-        return -1
-
-
 # --------------------------------------------------------------------------- BGL
 # BGL has no session id, so the session is the 5 minute window the timestamp falls in.
 def bgl_window(t):
@@ -80,51 +67,18 @@ def parse_bgl(line):
     return [bgl_window(t)], t, parts[7], parts[8], parts[9], [parts[3]], int(parts[0] != '-')
 
 
-def bgl_session_ids(line):
-    try:
-        return [bgl_window(int(line.split(None, 2)[1]))]
-    except (ValueError, IndexError):
-        return []
-
-
-def bgl_sort_key(line):
-    parts = line.split(None, 2)
-    try:
-        return int(parts[1])
-    except (ValueError, IndexError):
-        return -1
-
-
 # ------------------------------------------------------------------------ registry
 @dataclass(frozen=True)
 class Source:
     name: str
-    title: str
-    archive: str                  # folder / zip name under data/raw/ (Loghub, Zenodo record 8196385)
-    md5: str                      # MD5 of the zip as published on Zenodo
-    files: tuple                  # members to extract; files[0] is the raw log
-    session_definition: str
-    label_policy: str
     labels_in_log: bool           # True: labels come from the log lines; False: separate label file
     has_lifecycle: bool           # True: HDFS write-lifecycle features (G5) are meaningful for this source
     parse: Callable
-    session_ids: Callable         # fast, parse-free session lookup (used for the drill-down index)
-    sort_key: Callable
 
 
 SOURCES = {
-    'HDFS': Source(
-        name='HDFS', title='Hadoop Distributed File System (HDFS)', archive='HDFS_v1',
-        md5='76a24b4d9a6164d543fb275f89773260', files=('HDFS.log', 'preprocessed/anomaly_label.csv'),
-        session_definition='one session per block id (blk_...)',
-        label_policy='per-block labels from anomaly_label.csv', labels_in_log=False, has_lifecycle=True,
-        parse=parse_hdfs, session_ids=hdfs_session_ids, sort_key=hdfs_sort_key),
-    'BGL': Source(
-        name='BGL', title='Blue Gene/L supercomputer (BGL)', archive='BGL',
-        md5='4452953c470f2d95fcb32d5f6e733f7a', files=('BGL.log',),
-        session_definition=f'fixed {BGL_WINDOW_SECONDS // 60}-minute time windows (no session id exists in BGL)',
-        label_policy="window is anomalous if any line has an alert tag (first field != '-')", labels_in_log=True,
-        has_lifecycle=False, parse=parse_bgl, session_ids=bgl_session_ids, sort_key=bgl_sort_key),
+    'HDFS': Source(name='HDFS', labels_in_log=False, has_lifecycle=True, parse=parse_hdfs),
+    'BGL': Source(name='BGL', labels_in_log=True, has_lifecycle=False, parse=parse_bgl),
 }
 
 

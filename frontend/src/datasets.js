@@ -1,6 +1,6 @@
-// Model results shown in the "Choose a dataset to inspect" panel, as in the A2 dashboard.
-// These are the Assignment 2 training and evaluation results (results/HDFS_evaluation.json, results/BGL_evaluation.json
-// and the *_eda_summary.json files). The A3 API does not serve them, so they are copied here. The test numbers come from
+// Model results shown in the "Choose a dataset to inspect" panel.
+// These are the Assignment 2 training and evaluation results (the evaluation and EDA summary files on the a2-backup
+// branch). The A3 API does not serve them, so they are copied here. The test numbers come from
 // the temporal test split of each dataset, not from an uploaded log.
 export const DATASETS = [
   {
