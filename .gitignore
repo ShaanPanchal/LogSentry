@@ -18,3 +18,4 @@ predictions*.csv
 # front end: installed packages and build output (re-created by npm ci / npm run build)
 node_modules/
 frontend/dist/
+Markdown/
