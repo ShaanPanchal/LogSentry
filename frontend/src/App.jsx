@@ -43,6 +43,7 @@ function Home() {
   const [connection, setConnection] = useState('unknown');
   const [active, setActive] = useState('overview');
   const [view, setView] = useState('HDFS');           // which dataset the "Choose a dataset" panel describes
+  const [scoreRange, setScoreRange] = useState(null); // histogram range shared with the Session Explorer
   const current = useRef(null);
   const summaryHeading = useRef(null);
   const showSummary = useRef(false);
@@ -84,6 +85,7 @@ function Home() {
       setAnalysis(result);
       setView(result.summary.source);
       setSelected(null);
+      setScoreRange(null);
       saveId(result.analysis_id);
       const { total_sessions: total, flagged_sessions: flagged } = result.summary;
       setNotice({ kind: 'success', text: `Analysis complete: ${total.toLocaleString('en-US')} sessions analysed, ${flagged.toLocaleString('en-US')} flagged as anomalous.` });
@@ -114,6 +116,7 @@ function Home() {
     showSummary.current = true;
     setAnalysis(null);
     setSelected(null);
+    setScoreRange(null);
     setDeleting(false);
   }
 
@@ -174,10 +177,11 @@ function Home() {
         <Metrics summary={analysis?.summary} />
       </section>
 
-      {analysis && <Results analysis={analysis} onSelect={select} />}
+      {analysis && <Results analysis={analysis} onSelect={select} scoreRange={scoreRange} onScoreRange={setScoreRange} />}
 
       <SessionTable key={analysis?.analysis_id} sessions={analysis?.sessions ?? null} onSelect={select}
-                    onDelete={handleDelete} deleting={deleting} />
+                    onDelete={handleDelete} deleting={deleting}
+                    scoreRange={scoreRange} onClearScoreRange={() => setScoreRange(null)} />
 
       {analysis && selected && (
         <SessionDetail analysisId={analysis.analysis_id} sessionId={selected} onClose={closeDetail} />

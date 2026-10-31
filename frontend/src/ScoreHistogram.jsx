@@ -2,23 +2,30 @@ import { useMemo } from 'react';
 import { ChartTip, useChartTip } from './ChartTip.jsx';
 import { formatThreshold } from './format.js';
 
-const BINS = 10;
+export const BINS = 10;
 const GAP = 6;       // px between bars: the same value as `.hist { gap }` in styles.css
 
+// Which bar a score falls in: lower edge included, and 1.0 joins the last bar. The Session Explorer filters with this
+// too, so a bar's count always matches the rows it shows.
+export const scoreBin = (score) => Math.min(BINS - 1, Math.floor(score * BINS));
+
 // The A2 score-distribution chart: ten bars, heights on a square-root scale. Added in A3: tooltips, keyboard focus and
-// a dashed line for the decision threshold.
+// a dashed line for the decision threshold, and buttons that filter the Session Explorer.
 // Question answered: how are the anomaly scores spread, and where does the decision threshold fall?
-export default function ScoreHistogram({ sessions, threshold }) {
+export default function ScoreHistogram({ sessions, threshold, selected, onSelect = () => {} }) {
   const { box, tip, show, hide } = useChartTip();
 
   const counts = useMemo(() => {
     const c = new Array(BINS).fill(0);
-    for (const s of sessions) c[Math.min(BINS - 1, Math.floor(s.score * BINS))] += 1;
+    for (const s of sessions) c[scoreBin(s.score)] += 1;
     return c;
   }, [sessions]);
 
   const max = Math.max(...counts, 1);
   const label = (i) => `Scores ${(i / BINS).toFixed(1)} to ${((i + 1) / BINS).toFixed(1)}: ${counts[i]} ${counts[i] === 1 ? 'session' : 'sessions'}`;
+  const range = (i) => [i / BINS, (i + 1) / BINS];
+  const isOn = (i) => selected?.[0] === range(i)[0] && selected?.[1] === range(i)[1];
+  const toggle = (i) => onSelect(isOn(i) ? null : range(i));
 
   // Where the threshold sits: inside bin k of ten equal bars with fixed gaps between them.
   const k = Math.min(BINS - 1, Math.floor(threshold * BINS));
@@ -30,11 +37,14 @@ export default function ScoreHistogram({ sessions, threshold }) {
       <div className="chart" ref={box}>
         <div className="hist" role="group" aria-label="Bar chart: number of sessions in each anomaly score range">
           {counts.map((n, i) => (
-            <div key={i} className="bar" tabIndex={0} role="img" aria-label={label(i)}
+            <button key={i} type="button" className={`bar${isOn(i) ? ' on' : ''}`}
+                 aria-pressed={isOn(i)} aria-controls="sessions"
+                 aria-label={`${label(i)}. Filter the Session Explorer to this range.`}
+                 onClick={() => toggle(i)}
                  onMouseEnter={(e) => show(e, label(i))} onMouseLeave={hide} onFocus={(e) => show(e, label(i))} onBlur={hide}>
               <i style={{ height: `${((100 * Math.sqrt(n)) / Math.sqrt(max)).toFixed(1)}%` }} />
               <span>{(i / BINS).toFixed(1)}</span>
-            </div>
+            </button>
           ))}
           <div className="threshold-line" style={{ left: thresholdLeft }} aria-hidden="true" />
         </div>
@@ -44,6 +54,7 @@ export default function ScoreHistogram({ sessions, threshold }) {
         Number of sessions in each anomaly score bin, from 0.0 to 1.0 (each bin is labelled by its lower edge). Bar
         height is square-root scaled.<br />
         <span className="swatch" aria-hidden="true" />Dashed line: decision threshold {formatThreshold(threshold)}.
+        {' '}Click a bar, or focus it and press Enter or Space, to filter the Session Explorer. Select it again to clear.
       </p>
     </article>
   );
