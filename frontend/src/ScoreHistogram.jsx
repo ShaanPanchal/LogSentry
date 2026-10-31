@@ -2,8 +2,12 @@ import { useMemo } from 'react';
 import { ChartTip, useChartTip } from './ChartTip.jsx';
 import { formatThreshold } from './format.js';
 
-const BINS = 10;
+export const BINS = 10;
 const GAP = 6;       // px between bars: the same value as `.hist { gap }` in styles.css
+
+// Which bar a score falls in: lower edge included, and 1.0 joins the last bar. The Session Explorer filters with this
+// too, so a bar's count always matches the rows it shows.
+export const scoreBin = (score) => Math.min(BINS - 1, Math.floor(score * BINS));
 
 // The A2 score-distribution chart: ten bars, heights on a square-root scale. Added in A3: tooltips, keyboard focus and
 // a dashed line for the decision threshold, and buttons that filter the Session Explorer.
@@ -13,7 +17,7 @@ export default function ScoreHistogram({ sessions, threshold, selected, onSelect
 
   const counts = useMemo(() => {
     const c = new Array(BINS).fill(0);
-    for (const s of sessions) c[Math.min(BINS - 1, Math.floor(s.score * BINS))] += 1;
+    for (const s of sessions) c[scoreBin(s.score)] += 1;
     return c;
   }, [sessions]);
 

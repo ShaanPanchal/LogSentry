@@ -140,6 +140,14 @@ test('score bin boundaries: each exact edge belongs to one bin, including 0 and 
   assert.match(chart, /Scores 0\.9 to 1\.0: 2 sessions/);
 });
 
+test('score bins: a score just below an edge is counted and filtered in the same bar', () => {
+  const sessions = [{ ...SESSIONS[0], session_id: 'near_edge', score: 0.8999999999999999 }];
+  const chart = html(c.createElement(c.ScoreHistogram, { sessions, threshold: 0.5 }));
+  const table = html(c.createElement(c.SessionTable, { sessions, scoreRange: [0.9, 1] }));
+  assert.match(chart, /Scores 0\.9 to 1\.0: 1 session/);
+  assert.match(table, /aria-label="Inspect near_edge"/);
+});
+
 test('session table: an empty score bin retains its clear control and shows no matches', () => {
   const out = html(c.createElement(c.SessionTable, { sessions: SESSIONS, scoreRange: [0.2, 0.3] }));
   assert.match(out, /No sessions match these filters/);

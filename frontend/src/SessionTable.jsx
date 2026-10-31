@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { formatScore } from './format.js';
+import { BINS, scoreBin } from './ScoreHistogram.jsx';
 
 const PAGE_SIZE = 50;    // as in A2
 
@@ -31,9 +32,8 @@ export default function SessionTable({ sessions, onSelect, onDelete, deleting, s
     const q = filters.query.trim().toLowerCase();
     return sessions
       .filter((s) => (!filters.flaggedOnly || s.flagged) && (!q || s.session_id.toLowerCase().includes(q))
-        // Bins include their lower edge; only the final bin includes its upper edge (1.0).
-        && (!scoreRange || (s.score >= scoreRange[0]
-          && (s.score < scoreRange[1] || (scoreRange[1] === 1 && s.score === 1)))))
+        // The same bin rule as the histogram; rounding turns the range's lower edge (e.g. 0.3) back into its bar index.
+        && (!scoreRange || scoreBin(s.score) === Math.round(scoreRange[0] * BINS)))
       .sort(SORTS[filters.sort]);
   }, [sessions, filters, scoreRange]);
 
