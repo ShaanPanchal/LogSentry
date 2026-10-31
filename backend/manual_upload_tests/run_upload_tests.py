@@ -5,7 +5,7 @@ actual HTTP status of each one. It checks the unsafe-file-upload defence (backen
 size limit in backend/app/main.py) from the outside, over a real socket, as any client would see it.
 
 This is a local test utility, not application code. It never starts, stops or changes the server's code or files, and
-it only writes inside its own temporary folder, which is deleted at the end. See README.md in this folder.
+it only writes inside its own temporary folder, which is deleted at the end. See Appendix A of the main README.md.
 
 Run from the repository root, with the backend already running:
 
@@ -107,7 +107,7 @@ FILENAME_CASES = [
     # python-multipart cuts a name that starts with "X:\" or "\\" to its last backslash-separated part before the app
     # sees it (an old Internet Explorer workaround), so these arrive as the harmless name "evil.log" and are accepted.
     # Its check runs after it has turned "\\" into "\", so the raw UNC form arrives as "\server\share\evil.log" and is
-    # refused instead. See the README, "Known limitation".
+    # refused instead. See README.md, Appendix A, "Known limitation".
     ('C:' + BS + 'Windows' + BS + 'evil.log', {'escaped': 201, 'raw': 201}, ''),
     (BS * 2 + 'server' + BS + 'share' + BS + 'evil.log', {'escaped': 201, 'raw': 400}, NOT_A_PATH),
     ('sample;whoami|more&$(id).log', {'escaped': 400}, BAD_CHARS),
