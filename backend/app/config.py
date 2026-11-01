@@ -4,8 +4,8 @@ from pathlib import Path
 
 # backend/app/config.py -> repository root is two levels above backend/
 REPO_ROOT = Path(__file__).resolve().parents[2]
-A2_SRC = REPO_ROOT / 'src'          # the Assignment 2 pipeline, reused unchanged
-MODELS_DIR = REPO_ROOT / 'models'
+A2_SRC = REPO_ROOT / 'backend' / 'a2_pipeline'     # the Assignment 2 pipeline, reused unchanged
+MODELS_DIR = REPO_ROOT / 'backend' / 'models'
 
 SOURCES = ('HDFS', 'BGL')
 ALLOWED_EXTENSIONS = ('.log', '.txt')

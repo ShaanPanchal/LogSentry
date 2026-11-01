@@ -80,7 +80,7 @@ _SIGNATURES = [
     (b'\xff\xfe', 'UTF-16 text'), (b'\xfe\xff', 'UTF-16 text'),
 ]
 _TEXT_CONTROL = re.compile(r'[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]')   # controls other than tab, newline, carriage return
-# The line layout of each source, as in the A2 datasets (see src/sources.py for the A2 parser).
+# The line layout of each source, as in the A2 datasets (see a2_pipeline/sources.py for the A2 parser).
 #   HDFS: 081109 203518 143 INFO dfs.DataNode$PacketResponder: <message>
 #   BGL:  - 1117838570 2005.06.03 R02-M1-N0-C:J12-U11 2005-06-03-15.42.50.675872 R02-M1-N0-C:J12-U11 RAS KERNEL INFO <message>
 _LINE_FORMATS = {

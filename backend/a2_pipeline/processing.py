@@ -16,7 +16,7 @@ import pandas as pd
 from features import COLS, Session
 from sources import get_source
 
-# Repository root: src/ lives directly under it.
+# The back-end folder: this folder and models/ live directly under it.
 ROOT = Path(__file__).resolve().parents[1]
 
 META_COLS = ['session_id', 'source', 't_start', 't_end', 'label']

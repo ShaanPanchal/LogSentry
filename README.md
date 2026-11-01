@@ -20,12 +20,11 @@ It is a React front end talking to a FastAPI back end, which runs the model we t
 |---|---|
 | `frontend/` | React app (built with esbuild, served on port 5173) |
 | `backend/` | FastAPI app (port 8000), its tests, the manual upload test kit and the attack scripts |
-| `src/` | The A2 pipeline (parsing, features, training). The back end imports the parsing and feature code from here, so training and prediction process logs in exactly the same way. |
-| `models/` | The trained models (`HDFS_final.joblib`, `BGL_final.joblib`, `*_clusters.joblib`) |
-| `data/` | Prepared datasets, and sample logs in `data/supporting/` |
-| `results/` | A2 evaluation results |
+| `backend/a2_pipeline/` | The parts of the A2 pipeline the back end uses (parsing, features, cluster transform). The back end imports it unchanged, so prediction processes logs exactly as training did. |
+| `backend/models/` | The trained models (`HDFS_final.joblib`, `BGL_final.joblib`, `*_clusters.joblib`) |
+| `data/supporting/` | The two sample logs used in the setup steps and the tests |
 
-The models stay in `models/` and the A2 code in `src/`, rather than inside `backend/`, because the training scripts in `src/` write to `models/` and the back end must use the same feature code the model was trained with (`backend/app/a2.py`). Moving them would mean two copies of the pipeline that could drift apart. The back end finds both through `backend/app/config.py`.
+The back end finds `a2_pipeline/` and `models/` through `backend/app/config.py`, and imports the A2 code through `backend/app/a2.py`.
 
 ## 3. Setup and run
 
@@ -195,8 +194,8 @@ flowchart LR
   R -->|3. free analysis slot?<br/>if not: 503| R
   R -->|4. name, size, content checks| US[upload_safety.py]
   R -->|5. analyse| MS[model_service.py<br/>ModelService]
-  MS -->|parse + features<br/>same code as training| A2[src/processing.py<br/>src/features.py]
-  MS -->|predict_proba| M[(models/*_final.joblib<br/>loaded once at startup)]
+  MS -->|parse + features<br/>same code as training| A2[a2_pipeline/processing.py<br/>a2_pipeline/features.py]
+  MS -->|predict_proba| M[(backend/models/*_final.joblib<br/>loaded once at startup)]
   R -->|6. store result| ST[(store.py<br/>in memory)]
   R -->|7. JSON padded to a uniform size| FE
   FE -->|8. GET /api/analyses/id/sessions/sid| R
@@ -209,7 +208,7 @@ One request, step by step:
 2. **The front end sends `POST /api/analyses`** as multipart form data (`source`, `file`). `BodyLimitMiddleware` refuses a request that is too large before reading it, and CORS lets only our own front end read the reply (`backend/app/main.py`).
 3. **`create_analysis` in `routes.py` asks for one of the analysis slots.** If every slot is busy it answers 503 straight away, instead of queueing work it cannot handle.
 4. **`upload_safety.py` checks the upload.** It checks the file name, saves the file under a name the server generates, enforces the size limit while copying, and checks that the content really is a text log in the chosen format.
-5. **`model_service.py` analyses the log.** It parses the log and builds session features with the same A2 code used in training (`src/processing.py`, `src/features.py`), then scores every session with the model loaded at startup. The uploaded file is then deleted.
+5. **`model_service.py` analyses the log.** It parses the log and builds session features with the same A2 code used in training (`backend/a2_pipeline/processing.py`, `features.py`), then scores every session with the model loaded at startup. The uploaded file is then deleted.
 6. **The result is stored in memory** (`store.py`) under a random ID.
 7. **The back end returns JSON** with the summary and every session's anomaly score. The response is padded so its size doesn't reveal how many sessions were flagged.
 8. **When the user selects a session**, the front end calls `GET /api/analyses/{id}/sessions/{session_id}` and shows that session's details and log lines.

@@ -1,7 +1,7 @@
-"""POST /api/analyses against the existing A2 pipeline (src/predict.py) on the supplied sample logs."""
+"""POST /api/analyses against the existing A2 pipeline (a2_pipeline/predict.py) on the supplied sample logs."""
 import os
 
-import app.a2  # noqa: F401  (first: puts src/ on sys.path and applies the MKL setting before numpy loads)
+import app.a2  # noqa: F401  (first: puts a2_pipeline/ on sys.path and applies the MKL setting before numpy loads)
 import joblib
 import numpy as np
 import pytest

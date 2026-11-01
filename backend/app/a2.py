@@ -1,6 +1,6 @@
-"""The one place that imports the Assignment 2 pipeline from src/.
+"""The one place that imports the Assignment 2 pipeline from backend/a2_pipeline/.
 
-The A2 modules use flat imports (`from features import ...`), so src/ goes on sys.path. src/ keeps only
+The A2 modules use flat imports (`from features import ...`), so a2_pipeline/ goes on sys.path. It keeps only
 the parts of the A2 pipeline used here, unchanged in behaviour; the A2 training code is on the a2-backup
 branch. `mkl_setup` has to be imported before numpy (it is a no-op off Windows/conda).
 """

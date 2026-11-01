@@ -1,6 +1,6 @@
 """Loads the trained A2 models once and scores logs with them.
 
-`analyse` follows src/predict.py step for step (same feature order, same saved threshold, same
+`analyse` follows a2_pipeline/predict.py step for step (same feature order, same saved threshold, same
 cluster assignment); the only difference is that the joblib files are read once at startup instead
 of on every call. No scoring logic is new.
 """
