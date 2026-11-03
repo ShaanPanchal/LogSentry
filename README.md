@@ -290,7 +290,7 @@ We used generative AI tools during this assignment. Every member read, ran and t
 
 **Neeven Emmanuel Thumma:** I used Claude to review the code on our A3 branches against the brief and rubric, to draft this README, and to check its facts (commands, versions, file names and settings) against the repository. I reviewed every section against the code. [Add once done: I followed the setup steps on a fresh clone on my own Mac to confirm they work.] [Add any other AI tool you used.]
 
-**Dominique Tait:** I used Claude to write the Mermaid code for the architecture diagram in Section 5, based on our back-end and front-end code. I rendered it as an image with the Mermaid Live Editor (https://mermaid.live), which is a drawing tool. I checked every box and arrow against the code, so that each step matches what `routes.py`, `upload_safety.py` and `model_service.py` actually do, in the same order.
+**Dominique Tait:** I used Claude to help me understand the rules and structure of an architecture diagram based on our back-end and front-end code. I then created the diagram myself using the Mermaid Live Editor ([https://mermaid.live](https://mermaid.live)), without using its AI features. I checked every box and arrow against the code to ensure that each step accurately represents what `routes.py`, `upload_safety.py` and `model_service.py` actually do, in the correct order.
 
 **Shaan Panchal:** [Shaan to write: which tools, what for, how the output was checked.]
 
