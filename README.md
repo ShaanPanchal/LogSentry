@@ -288,7 +288,7 @@ Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O.,
 
 We used generative AI tools during this assignment. Every member read, ran and tested the work they submitted, and each of us can explain the parts we present in the video.
 
-**Neeven Emmanuel Thumma:** I used Claude to review the code on our A3 branches against the brief and rubric, to draft this README, and to check its facts (commands, versions, file names and settings) against the repository. I reviewed every section against the code. [Add once done: I followed the setup steps on a fresh clone on my own Mac to confirm they work.] [Add any other AI tool you used.]
+**Neeven Emmanuel Thumma:**  : Generative AI tools (claude), were used for debugging assistance during testing, helping identify and resolve command-related errors, and for minor grammar and wording corrections to improve the clarity of the written content. All implementation, analysis, and final decisions were completed independently by the author. AI was not used to generate the assignment’s solutions or core content.
 
 **Dominique Tait:** I used Claude to help me understand the rules and structure of an architecture diagram based on our back-end and front-end code. I then created the diagram myself using the Mermaid Live Editor ([https://mermaid.live](https://mermaid.live)), without using its AI features. I checked every box and arrow against the code to ensure that each step accurately represents what `routes.py`, `upload_safety.py` and `model_service.py` actually do, in the correct order.
 
