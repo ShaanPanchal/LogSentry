@@ -292,7 +292,7 @@ We used generative AI tools during this assignment. Every member read, ran and t
 
 **Dominique Tait:** I used Claude to learn the general rules and conventions for creating architecture diagrams. I then created the diagram myself using the Mermaid Live Editor ([https://mermaid.live](https://mermaid.live)), without using its AI features. I checked every box and arrow against the code to ensure that each step accurately represents what `routes.py`, `upload_safety.py` and `model_service.py` actually do, in the correct order.
 
-**Shaan Panchal:** [Shaan to write: which tools, what for, how the output was checked.]
+**Shaan Panchal:** OpenAI tools (ChatGPT) were used for research purposes to explore relevant concepts and gather general background information related to the assignment. All research was independently reviewed and evaluated by the author. No AI-generated content, solutions, or assignment work were used in the final submission.
 
 ## Appendix A. Reading the upload test kit's output
 
