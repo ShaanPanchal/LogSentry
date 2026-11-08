@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from app.config import REPO_ROOT
 from app.main import app
 
-SAMPLES = {s: REPO_ROOT / 'data' / 'supporting' / f'sample_{s}.log' for s in ('HDFS', 'BGL')}
+SAMPLES = {s: REPO_ROOT / 'sample_logs' / f'sample_{s}.log' for s in ('HDFS', 'BGL')}
 
 
 @pytest.fixture(scope='module')

@@ -12,11 +12,11 @@ It is a React front end (Meta Platforms, n.d.) talking to a FastAPI back end (Fa
 
 - `frontend/`: the React app, built with esbuild and served on port 5173.
 - `backend/app/`: the FastAPI app, served on port 8000.
-- `backend/a2_pipeline/`: the parts of the Assignment 2 pipeline the back end uses (parsing, features, cluster transform), unchanged, so prediction processes logs exactly as training did. The A2 training code is on the `a2-backup` branch.
+- `backend/a2_pipeline/`: the parts of the Assignment 2 pipeline the back end uses (parsing, features, cluster transform), unchanged, so prediction processes logs exactly as training did.
 - `backend/models/`: the trained models.
 - `backend/tests/`: the automated tests.
 - `backend/manual_upload_tests/` and `backend/attacks/`: the scripts that attack a running back end (Sections 8 and 9).
-- `data/supporting/`: the two sample logs used below.
+- `sample_logs/`: the two sample logs used below.
 
 ## 3. Setup and run
 
@@ -24,13 +24,12 @@ Run every command from the repository root unless a step says otherwise. You nee
 
 ### Requirements
 
-- Python **3.12**
+- Python **3.12 or 3.14**
 - Node.js **24** (the exact version is in `frontend/.nvmrc`: 24.21.0)
-- Git
 
 ### Back end (Terminal 1)
 
-Check the Python version first with `python --version` (Windows) or `python3 --version` (Mac/Linux). It must say 3.12, because the pinned packages and the saved models were built for it. If your default Python is a different version, use `py -3.12` on Windows or `python3.12` on Mac/Linux in place of `python` or `python3` in the second command below.
+Check the Python version first with `python --version` (Windows) or `python3 --version` (Mac/Linux). It must say 3.12 or 3.14, the versions the pinned packages and saved models have been tested on. If your default Python is a different version, use `py -3.12` on Windows or `python3.12` on Mac/Linux in place of `python` or `python3` in the second command below.
 
 Windows:
 ```
@@ -58,7 +57,9 @@ npm ci
 npm start
 ```
 
-Open **http://localhost:5173**, choose source **HDFS** and upload `data/supporting/sample_HDFS.log`. Within a few seconds you should see the summary (200 sessions, 40 flagged), the score histogram, the session timeline and the session table. Click any session to see its log lines.
+`npm ci` may print an `install-scripts` warning about `esbuild@0.28.2`. It is safe to ignore: esbuild's platform binary is installed as a separate package, and the app builds and runs without that script.
+
+Open **http://localhost:5173**, choose source **HDFS** and upload `sample_logs/sample_HDFS.log`. Within a few seconds you should see the summary (200 sessions, 40 flagged), the score histogram, the session timeline and the session table. Click any session to see its log lines.
 
 > **Use `localhost`, not `127.0.0.1`, for the front end.** The back end's CORS setting allows only `http://localhost:5173`. If you open `http://127.0.0.1:5173`, the browser blocks every request to the API.
 
@@ -91,6 +92,8 @@ cd frontend
 npm test
 ```
 
+To check the security defences next, see Sections 8 and 9. Each one has a script to run against the running back end.
+
 ### Settings
 
 All settings are optional environment variables, read in `backend/app/config.py`. The app has no passwords, API keys or other secrets.
@@ -100,9 +103,43 @@ All settings are optional environment variables, read in `backend/app/config.py`
 - `LOGSENTRY_MAX_CONCURRENT_ANALYSES` (default 2): how many analyses can run at once. Any more get an immediate 503.
 - `LOGSENTRY_UNIFORM_SIZE` (default 1, on): pads responses so their size doesn't reveal the result. Set it to 0 only to measure the attack in Section 9.
 
+### Turning a defence off and on
+
+Every defence is **on by default**. Two of them can be switched off so you can measure the attack in Sections 8.2 and 9. The upload checks in Section 8.1 cannot be switched off.
+
+| Defence | Section | Variable to turn it off |
+|---|---|---|
+| Concurrency cap (DoS) | 8.2 | `LOGSENTRY_MAX_CONCURRENT_ANALYSES=1000` |
+| Response padding (size side channel) | 9 | `LOGSENTRY_UNIFORM_SIZE=0` |
+
+The variable only affects a back end started in the same terminal after you set it. Stop the back end with **Ctrl+C** first, then run these in the `backend` folder.
+
+**Turn a defence off**, then start the back end:
+
+| Terminal | Command (DoS example; swap in the other variable for Section 9) |
+|---|---|
+| PowerShell | `$env:LOGSENTRY_MAX_CONCURRENT_ANALYSES=1000` |
+| Command Prompt (cmd) | `set LOGSENTRY_MAX_CONCURRENT_ANALYSES=1000` |
+| Mac/Linux | `export LOGSENTRY_MAX_CONCURRENT_ANALYSES=1000` |
+
+```
+.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 8000      (Windows)
+.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000          (Mac/Linux)
+```
+
+**Turn it back on**: stop the back end with Ctrl+C, clear the variable, then start the back end again with the same command:
+
+| Terminal | Command |
+|---|---|
+| PowerShell | `Remove-Item Env:LOGSENTRY_MAX_CONCURRENT_ANALYSES` |
+| Command Prompt (cmd) | `set LOGSENTRY_MAX_CONCURRENT_ANALYSES=` |
+| Mac/Linux | `unset LOGSENTRY_MAX_CONCURRENT_ANALYSES` |
+
+Closing the terminal also clears the variable, so a new terminal always starts with every defence on.
+
 ## 4. Pinned dependencies
 
-Back end (`backend/requirements.txt`, Python 3.12): fastapi 0.143.0, starlette 1.7.0, pydantic 2.14.1, uvicorn 0.46.0, python-multipart 0.0.31, numpy 2.5.3, pandas 3.0.6, scikit-learn 1.9.1, scipy 1.18.1, joblib 1.6.0.
+Back end (`backend/requirements.txt`, Python 3.12 or 3.14): fastapi 0.143.0, starlette 1.7.0, pydantic 2.14.1, uvicorn 0.46.0, python-multipart 0.0.31, numpy 2.5.3, pandas 3.0.6, scikit-learn 1.9.1, scipy 1.18.1, joblib 1.6.0.
 
 The tests also need pytest 8.4.2 and httpx 0.28.1 (`backend/requirements-dev.txt`). scikit-learn must stay at 1.9.1, because the saved models are pickles created with that version.
 
@@ -197,7 +234,7 @@ backend/.venv/bin/python backend/manual_upload_tests/run_upload_tests.py        
 A single attack can also be sent by hand (on Windows PowerShell, type `curl.exe`, because `curl` there is a different command):
 
 ```
-curl -F source=HDFS -F "file=@data/supporting/sample_HDFS.log;filename=../evil.log" http://127.0.0.1:8000/api/analyses
+curl -F source=HDFS -F "file=@sample_logs/sample_HDFS.log;filename=../evil.log" http://127.0.0.1:8000/api/analyses
 ```
 
 It is refused with `{"error":"bad_request","detail":"The file name must be a plain file name, not a path."}`.
@@ -215,14 +252,13 @@ It is refused with `{"error":"bad_request","detail":"The file name must be a pla
 - **Without the defence** (`LOGSENTRY_MAX_CONCURRENT_ANALYSES=1000`): all 12 uploads accepted (201). The flood took 9.6 s, and GET requests slowed to a median of 150 ms and a maximum of 1402 ms.
 - **With the defence** (cap of 2): 2 accepted (201) and 10 refused (503). The flood took 1.6 s, and GET requests stayed at a median of 26 ms and a maximum of 432 ms.
 
-To run it, start the back end with the defence off, run the script, then restart the back end without the variable and run it again. Windows (PowerShell), in the back-end terminal:
-```
-$env:LOGSENTRY_MAX_CONCURRENT_ANALYSES=1000
-.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
-After stopping it, turn the defence back on with `Remove-Item Env:LOGSENTRY_MAX_CONCURRENT_ANALYSES`. On Mac/Linux, put `LOGSENTRY_MAX_CONCURRENT_ANALYSES=1000` in front of the start command for the "without" run only.
+To run it:
+1. Turn the defence **off** (`LOGSENTRY_MAX_CONCURRENT_ANALYSES=1000`) and start the back end. The exact commands for each terminal are in "Turning a defence off and on" in Section 3.
+2. Run the script below.
+3. Turn the defence back **on** and restart the back end.
+4. Run the script again.
 
-Then, from the repository root:
+The script, from the repository root:
 ```
 backend\.venv\Scripts\python backend\attacks\dos_demo.py --flood 12      (Windows)
 backend/.venv/bin/python backend/attacks/dos_demo.py --flood 12          (Mac/Linux)
@@ -241,12 +277,12 @@ backend/.venv/bin/python backend/attacks/dos_demo.py --flood 12          (Mac/Li
 - **Before** (`LOGSENTRY_UNIFORM_SIZE=0`): a normal log's response was 3362 bytes and a flagged log's was 3356 bytes. The attack was right 100% of the time.
 - **After** (default): both were 7168 bytes. The attack was right 50% of the time, which is guessing.
 
-To run it, start the back end with `LOGSENTRY_UNIFORM_SIZE=0` set (in the same way as in Section 8.2), then from the repository root:
+To run it, turn the defence **off** (`LOGSENTRY_UNIFORM_SIZE=0`) and start the back end. The exact commands for each terminal are in "Turning a defence off and on" in Section 3. Then, from the repository root:
 ```
 backend\.venv\Scripts\python backend\attacks\size_attack.py --label before      (Windows)
 backend/.venv/bin/python backend/attacks/size_attack.py --label before          (Mac/Linux)
 ```
-Restart the back end without the variable and run it again with `--label after`. Each run adds its result to `size_results.json`.
+Turn the defence back **on**, restart the back end, and run it again with `--label after`. Each run adds its result to `size_results.json`.
 
 **Cost:** analysis responses are about twice as large (7168 instead of 3362 bytes here), and session details carry up to about 2 KB of padding. Compression (gzip) must stay off, because compressed sizes would differ again.
 

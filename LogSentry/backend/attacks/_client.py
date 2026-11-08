@@ -9,7 +9,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SAMPLE_HDFS = REPO_ROOT / 'data' / 'supporting' / 'sample_HDFS.log'
+SAMPLE_HDFS = REPO_ROOT / 'sample_logs' / 'sample_HDFS.log'
 
 
 def request(base_url, method, path, body=b'', headers=None, timeout=120):
