@@ -296,13 +296,15 @@ Turn the defence back **on**, restart the back end, and run it again with `--lab
 - When the server is busy, the concurrency cap also turns real users away with a 503. They have to wait a few seconds and retry.
 - Python's multipart parser removes Windows-style paths such as `C:\Windows\evil.log` before our code sees them, so these names arrive as `evil.log` and are accepted. This is harmless, because the name is never used as a path. Details are in Appendix A.
 - We have no defence of our own against request-rate abuse, vulnerable dependencies or a tampered model file. The concurrency cap limits how much work runs at once, but it does not limit how often one client can send requests. The models are not checked against a hash when the server starts.
+- The **Try it out** button for `POST /api/analyses` on the `/docs` page does not work. The endpoint takes the whole form as one Pydantic model (`AnalysisForm`), and FastAPI describes that in `/openapi.json` as a plain text form (`application/x-www-form-urlencoded`) instead of a file upload (`multipart/form-data`). The browser sends the file but labels it as plain text, so the server cannot find `source` or `file` and returns a 422. Only this button is affected. The website (`api.js` sends `FormData`), `curl -F` and the automated tests all send a correct multipart request and work. To test the endpoint by hand, use the curl example in its description: `curl -F source=HDFS -F file=@sample_HDFS.log http://127.0.0.1:8000/api/analyses`.
 
 Next, we would:
 - add a database for saved results, with a limit on how long they are kept;
 - add user accounts so each analysis belongs to its owner;
 - add rate limiting per client;
 - check the model files against a known hash at startup;
-- scan dependencies with `pip-audit` and `npm audit` as part of every build.
+- scan dependencies with `pip-audit` and `npm audit` as part of every build;
+- declare the form as `Form(media_type='multipart/form-data')` in `routes.py`, so that `/docs` describes the upload correctly and Try it out works.
 
 ## 11. References
 
